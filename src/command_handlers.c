@@ -9,6 +9,7 @@
 #include "server.h"
 #include "account.h"
 #include "constants.h"
+#include "function_stack.h"
 
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 #define UNUSED(x) (void)(x)
