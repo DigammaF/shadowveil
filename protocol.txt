@@ -1,0 +1,15 @@
+
+server
+	SET-PROMPT <word>
+	SET-CONTEXT <int>
+	!AWAITING-COMMAND
+	OUTPUT <word>+
+	ERROR <word>+
+
+client
+	!COMMAND <word>+
+		- initial
+		LOGIN <name> <password>
+		REGISTER <name> <password>
+	END
+	KEEP-ALIVE
