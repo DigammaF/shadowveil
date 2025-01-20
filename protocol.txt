@@ -1,8 +1,6 @@
 
 server
-	SET-PROMPT <word>
 	SET-CONTEXT <int>
-	!AWAITING-COMMAND
 	OUTPUT <word>+
 	ERROR <word>+
 

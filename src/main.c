@@ -13,7 +13,7 @@
 void setupServer(server_t* server) {
 	account_t* account = malloc(sizeof(account_t));
 	CHECKM(account, "account");
-	createAccount(server, account, "admin", "admin\n", ADMIN);
+	createAccount(server, account, "admin", "admin\n", ADMIN_FLAG);
 }
 
 int mainServer(int argc, const char* argv[]) {
@@ -59,7 +59,7 @@ int mainServer(int argc, const char* argv[]) {
 
 void getInput(char* input) {
 	printf(": ");
-	fgets(input, sizeof(input), stdin);
+	scanf("%s", input);
 	size_t len = strlen(input);
 	if (len > 0 && input[len - 1] == '\n') {
 		input[len - 1] = '\0';
@@ -71,14 +71,15 @@ int mainClient(int argc, const char* argv[]) {
 	connectServer(&socket, "127.0.0.1", SERVER_PORT);
 
 	while (1) {
-		char input[1024];
-		getInput(input);
-		printf(">>> '%s'\n", input);
-		sendData(&socket, input);
+		sendData(&socket, "COMMAND");
 		char data[1024];
 		size_t length = 1024;
-		recvData(&socket, data, length);
-		printf("<<< '%s'\n", data);
+
+		do {
+			memset(data, 0, sizeof(data));
+			recvData(&socket, data, length);
+			printf("<<< '%s'\n", data);
+		} while (1);
 	}
 }
 

@@ -27,21 +27,21 @@ void* initialHandler(void* arg) {
 				account_t* account = server->accounts[n];
 				if (strcmp(account->name, context->args[2]) == 0) {
 					if (strcmp(account->password, context->args[3]) == 0) {
-						if (account->flags | BANNED) {
+						if (account->flags | BANNED_FLAG) {
 							printf("\t[banni]\n");
-							sendData(user->socket, "OUTPUT ce compte est banni");
-							sendData(user->socket, "AWAITING-COMMAND");
+							sendData(user->socket, "OUTPUT ce compte est banni\0");
+							sendData(user->socket, "AWAITING-COMMAND\0");
 							return NULL;
 						}
 
-						if (account->flags | ADMIN) {
+						if (account->flags | ADMIN_FLAG) {
 							printf("\t[admin]\n");
 							popFunction(&user->commandHandlers);
 							pushFunction(&user->commandHandlers, adminHandler);
 							char message[255];
-							sprintf(message, "SET-CONTEXT %i", ADMIN_CONTEXT);
+							sprintf(message, "SET-CONTEXT %i\0", GAMEWORLD);
 							sendData(user->socket, message);
-							sendData(user->socket, "AWAITING-COMMAND");
+							sendData(user->socket, "AWAITING-COMMAND\0");
 							return NULL;
 						}
 
@@ -50,22 +50,22 @@ void* initialHandler(void* arg) {
 						pushFunction(&user->commandHandlers, gameworldHandler);
 						user->account = account;
 						char message[255];
-						sprintf(message, "SET-CONTEXT %i", GAMEWORLD_CONTEXT);
+						sprintf(message, "SET-CONTEXT %i\0", GAMEWORLD);
 						sendData(user->socket, message);
-						sendData(user->socket, "AWAITING-COMMAND");
+						sendData(user->socket, "AWAITING-COMMAND\0");
 						return NULL;
 					} else {
 						printf("\t[mot de passe incorrect]\n");
-						sendData(user->socket, "OUTPUT mauvais mot de passe");
-						sendData(user->socket, "AWAITING-COMMAND");
+						sendData(user->socket, "OUTPUT mauvais mot de passe\0");
+						sendData(user->socket, "AWAITING-COMMAND\0");
 						return NULL;
 					}
 				}
 			}
 
 			printf("\t[introuvable]\n");
-			sendData(user->socket, "OUTPUT ce compte n'existe pas");
-			sendData(user->socket, "AWAITING-COMMAND");
+			sendData(user->socket, "OUTPUT ce compte n'existe pas\0");
+			sendData(user->socket, "AWAITING-COMMAND\0");
 			return NULL;
 		}
 
@@ -77,8 +77,8 @@ void* initialHandler(void* arg) {
 
 				if (strcmp(account->name, context->args[2]) == 0) {
 					printf("\t[existe déjà]\n");
-					sendData(user->socket, "OUTPUT ce compte existe déjà");
-					sendData(user->socket, "AWAITING-COMMAND");
+					sendData(user->socket, "OUTPUT ce compte existe déjà\0");
+					sendData(user->socket, "AWAITING-COMMAND\0");
 					return NULL;
 				}
 			}
@@ -93,14 +93,14 @@ void* initialHandler(void* arg) {
 				popFunction(&user->commandHandlers);
 				pushFunction(&user->commandHandlers, gameworldHandler);
 				char message[255];
-				sprintf(message, "SET-CONTEXT %i", GAMEWORLD_CONTEXT);
+				sprintf(message, "SET-CONTEXT %i\0", GAMEWORLD);
 				sendData(user->socket, message);
-				sendData(user->socket, "AWAITING-COMMAND");
+				sendData(user->socket, "AWAITING-COMMAND\0");
 				return NULL;
 			} else {
 				printf("\t[impossible]\n");
-				sendData(user->socket, "ERROR impossible de créer le compte");
-				sendData(user->socket, "AWAITING-COMMAND");
+				sendData(user->socket, "ERROR impossible de créer le compte\0");
+				sendData(user->socket, "AWAITING-COMMAND\0");
 				return NULL;
 			}
 		}
@@ -108,19 +108,19 @@ void* initialHandler(void* arg) {
 		char message[255];
 		sprintf(
 			message,
-			"ERROR argument invalide '%s' (attendu: LOGIN|REGISTER)", context->args[1]
+			"ERROR argument invalide '%s' (attendu: LOGIN|REGISTER)\0", context->args[1]
 		);
 		sendData(user->socket, message);
-		sendData(user->socket, "AWAITING-COMMAND");
+		sendData(user->socket, "AWAITING-COMMAND\0");
 		return NULL;
 	} else {
 		char message[255];
 		sprintf(
 			message,
-			"ERROR mauvais nombre d'arguments: %i (attendu: 4)", context->count
+			"ERROR mauvais nombre d'arguments: %i (attendu: 4)\0", context->count
 		);
 		sendData(user->socket, message);
-		sendData(user->socket, "AWAITING-COMMAND");
+		sendData(user->socket, "AWAITING-COMMAND\0");
 		return NULL;
 	}
 }
@@ -129,9 +129,9 @@ void* gameworldHandler(void* arg) {
 	commandContext_t* context = (commandContext_t*)arg;
 	user_t* user = context->user;
 	char message[255];
-	sprintf(message, "OUTPUT '%s'", context->args[1]);
+	sprintf(message, "OUTPUT '%s'\0", context->args[1]);
 	sendData(user->socket, message);
-	sendData(user->socket, "AWAITING-COMMAND");
+	sendData(user->socket, "AWAITING-COMMAND\0");
 	return NULL;
 }
 

@@ -2,8 +2,8 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
-#define ADMIN (1 << 0)
-#define BANNED (1 << 1)
+#define ADMIN_FLAG (1 << 0)
+#define BANNED_FLAG (1 << 1)
 
 typedef struct {
 	char* name;

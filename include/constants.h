@@ -1,7 +1,6 @@
 
 #define SERVER_PORT 58420
 
-#define INITIAL_CONTEXT 0
-#define ADMIN_CONTEXT 1
-#define GAMEWORLD_CONTEXT 2
-#define COMBAT_CONTEXT 3
+typedef enum {
+    INITIAL, ADMIN, GAMEWORLD, COMBAT
+} context_t;
