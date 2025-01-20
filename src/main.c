@@ -3,6 +3,9 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <sys/select.h>
 
 #include "server.h"
 #include "constants.h"
@@ -25,31 +28,26 @@ int mainServer(int argc, const char* argv[]) {
 	printf("(+) serveur prêt\n");
 
 	while (server.running) {
+		struct timeval timeout = { 0, 500 };
+		fd_set readDescriptors;
+		FD_ZERO(&readDescriptors);
+		FD_SET(server.socket.fileDescriptor, &readDescriptors);
+		int maxFileDescriptor = server.socket.fileDescriptor;
 
-		printf("(...) en attente d'utilisateur\n");
-		socket_t* clientSocket = malloc(sizeof(socket_t));
-		CHECKM(clientSocket, "clientSocket");
-		acceptRemote(&server.socket, clientSocket);
-
-		pthread_mutex_lock(&server.mutex);
-		printf("(+) nouveau client connecté\n");
-		user_t* user = malloc(sizeof(user_t));
-		CHECKM(user, "user");
-		initUser(user);
-		printf("(+) création d'un utilisateur\n");
-
-		if (createUser(&server, user, clientSocket)) {
-			server.users[user->address] = user;
-			printf("(+) nouveau utilisateur créé\n");
-		} else {
-			dropUser(user);
-			closeSocket(clientSocket);
-			free(user);
-			free(clientSocket);
-			printf("(-) abandon de service\n");
+		for (unsigned n = 0; n < MAX_USERS; n++) {
+			if (server.users[n] == NULL) { continue; }
+			user_t* user = server.users[n];
+			FD_SET(user->socket->fileDescriptor, &readDescriptors);
+			if (user->socket->fileDescriptor > maxFileDescriptor) {
+				maxFileDescriptor = user->socket->fileDescriptor;
+			}
 		}
 
-		pthread_mutex_unlock(&server.mutex);
+		int count = select(
+			maxFileDescriptor + 1,
+			&readDescriptors,
+			NULL, NULL, &timeout
+		);
 	}
 
 	closeSocket(&server.socket);
