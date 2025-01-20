@@ -1,5 +1,4 @@
 
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <netinet/in.h>
@@ -19,7 +18,6 @@
 void initServer(server_t* server) {
 	initStack(&server->freeUsers);
 	initStack(&server->freeAccounts);
-	pthread_mutex_init(&server->mutex, NULL);
 
 	for (unsigned n = 0; n < MAX_USERS; n++) {
 		server->users[n] = NULL;
@@ -46,7 +44,6 @@ void dropServer(server_t* server) {
 		}
 	}
 
-	pthread_mutex_destroy(&server->mutex);
 	dropStack(&server->freeUsers);
 	dropStack(&server->freeAccounts);
 }
@@ -61,22 +58,13 @@ int createUser(server_t* server, user_t* user, socket_t* socket) {
 	user->socket = socket;
 	user->lastActivity = time(NULL);
 	user->address = pop(&server->freeUsers);
-	user->thread = malloc(sizeof(pthread_t));
-	CHECKM(user->thread, "user->thread");
 	pushFunction(&user->commandHandlers, initialHandler);
-	userContext_t* context = malloc(sizeof(userContext_t));
-	CHECKM(context, "context");
-	context->user = user;
-	context->server = server;
-	pthread_create(user->thread, NULL, handleUser, (void*)context);
 	return 1;
 }
 
 void deleteUser(server_t* server, user_t* user) {
 	server->users[user->address] = NULL;
 	push(&server->freeUsers, user->address);
-	pthread_cancel(*user->thread);
-	free(user->thread);
 }
 
 int createAccount(
@@ -100,74 +88,102 @@ void deleteAccount(server_t* server, account_t* account) {
 	server->accounts[account->address] = NULL;
 }
 
-void* handleUser(void* arg) {
-	printf("(+) démarrage du gestionnaire de client\n");
-	userContext_t* context = (userContext_t*)arg;
-	user_t* user = context->user;
-	server_t* server = context->server;
-	free(context);
+void handleNewConnection(server_t* server) {
+	printf("(+) accepting client\n");
+	socket_t* socket = malloc(sizeof(socket_t));
+	CHECKM(socket, "malloc socket");
+	acceptRemote(&server->socket, socket);
+	user_t* user = malloc(sizeof(user_t));
+	CHECKM(user, "malloc user");
+	initUser(user);
+	user->socket = socket;
+	if (createUser(server, user, socket)) {
+		printf("(+) created new user\n");
+	} else {
+		printf("(!) unable to create new user\n");
+		closeSocket(socket);
+	}
+}
 
-	while (user->running) {
-		char data[1024];
-		recvData(user->socket, data, 1024);
-		int argCount;
-		char** args = splitString(data, &argCount);
-
-		pthread_mutex_lock(&server->mutex);
-
-		if (!functionStackEmpty(&user->commandHandlers)) {
-			if (argCount > 0) {
-				int processed = 0;
-
-				if (strcmp(args[0], "COMMAND") == 0) {
-					processed = 1;
-					commandContext_t* commandContext = malloc(sizeof(commandContext_t));
-					CHECKM(commandContext, "commandContext");
-					commandContext->args = args;
-					commandContext->count = argCount;
-					commandContext->user = user;
-					commandContext->server = server;
-					function_t commandHandler = peekFunction(&user->commandHandlers);
-					commandHandler((void*)commandContext);
-					free(commandContext);
-					user->lastActivity = time(NULL);
-
-					if (functionStackEmpty(&user->commandHandlers)) { user->running = 0; }
-				}
-
-				if (strcmp(args[0], "END") == 0) {
-					processed = 1;
-					user->running = 0;
-				}
-
-				if (strcmp(args[0], "KEEP-ALIVE") == 0) {
-					processed = 1;
-				}
-
-				if (!processed) {
-					char message[255];
-					sprintf(
-						message,
-						"ERROR argument invalide '%s' (attendu: COMMAND|END|KEEP-ALIVE)",
-						args[0]
-					);
-					sendData(user->socket, message);
-					sendData(user->socket, "AWAITING-COMMAND");
-				}
-			} else {
-				sendData(user->socket, "ERROR pas de contenu");
-				sendData(user->socket, "AWAITING-COMMAND");
-			}
-		} else {
-			printf("(!) un utilisateur envoie une commande sans contexte\n");
-		}
-
-		freeSplit(args, argCount);
-		pthread_mutex_unlock(&server->mutex);
+void handleUserCommand(server_t* server, user_t* user, char**args, int argCount) {
+	if (functionStackEmpty(&user->commandHandlers)) {
+		printf("(!) user has no command handler\n");
+		return;
 	}
 
+	commandContext_t* commandContext = malloc(sizeof(commandContext_t));
+	CHECKM(commandContext, "malloc commandContext");
+	commandContext->args = args;
+	commandContext->count = argCount;
+	commandContext->user = user;
+	commandContext->server = server;
+	function_t commandHandler = peekFunction(&user->commandHandlers);
+	commandHandler((void*)commandContext);
+	free(commandContext);
+	user->lastActivity = time(NULL);
+	if (functionStackEmpty(&user->commandHandlers)) { user->running = 0; }
+}
+
+void handleUserEnd(user_t* user) {
 	closeSocket(user->socket);
-	deleteUser(server, user);
-	dropUser(user);
-	return NULL;
+	user->running = 0;
+}
+
+void handleUserKeepAlive(user_t* user) {
+	user->lastActivity = time(NULL);
+}
+
+void handleUserRequest(server_t* server, user_t* user) {
+	char data[1024];
+	recvData(user->socket, data, 1024);
+	int argCount;
+	char** args = splitString(data, &argCount);
+
+	if (argCount <= 0) {
+		printf("(!) user sent no data\n");
+		return;
+	}
+
+	int processed = 0;
+
+	if (strcmp(args[0], "COMMAND") == 0) {
+		processed = 1;
+		handleUserCommand(server, user, args, argCount);
+	}
+
+	if (strcmp(args[0], "END") == 0) {
+		processed = 1;
+		handleUserEnd(user);
+	}
+
+	if (strcmp(args[0], "KEEP-ALIVE") == 0) {
+		processed = 1;
+		handleUserKeepAlive(user);
+	}
+
+	if (!processed) {
+		char message[255];
+		sprintf(
+			message,
+			"ERROR argument invalide '%s' (attendu: COMMAND|END|KEEP-ALIVE)",
+			args[0]
+		);
+		sendData(user->socket, message);
+	}
+
+	freeSplit(args, argCount);
+}
+
+void update(server_t* server) {
+	for (unsigned n = 0; n < MAX_USERS; n++) {
+		if (server->users[n] == NULL) { continue; }
+		updateUser(server, server->users[n]);
+	}
+}
+
+void updateUser(server_t* server, user_t* user) {
+	if (!user->running) {
+		deleteUser(server, user);
+		dropUser(user);
+	}
 }

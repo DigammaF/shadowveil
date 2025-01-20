@@ -19,35 +19,53 @@ void setupServer(server_t* server) {
 	createAccount(server, account, "admin", "admin\n", ADMIN_FLAG);
 }
 
+void setupFileDescriptorsSet(
+	server_t* server, fd_set* fileDescriptorSet, int* maxFileDescriptor
+) {
+	FD_ZERO(&fileDescriptorSet);
+	FD_SET(server->socket.fileDescriptor, fileDescriptorSet);
+	*maxFileDescriptor = server->socket.fileDescriptor;
+
+	for (unsigned n = 0; n < MAX_USERS; n++) {
+		if (server->users[n] == NULL) { continue; }
+		user_t* user = server->users[n];
+		FD_SET(user->socket->fileDescriptor, fileDescriptorSet);
+		if (user->socket->fileDescriptor > *maxFileDescriptor) {
+			*maxFileDescriptor = user->socket->fileDescriptor;
+		}
+	}
+}
+
+void handleSockets(server_t* server, fd_set* fileDescriptorSet) {
+	if (FD_ISSET(server->socket.fileDescriptor, fileDescriptorSet)) {
+		handleNewConnection(&server);
+	}
+
+	for (unsigned n = 0; n < MAX_USERS; n++) {
+		if (server->users[n] == NULL) { continue; }
+		user_t* user = server->users[n];
+		if (FD_ISSET(user->socket->fileDescriptor, fileDescriptorSet)) {
+			handleUserRequest(&server, user);
+		}
+	}
+}
+
 int mainServer(int argc, const char* argv[]) {
 	server_t server;
 	initServer(&server);
 	setupServer(&server);
 	server.running = 1;
 	serverSTREAM(&server.socket, "127.0.0.1", SERVER_PORT, 5);
-	printf("(+) serveur prêt\n");
+	printf("(+) server ready\n");
 
 	while (server.running) {
+		update(&server);
 		struct timeval timeout = { 0, 500 };
-		fd_set readDescriptors;
-		FD_ZERO(&readDescriptors);
-		FD_SET(server.socket.fileDescriptor, &readDescriptors);
-		int maxFileDescriptor = server.socket.fileDescriptor;
-
-		for (unsigned n = 0; n < MAX_USERS; n++) {
-			if (server.users[n] == NULL) { continue; }
-			user_t* user = server.users[n];
-			FD_SET(user->socket->fileDescriptor, &readDescriptors);
-			if (user->socket->fileDescriptor > maxFileDescriptor) {
-				maxFileDescriptor = user->socket->fileDescriptor;
-			}
-		}
-
-		int count = select(
-			maxFileDescriptor + 1,
-			&readDescriptors,
-			NULL, NULL, &timeout
-		);
+		fd_set fileDescriptorSet;
+		int maxFileDescriptor;
+		setupFileDescriptorsSet(&server, &fileDescriptorSet, &maxFileDescriptor);
+		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
+		handleSockets(&server, &fileDescriptorSet);
 	}
 
 	closeSocket(&server.socket);
@@ -82,13 +100,8 @@ int mainClient(int argc, const char* argv[]) {
 }
 
 int main(int argc, const char* argv[]) {
-	if (strcmp(argv[1], "server") == 0) {
-		mainServer(argc, argv);
-	}
-
-	if (strcmp(argv[1], "client") == 0) {
-		mainClient(argc, argv);
-	}
+	if (strcmp(argv[1], "server") == 0) { mainServer(argc, argv); }
+	if (strcmp(argv[1], "client") == 0) { mainClient(argc, argv); }
 
 	return 0;
 }

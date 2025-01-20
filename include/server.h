@@ -11,7 +11,6 @@
 #define MAX_ACCOUNTS 1024
 
 typedef struct {
-	pthread_mutex_t mutex;
 	int running;
 	socket_t socket;
 	user_t* users[MAX_USERS];
@@ -27,12 +26,8 @@ typedef struct {
 	unsigned count;
 } commandContext_t;
 
-typedef struct {
-	server_t* server;
-	user_t* user;
-} userContext_t;
-
-void* handleUser(void* arg);
+void handleNewConnection(server_t* server);
+void handleUserRequest(server_t* server, user_t* user);
 
 void initServer(server_t* server);
 void dropServer(server_t* server);
@@ -42,5 +37,8 @@ void deleteUser(server_t* server, user_t* user);
 
 int createAccount(server_t* server, account_t* account, char* name, char* password, unsigned flags);
 void deleteAccount(server_t* server, account_t* account);
+
+void update(server_t* server);
+void updateUser(server_t* server, user_t* user);
 
 #endif

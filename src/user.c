@@ -5,7 +5,6 @@
 void initUser(user_t* user) {
 	user->socket = NULL;
 	user->account = NULL;
-	user->thread = NULL;
 	initFunctionStack(&user->commandHandlers);
 }
 
