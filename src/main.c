@@ -22,7 +22,7 @@ void setupServer(server_t* server) {
 void setupFileDescriptorsSet(
 	server_t* server, fd_set* fileDescriptorSet, int* maxFileDescriptor
 ) {
-	FD_ZERO(&fileDescriptorSet);
+	FD_ZERO(fileDescriptorSet);
 	FD_SET(server->socket.fileDescriptor, fileDescriptorSet);
 	*maxFileDescriptor = server->socket.fileDescriptor;
 
@@ -38,19 +38,20 @@ void setupFileDescriptorsSet(
 
 void handleSockets(server_t* server, fd_set* fileDescriptorSet) {
 	if (FD_ISSET(server->socket.fileDescriptor, fileDescriptorSet)) {
-		handleNewConnection(&server);
+		handleNewConnection(server);
 	}
 
 	for (unsigned n = 0; n < MAX_USERS; n++) {
 		if (server->users[n] == NULL) { continue; }
 		user_t* user = server->users[n];
 		if (FD_ISSET(user->socket->fileDescriptor, fileDescriptorSet)) {
-			handleUserRequest(&server, user);
+			handleUserRequest(server, user);
 		}
 	}
 }
 
 int mainServer(int argc, const char* argv[]) {
+	UNUSED(argc); UNUSED(argv);
 	server_t server;
 	initServer(&server);
 	setupServer(&server);
@@ -83,6 +84,7 @@ void getInput(char* input) {
 }
 
 int mainClient(int argc, const char* argv[]) {
+	UNUSED(argc); UNUSED(argv);
 	socket_t socket;
 	connectServer(&socket, "127.0.0.1", SERVER_PORT);
 
