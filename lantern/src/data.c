@@ -18,24 +18,21 @@
  * 	\brief		Envoie des données à .remote
  *  \param		socket: la socket à utiliser
  *  \param		data: chaîne de charactères terminée par un zéro
- * 	\result		nombre d'octets envoyés et indicateur de réussite POSIX
+ * 	\result		nombre d'octets envoyés
  * 
  */
 int sendData(socket_t* socket, const char* data) {
-	if (socket->mode == SOCK_STREAM) {
-		ssize_t bytesSent = send(socket->fileDescriptor, data, strlen(data) + 1, 0);
-		if (bytesSent < 0) { return -1; }
-		return (int)bytesSent;
-	} else if (socket->mode == SOCK_DGRAM) {
-		ssize_t bytesSent = sendto(socket->fileDescriptor, data, strlen(data) + 1, 0,
-			(struct sockaddr*)&(socket->remote), sizeof(socket->remote)
-		);
-		if (bytesSent < 0) { return -1; }
-		return (int)bytesSent;
-	} else {
-		errno = EPFNOSUPPORT;
-		return -1;
-	}
+	ssize_t bytesSent = send(socket->fileDescriptor, data, strlen(data) + 1, 0);
+	if (bytesSent < 0) { return -1; }
+	return (int)bytesSent;
+}
+
+int sendDGRAM(socket_t* socket, const char* address, const short port, const char* data) {
+	ssize_t bytesSent = sendto(socket->fileDescriptor, data, strlen(data) + 1, 0,
+		(struct sockaddr*)&(socket->remote), sizeof(socket->remote)
+	);
+	if (bytesSent < 0) { return -1; }
+	return (int)bytesSent;
 }
 
 /**
@@ -45,7 +42,7 @@ int sendData(socket_t* socket, const char* data) {
  *  \param		socket: la socket à utiliser
  *  \param		data: chaîne de charactères terminée par un zéro
  *  \param		maxDataLength: la longueur maximale des données reçues
- * 	\result		nombre d'octets recus et indicateur de réussite POSIX
+ * 	\result		nombre d'octets recus
  * 
  */
 int recvData(socket_t* socket, char* data, size_t maxDataLength) {

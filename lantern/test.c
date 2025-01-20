@@ -11,15 +11,17 @@
 
 int main() {
 	socket_t socket;
-	CHECK(createSocket(SOCK_STREAM, &socket), "createSocket");
-	CHECK(bindLocal(&socket, "127.0.0.1", 20000), "bindLocal");
-	CHECK(listenSocket(&socket, 3), "listenSocket");
 	socket_t clientSocket;
-	CHECK(acceptRemote(&socket, &clientSocket), "acceptRemote");
-	char buffer[1024];
-	CHECK(recvData(&clientSocket, (char*)&buffer, 1024), "recvData");
-	printf("'%s'\n", buffer);
-	CHECK(sendData(&clientSocket, "UwU\0"), "sendData");
-	CHECK(closeSocket(&clientSocket), "closeSocket(&clientSocket)");
-	CHECK(closeSocket(&socket), "closeSocket(&socket)");
+	serverSTREAM(&socket, "127.0.0.1", 20000, 5);
+
+	while (1) {
+		acceptRemote(&socket, &clientSocket);
+		char buffer[1024];
+		recvData(&clientSocket, (char*)&buffer, 1024);
+		printf("'%s'\n", buffer);
+		sendData(&clientSocket, "back\0");
+		closeSocket(&clientSocket);
+	}
+
+	closeSocket(&socket);
 }

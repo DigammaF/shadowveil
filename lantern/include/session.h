@@ -8,12 +8,16 @@
 
 #include "socket_t.h"
 
-int createSocket(const int mode, socket_t* socketObject);
-int closeSocket(socket_t* socket);
-int bindLocal(socket_t* socket, const char* address, const short port);
-int listenSocket(socket_t* socket, const int maxClientCount);
-int acceptRemote(socket_t* socket, socket_t* newSocket);
-int connectToRemote(socket_t* socket, const char* address, const short port);
-int setRemote(socket_t* socket, const char* address, const short port);
+void createSocket(const int mode, socket_t* socketObject);
+void closeSocket(socket_t* socket);
+void bindLocal(socket_t* socket, const char* address, const short port);
+void listenSocket(socket_t* socket, const int maxClientCount);
+void acceptRemote(socket_t* socket, socket_t* newSocket);
+void connectToRemote(socket_t* socket, const char* address, const short port);
+void setRemote(socket_t* socket, const char* address, const short port);
+
+void serverDGRAM(socket_t* socket, const char* address, const short port);
+void serverSTREAM(socket_t* socket, const char* address, const short port, const int maxClients);
+void connectServer(socket_t* socket, const char* address, const short port);
 
 #endif

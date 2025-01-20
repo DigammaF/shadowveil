@@ -13,8 +13,6 @@
 #include "command_handlers.h"
 #include "string_utils.h"
 
-#define UNUSED(x) (void)(x)
-
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 
@@ -172,53 +170,4 @@ void* handleUser(void* arg) {
 	deleteUser(server, user);
 	dropUser(user);
 	return NULL;
-}
-
-void setupServer(server_t* server) {
-	account_t* account = malloc(sizeof(account_t));
-	CHECKM(account, "account");
-	createAccount(server, account, "admin", "admin", ADMIN);
-}
-
-int main(int argc, const char * argv[]) {
-	UNUSED(argc); UNUSED(argv);
-	server_t server;
-	initServer(&server);
-	setupServer(&server);
-	server.running = 1;
-	CHECK(createSocket(SOCK_STREAM, &server.socket), "createSocket");
-	CHECK(bindLocal(&server.socket, "127.0.0.1", SERVER_PORT), "bindLocal");
-	CHECK(listenSocket(&server.socket, 5), "listenSocket");
-	printf("(+) serveur prêt\n");
-
-	while (server.running) {
-
-		printf("(...) en attente d'utilisateur\n");
-		socket_t* clientSocket = malloc(sizeof(socket_t));
-		CHECKM(clientSocket, "clientSocket");
-		CHECK(acceptRemote(&server.socket, clientSocket), "acceptRemote");
-
-		pthread_mutex_lock(&server.mutex);
-		printf("(+) nouveau client connecté\n");
-		user_t* user = malloc(sizeof(user_t));
-		CHECKM(user, "user");
-		initUser(user);
-		printf("(+) création d'un utilisateur\n");
-
-		if (createUser(&server, user, clientSocket)) {
-			server.users[user->address] = user;
-			printf("(+) nouveau utilisateur créé\n");
-		} else {
-			dropUser(user);
-			closeSocket(clientSocket);
-			free(user);
-			free(clientSocket);
-			printf("(-) abandon de service\n");
-		}
-
-		pthread_mutex_unlock(&server.mutex);
-	}
-
-	CHECK(closeSocket(&server.socket), "closeSocket");
-	dropServer(&server);
 }
