@@ -3,18 +3,28 @@
 #define CHAMPION_H
 
 #include "ability.h"
+#include "constants.h"
 
-#define ATTACK_COUNT 3 /** nombre maximum d'attaques par personnage */
+#define ABILITY_COUNT 3 /** nombre maximum d'attaques par personnage */
+
+typedef struct {
+    int value;
+    int maxValue;
+} stat_t;
 
 /** Structure représentant un personnage jouable. */
 typedef struct {
-    int intelligenceStat; /** définit dans quel ordre les personnages agissent */
-    int attackStat;
-    int defenseStat;
-    int magicAttackStat;
-    int magicDefenseStat;
+    champion_type_t type;
+    unsigned long long effects;
 
-    ability_t* abilities[ATTACK_COUNT];
+    stat_t intelligence; /** définit dans quel ordre les personnages agissent */
+    stat_t attack;
+    stat_t defense;
+    stat_t magicAttack;
+    stat_t magicDefense;
+    stat_t health;
+
+    ability_t* abilities[ABILITY_COUNT];
 } champion_t;
 
 #endif
