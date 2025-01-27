@@ -15,6 +15,7 @@ typedef struct {
 	unsigned address;
 	function_stack_t commandHandlers;
 	int running;
+	vector_t*  champions; /* Contient les champion_t de l'utilisateur. */
 } user_t;
 
 void initUser(user_t* user);

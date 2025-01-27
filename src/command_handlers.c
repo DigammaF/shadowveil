@@ -85,7 +85,7 @@ void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
 		printf("\t[réussi]\n");
 		user->account = account;
 		popFunction(&user->commandHandlers);
-		pushFunction(&user->commandHandlers, gameworldHandler);
+		pushFunction(&user->commandHandlers, fillAccountHandler);
 		char message[255];
 		sprintf(message, "SET-CONTEXT %i\0", GAMEWORLD);
 		sendData(user->socket, message);
@@ -136,4 +136,15 @@ void* gameworldHandler(void* arg) {
 void* adminHandler(void* arg) {
 	UNUSED(arg);
 	return NULL;
+}
+
+/**
+ * Appelé durant la phase handleRegister()
+ * Assigne un premier personnage au joueur
+ */
+void* fillAccountHandler(void* arg){
+	character_t firstChampion = malloc 
+	//
+
+	pushFunction(&user->commandHandlers, gameworldHandler);
 }
