@@ -88,6 +88,18 @@ void deleteAccount(server_t* server, account_t* account) {
 	server->accounts[account->address] = NULL;
 }
 
+void locateAccount(server_t* server, char* name, account_t* account) {
+	account = NULL;
+	for (unsigned n = 0; n < MAX_ACCOUNTS; n++) {
+		if (server->accounts[n] == NULL) { continue; }
+		if (strcmp(server->accounts[n]->name, name) == 0) { account = server->accounts[n]; return; }
+	}
+}
+
+int checkPassword(account_t* account, char* password) {
+	return strcmp(account->password, password) == 0;
+}
+
 void handleNewConnection(server_t* server) {
 	printf("(+) accepting client\n");
 	socket_t* socket = malloc(sizeof(socket_t));
