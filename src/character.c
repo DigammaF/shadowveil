@@ -1,0 +1,1 @@
+//todo fonctions liées à character_t
