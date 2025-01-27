@@ -26,7 +26,7 @@ void applyAbility(champion_t* source, champion_t* destination, ability_t* abilit
                 break;
 
             case SET_HEALTH:
-                setStat(&target->health, target->health.value + arg);
+                setStat(&target->stats[HEALTH], target->stats[HEALTH].value + arg);
                 reader += 2;
                 break;
 
