@@ -1,4 +1,6 @@
 
+#include "champion.h"
+
 /** Crée des personnages définis. */
 int setupExamples() {
 
@@ -40,4 +42,10 @@ int setupExamples() {
 */
 character_t* generateRandomChampion(){
     todo
+}
+
+void setStat(stat_t* stat, int value) {
+    if (value < stat->minValue) { stat->value = stat->minValue; }
+    if (value > stat->maxValue) { stat->value = stat->maxValue; }
+    stat->value = value;
 }

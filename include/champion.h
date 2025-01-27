@@ -12,6 +12,7 @@
 typedef struct {
     int value;
     int maxValue;
+    int minValue;
 } stat_t;
 
 /** Structure représentant un personnage jouable. */
@@ -28,5 +29,7 @@ typedef struct {
 
     ability_t* abilities[ABILITY_COUNT];
 } champion_t;
+
+void setStat(stat_t* stat, int value);
 
 #endif
