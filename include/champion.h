@@ -2,6 +2,8 @@
 #ifndef CHAMPION_H
 #define CHAMPION_H
 
+#include <stdint.h>
+
 #include "ability.h"
 #include "constants.h"
 
@@ -10,6 +12,7 @@
 typedef struct {
     int value;
     int maxValue;
+    int minValue;
 } stats_t;
 
 typedef enum STAT { 
@@ -25,12 +28,13 @@ typedef enum STAT {
 /** Structure représentant un personnage jouable. */
 typedef struct {
     champion_type_t type;
-    unsigned long long effects;
+    uint64_t effects;
 
     stats_t* stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */
 
     ability_t* abilities[ABILITY_COUNT];
 } champion_t;
 
+void setStat(stat_t* stat, int value);
 
 #endif

@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 
+#include "constants.h"
 #include "ability.h"
 #include "champion.h"
 
@@ -21,14 +22,33 @@ void applyAbility(champion_t* source, champion_t* destination, ability_t* abilit
             case SET_TARGET:
                 if (arg == 0) { target = source; }
                 if (arg == 1) { target = destination; }
+                reader += 2;
                 break;
 
             case SET_HEALTH:
-                target->health.value += arg;
+                setStat(&target->health, target->health.value + arg);
+                reader += 2;
                 break;
 
             case ADD_EFFECT:
-                
+                target->effects |= EFFECTS[arg];
+                reader += 2;
+                break;
+
+            case REM_EFFECT:
+                target->effects &= ~EFFECTS[arg];
+                reader += 2;
+                break;
+
+            case IF_EFFECT:
+                if (!(target->effects & EFFECTS[arg])) { return; }
+                reader++;
+                break;
+
+            case IF_TYPE:
+                if (target->type != arg) { return; }
+                reader++;
+                break;
         }
     }
 }
