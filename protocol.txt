@@ -5,7 +5,7 @@ server
 	ERROR <word>+
 
 client
-	!COMMAND <word>+
+	COMMAND <word>+
 		- initial
 		LOGIN <name> <password>
 		REGISTER <name> <password>
@@ -14,6 +14,7 @@ client
 		INTERACT <int>
 		MESSAGE <int> <word>+
 		GLOBAL-MESSAGE <word>+
+		LIST-ONLINE
 		SEARCH-ACCOUNTS <name>
 		PULL-MESSAGES
 		DUEL-OFFER <int>
@@ -23,8 +24,12 @@ client
 		BUY-CHAMPION <int>
 		SELL-ITEM <int> <int>
 		BUY-ITEM <int>
+		SEE
 		- combat
 		ATTACK <int> <int> <int>
 		SWAP <int> <int>
+		SURREND
+		DRAW-OFFER
+		DRAW-ACCEPT
 	END
 	KEEP-ALIVE
