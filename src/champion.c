@@ -38,10 +38,17 @@ int setupExamples() {
 
 /** Renvoie un pointeur vers un character_t généré procéduralement.
  * - Il possède une attaque choisie au hasard parmi la pool. 
- * - Il a en moyenne 10 points par catégorie, et au minimum 1
+ * - Il a au minimum 1 point par catégorie
 */
 character_t* generateRandomChampion(){
-    todo
+
+    int pointsToGive = (STAT.STAT_COUNT)*(10);
+    for (int i=0; i<pointsToGive; i++){
+        
+    }
+
+
+    
 }
 
 void setStat(stat_t* stat, int value) {
@@ -49,3 +56,7 @@ void setStat(stat_t* stat, int value) {
     if (value > stat->maxValue) { stat->value = stat->maxValue; }
     stat->value = value;
 }
+
+
+1 point partout, 9*STAT_COUNT points à distribuer
+1+(quantité de 0 à 9 inclus)
