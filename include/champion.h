@@ -30,12 +30,10 @@ typedef enum {
 typedef struct {
     champion_type_t type;
     uint64_t effects;
-
-    stat_value_t* stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */
-
-    ability_t* abilities[ABILITY_COUNT];
+    stat_value_t stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */
+    ability_t abilities[ABILITY_COUNT];
 } champion_t;
 
-void setStat(stat_t* stat, int value);
+void setStat(stat_value_t* stat, int value);
 
 #endif

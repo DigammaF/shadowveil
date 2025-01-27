@@ -66,9 +66,9 @@ champion_t* generateRandomChampion(){
     return champion;
 }
 
-void setStat(stat_t* stat, int value) { todo debuger
-    if (value < stat->minValue) { stat->value = stat->minValue; }
-    if (value > stat->maxValue) { stat->value = stat->maxValue; }
+void setStat(stat_value_t* stat, int value) {
+    if (value < stat->minValue) { stat->value = stat->minValue; return; }
+    if (value > stat->maxValue) { stat->value = stat->maxValue; return; }
     stat->value = value;
 }
 
