@@ -16,9 +16,9 @@ typedef struct {
 } stat_value_t;
 
 typedef enum { 
-    ATTACK, 
-    DEFENSE, 
-    MAGIC_ATTACK, 
+    ATTACK,
+    DEFENSE,
+    MAGIC_ATTACK,
     MAGIC_DEFENSE, 
     INTELLIGENCE, /** définit dans quel ordre les personnages agissent */
     HEALTH, 

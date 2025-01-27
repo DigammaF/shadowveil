@@ -71,7 +71,7 @@ typedef enum {
 	TYPE_RUSH,
 	TYPE_WARLOCK,
 	TYPE_WITCHCRAFT,
-	TYPE_MAX
+	TYPE_COUNT
 } champion_type_t;
 
 #define EFFECT_FLAME (1 << 0)

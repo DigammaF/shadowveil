@@ -143,7 +143,7 @@ void* adminHandler(void* arg) {
  * Assigne un premier personnage au joueur
  */
 void* fillAccountHandler(void* arg){
-	character_t firstChampion = malloc 
+	character_t firstChampion = todo 
 	//
 
 	pushFunction(&user->commandHandlers, gameworldHandler);

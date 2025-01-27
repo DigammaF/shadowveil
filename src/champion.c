@@ -1,5 +1,9 @@
 
 #include "champion.h"
+#define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
+#define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
+
+#define AVERAGE_STARTING_POINTS 5
 
 /** Crée des personnages définis. */
 int setupExamples() {
@@ -38,20 +42,31 @@ int setupExamples() {
 
 /** Renvoie un pointeur vers un character_t généré procéduralement.
  * - Il possède une attaque choisie au hasard parmi la pool. 
- * - Il a au minimum 1 point par catégorie
+ * - Il a au minimum 1 point par catégorie, et les persos ont en moyenne 5 pts par stat.
 */
-character_t* generateRandomChampion(){
+champion_t* generateRandomChampion(){
 
-    int pointsToGive = (STAT.STAT_COUNT)*(10);
-    for (int i=0; i<pointsToGive; i++){
-        
+    champion_t* champion = malloc( sizeof(champion_t) );
+
+    champion->type = rand()% TYPE_MAX;
+
+    champion->effects = 0; //pas d'effets => 0 partout
+
+    for ( int i=0; i< STAT_COUNT ; i++ ){
+        ( champion->stats )[randomStat] = 1; // init des stats à 1
+    }
+    for ( int pointsLeft = ( STAT_COUNT * AVERAGE_STARTING_POINTS ) ; pointsLeft>0 ; pointsLeft-- ){ //décrémenter le stock de points jusqu'à ce qu'il n'y en ait plus à distribuer
+        STAT randomStat = (rand() % STAT_COUNT); //choisir l'une des stat au hasard
+        ( ( champion->stats )[randomStat] ) ++ ; //et l'incrémenter
     }
 
+    champion->abilities = {NULL, NULL, NULL}; //todo abilities;
 
-    
+
+    return champion;
 }
 
-void setStat(stat_t* stat, int value) {
+void setStat(stat_t* stat, int value) { todo debuger
     if (value < stat->minValue) { stat->value = stat->minValue; }
     if (value > stat->maxValue) { stat->value = stat->maxValue; }
     stat->value = value;
