@@ -36,7 +36,7 @@ int setupExamples() {
 
 /** Renvoie un pointeur vers un character_t généré procéduralement.
  * - Il possède une attaque choisie au hasard parmi la pool. 
- * - Il a en moyenne 10 points par catégorie 
+ * - Il a en moyenne 10 points par catégorie, et au minimum 1
 */
 character_t* generateRandomChampion(){
     todo
