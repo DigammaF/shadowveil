@@ -3,7 +3,7 @@
 #define COMMAND_HANDLERS_H
 
 void* initialHandler(void* arg);
-void* gameworldHandler(void* arg);
+void* gameWorldHandler(void* arg);
 void* adminHandler(void* arg);
 
 #endif

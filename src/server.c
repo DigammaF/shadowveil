@@ -88,12 +88,13 @@ void deleteAccount(server_t* server, account_t* account) {
 	server->accounts[account->address] = NULL;
 }
 
-void locateAccount(server_t* server, char* name, account_t* account) {
-	account = NULL;
+account_t* locateAccount(server_t* server, char* name) {
 	for (unsigned n = 0; n < MAX_ACCOUNTS; n++) {
 		if (server->accounts[n] == NULL) { continue; }
-		if (strcmp(server->accounts[n]->name, name) == 0) { account = server->accounts[n]; return; }
+		if (strcmp(server->accounts[n]->name, name) == 0) { return server->accounts[n]; }
 	}
+
+	return NULL;
 }
 
 int checkPassword(account_t* account, char* password) {
