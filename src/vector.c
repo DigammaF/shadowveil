@@ -6,6 +6,8 @@
 
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 
+#define CHECKKEY(vector, key) { if (key < 0 || key > vector->length) { fprintf(stderr, "%i is not in vector bounds [0-%i[", key, vector->length); exit(EXIT_FAILURE); } }
+
 void initVector(vector_t* vector) {
     vector->capacity = 1;
     vector->length = 0;
@@ -18,10 +20,12 @@ void dropVector(vector_t* vector) {
 }
 
 void* vectorGet(vector_t* vector, unsigned key) {
+    CHECKKEY(vector, key);
     return vector->elements[key];
 }
 
 void vectorSet(vector_t* vector, unsigned key, void* value) {
+    CHECKKEY(vector, key);
     vector->elements[key] = value;
 }
 
@@ -48,8 +52,9 @@ void* vectorPop(vector_t* vector, unsigned key) {
 }
 
 void increaseCapacity(vector_t* vector) {
-    unsigned newCapacity = (unsigned)vector->capacity*GROWTH_RATE;
-    if (newCapacity <= vector->capacity) { fprintf(stderr, "cannot increase vector capcity"); exit(EXIT_FAILURE); }
+    unsigned newCapacity = vector->capacity*GROWTH_RATE;
+    if (newCapacity <= vector->capacity) { fprintf(stderr, "cannot increase vector capacity"); exit(EXIT_FAILURE); }
     vector->capacity = newCapacity;
     vector->elements = realloc(vector->elements, vector->capacity*sizeof(void*));
+    CHECKM(vector->elements, "realloc(vector->elements)");
 }
