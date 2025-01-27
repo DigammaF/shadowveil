@@ -15,7 +15,7 @@ typedef struct {
     abilities_t abilities[NB_OF_ATTACKS]; /* pointeurs vers les attaques */
 
     //ajouts futurs potentiels : arme, armure, niveaux
-} character_t;
+} champion_t;
 
 
 #endif
