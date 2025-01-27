@@ -10,6 +10,8 @@
 #include "server.h"
 #include "constants.h"
 
+#define SERVER_TICK 500 // ms
+
 #define UNUSED(x) (void)(x)
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 
@@ -19,7 +21,7 @@ void setupServer(server_t* server) {
 	createAccount(server, account, "admin", "admin\n", ADMIN_FLAG);
 }
 
-void setupFileDescriptorsSet(
+void setupFileDescriptorSet(
 	server_t* server, fd_set* fileDescriptorSet, int* maxFileDescriptor
 ) {
 	FD_ZERO(fileDescriptorSet);
@@ -61,10 +63,10 @@ int mainServer(int argc, const char* argv[]) {
 
 	while (server.running) {
 		update(&server);
-		struct timeval timeout = { 0, 500 };
+		struct timeval timeout = { 0, SERVER_TICK };
 		fd_set fileDescriptorSet;
 		int maxFileDescriptor;
-		setupFileDescriptorsSet(&server, &fileDescriptorSet, &maxFileDescriptor);
+		setupFileDescriptorSet(&server, &fileDescriptorSet, &maxFileDescriptor);
 		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
 		handleSockets(&server, &fileDescriptorSet);
 	}
