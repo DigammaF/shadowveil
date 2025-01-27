@@ -34,9 +34,10 @@ int setupExamples() {
     return 0;
 }
 
-
-//todo fonctions liées à character_t
-
-
-
-// todo futur : générateur procédural de persos
+/** Renvoie un pointeur vers un character_t généré procéduralement.
+ * - Il possède une attaque choisie au hasard parmi la pool. 
+ * - Il a en moyenne 10 points par catégorie 
+*/
+character_t* generateRandomChampion(){
+    todo
+}
