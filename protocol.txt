@@ -27,7 +27,6 @@ client
 		SEE
 		- combat
 		ATTACK <int> <int> <int>
-		SWAP <int> <int>
 		SURREND
 		DRAW-OFFER
 		DRAW-ACCEPT

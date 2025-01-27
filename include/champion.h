@@ -2,6 +2,8 @@
 #ifndef CHAMPION_H
 #define CHAMPION_H
 
+#include <stdint.h>
+
 #include "ability.h"
 #include "constants.h"
 
@@ -15,7 +17,7 @@ typedef struct {
 /** Structure représentant un personnage jouable. */
 typedef struct {
     champion_type_t type;
-    unsigned long long effects;
+    uint64_t effects;
 
     stat_t intelligence; /** définit dans quel ordre les personnages agissent */
     stat_t attack;

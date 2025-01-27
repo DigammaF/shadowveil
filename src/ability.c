@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 
+#include "constants.h"
 #include "ability.h"
 #include "champion.h"
 
@@ -28,7 +29,7 @@ void applyAbility(champion_t* source, champion_t* destination, ability_t* abilit
                 break;
 
             case ADD_EFFECT:
-                
+                target->effects |= EFFECTS[arg];
         }
     }
 }
