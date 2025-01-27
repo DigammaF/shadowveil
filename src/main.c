@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/select.h>
 
+#include "vector.h"
 #include "server.h"
 #include "constants.h"
 
@@ -106,6 +107,20 @@ int mainClient(int argc, const char* argv[]) {
 int main(int argc, const char* argv[]) {
 	if (strcmp(argv[1], "server") == 0) { mainServer(argc, argv); }
 	if (strcmp(argv[1], "client") == 0) { mainClient(argc, argv); }
+
+	vector_t vec;
+	initVector(&vec);
+	dumpVector(&vec);
+	vectorAppend(&vec, (void*)8);
+	vectorAppend(&vec, (void*)16);
+	dumpVector(&vec);
+	printf("%i\n", (unsigned)vectorGet(&vec, 1));
+	vectorSet(&vec, 1, (void*)42);
+	dumpVector(&vec);
+	vectorInsert(&vec, 0, (void*)23);
+	dumpVector(&vec);
+	vectorPop(&vec, 1);
+	dumpVector(&vec);
 
 	return 0;
 }

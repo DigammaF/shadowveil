@@ -37,7 +37,7 @@ void deleteUser(server_t* server, user_t* user);
 
 int createAccount(server_t* server, account_t* account, char* name, char* password, unsigned flags);
 void deleteAccount(server_t* server, account_t* account);
-void locateAccount(server_t* server, char* name, account_t* account);
+account_t* locateAccount(server_t* server, char* name);
 int checkPassword(account_t* account, char* password);
 
 void update(server_t* server);

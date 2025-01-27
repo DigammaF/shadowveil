@@ -13,7 +13,7 @@ typedef struct {
     int value;
     int maxValue;
     int minValue;
-} stats_t;
+} stat_t;
 
 typedef enum STAT { 
     ATTACK, 
@@ -30,7 +30,7 @@ typedef struct {
     champion_type_t type;
     uint64_t effects;
 
-    stats_t* stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */
+    stat_t* stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */
 
     ability_t* abilities[ABILITY_COUNT];
 } champion_t;

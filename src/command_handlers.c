@@ -19,31 +19,30 @@ int checkArgCount(socket_t* socket, int count, int expected) {
 	char message[255];
 	sprintf(
 		message,
-		"ERROR mauvais nombre d'arguments: %i (attendu: %i)\0", count, expected
+		"ERROR mauvais nombre d'arguments: %i (attendu: %i)", count, expected
 	);
 	sendData(socket, message);
 	return 0;
 }
 
 void handleLogin(server_t* server, user_t* user, commandContext_t* context) {
-	account_t* account;
-	locateAccount(server, context->args[2], account);
+	account_t* account = locateAccount(server, context->args[2]);
 
 	if (account == NULL) {
 		printf("\t[introuvable]\n");
-		sendData(user->socket, "OUTPUT ce compte n'existe pas\0");
+		sendData(user->socket, "OUTPUT ce compte n'existe pas");
 		return;
 	}
 
 	if (account->flags | BANNED_FLAG) {
 		printf("\t[banni]\n");
-		sendData(user->socket, "OUTPUT ce compte est banni\0");
+		sendData(user->socket, "OUTPUT ce compte est banni");
 		return;
 	}
 
 	if (!checkPassword(account, context->args[3])) {
 		printf("\t[mot de passe incorrect]\n");
-		sendData(user->socket, "OUTPUT mauvais mot de passe\0");
+		sendData(user->socket, "OUTPUT mauvais mot de passe");
 		return;
 	}
 
@@ -52,27 +51,26 @@ void handleLogin(server_t* server, user_t* user, commandContext_t* context) {
 		popFunction(&user->commandHandlers);
 		pushFunction(&user->commandHandlers, adminHandler);
 		char message[255];
-		sprintf(message, "SET-CONTEXT %i\0", GAMEWORLD);
+		sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
 		sendData(user->socket, message);
-		return NULL;
+		return;
 	}
 
 	printf("\t[basique]\n");
 	popFunction(&user->commandHandlers);
-	pushFunction(&user->commandHandlers, gameworldHandler);
+	pushFunction(&user->commandHandlers, gameWorldHandler);
 	user->account = account;
 	char message[255];
-	sprintf(message, "SET-CONTEXT %i\0", GAMEWORLD);
+	sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
 	sendData(user->socket, message);
 }
 
 void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
-	account_t* account;
-	locateAccount(server, context->args[2], account);
+	account_t* account = locateAccount(server, context->args[2]);
 
 	if (account != NULL) {
 		printf("\t[existe déjà]\n");
-		sendData(user->socket, "OUTPUT ce compte existe déjà\0");
+		sendData(user->socket, "OUTPUT ce compte existe déjà");
 		return;
 	}
 
@@ -85,15 +83,15 @@ void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
 		printf("\t[réussi]\n");
 		user->account = account;
 		popFunction(&user->commandHandlers);
-		pushFunction(&user->commandHandlers, fillAccountHandler);
+		pushFunction(&user->commandHandlers, gameWorldHandler);
 		char message[255];
-		sprintf(message, "SET-CONTEXT %i\0", GAMEWORLD);
+		sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
 		sendData(user->socket, message);
-		return NULL;
+		return;
 	} else {
 		printf("\t[impossible]\n");
-		sendData(user->socket, "ERROR impossible de créer le compte\0");
-		return NULL;
+		sendData(user->socket, "ERROR impossible de créer le compte");
+		return;
 	}
 }
 
@@ -118,17 +116,17 @@ void* initialHandler(void* arg) {
 	char message[255];
 	sprintf(
 		message,
-		"ERROR argument invalide '%s' (attendu: LOGIN|REGISTER)\0", context->args[1]
+		"ERROR argument invalide '%s' (attendu: LOGIN|REGISTER)", context->args[1]
 	);
 	sendData(user->socket, message);
 	return NULL;
 }
 
-void* gameworldHandler(void* arg) {
+void* gameWorldHandler(void* arg) {
 	commandContext_t* context = (commandContext_t*)arg;
 	user_t* user = context->user;
 	char message[255];
-	sprintf(message, "OUTPUT '%s'\0", context->args[1]);
+	sprintf(message, "OUTPUT '%s'", context->args[1]);
 	sendData(user->socket, message);
 	return NULL;
 }
@@ -142,9 +140,9 @@ void* adminHandler(void* arg) {
  * Appelé durant la phase handleRegister()
  * Assigne un premier personnage au joueur
  */
-void* fillAccountHandler(void* arg){
-	character_t firstChampion = malloc 
-	//
+// void* fillAccountHandler(void* arg){
+// 	character_t firstChampion = malloc 
+// 	//
 
-	pushFunction(&user->commandHandlers, gameworldHandler);
-}
+// 	pushFunction(&user->commandHandlers, gameworldHandler);
+// }

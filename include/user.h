@@ -7,6 +7,7 @@
 #include "lantern.h"
 #include "account.h"
 #include "function_stack.h"
+#include "vector.h"
 
 typedef struct {
 	socket_t* socket;

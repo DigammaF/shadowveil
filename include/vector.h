@@ -22,4 +22,6 @@ void* vectorPop(vector_t* vector, unsigned key);
 
 void increaseCapacity(vector_t* vector);
 
+void dumpVector(vector_t* vector);
+
 #endif
