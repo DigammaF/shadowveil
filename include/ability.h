@@ -2,6 +2,8 @@
 #ifndef ABILITY_H
 #define ABILITY_H
 
+#include "champion.h"
+
 #define MAX_ABILITY_DATA 10
 
 /**
@@ -29,6 +31,6 @@ typedef struct {
     int monoTarget;
 } ability_t;
 
-void applyAbility(champion_t* source, chamption_t* destination, ability_t* ability);
+void applyAbility(champion_t* source, champion_t* destination, ability_t* ability);
 
 #endif
