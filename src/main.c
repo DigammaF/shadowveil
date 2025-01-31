@@ -73,7 +73,7 @@ int mainServer(int argc, const char* argv[]) {
 		int maxFileDescriptor;
 		setupFileDescriptorSet(&server, &fileDescriptorSet, &maxFileDescriptor);
 		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
-		handleSockets(&server, &fileDescriptorSet);
+		handleServerSockets(&server, &fileDescriptorSet);
 	}
 
 	closeSocket(&server.socket);
@@ -106,11 +106,16 @@ int mainClient(int argc, const char* argv[]) {
 	socket_t clientSocket;
 	connectServer(&clientSocket, "127.0.0.1", SERVER_PORT);
 	
-
 	while (1) {
 		fd_set fileDescriptorSet;
 		int maxFileDescriptor;
-		setupFileDescriptorSet(&TODO
+		struct timeval timeout = { 0, SERVER_TICK };
+		setupClientFileDescriptorSet( clientSocket, &fileDescriptorSet, &maxFileDescriptor );
+		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
+		handleClientSockets(&clientSocket, &fileDescriptorSet);
+		
+		
+	/** TODO : ancien à trier 
 	
 		sendData(&clientSocket, "COMMAND");
 		char data[1024];
@@ -121,7 +126,12 @@ int mainClient(int argc, const char* argv[]) {
 			recvData(&socket, data, length);
 			printf("<<< '%s'\n", data);
 		} while (1);
+		*/
 	}
+}
+
+void handleClientSockets(socket_t clientSocket, fd_set* fileDescriptorSet){
+	//TODO
 }
 
 
