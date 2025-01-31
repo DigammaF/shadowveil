@@ -1,5 +1,9 @@
 
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "champion.h"
+
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 
@@ -7,64 +11,53 @@
 
 /** Crée des personnages définis. */
 int setupExamples() {
-
-    character_t character1 = {
-        .intelligenceStat = 5,
-        .attackStat = 9,
-        .defenseStat = 8,
-        .magicAttackStat = 2,
-        .magicDefenseStat = 3,
-        .abilities = {NULL, NULL, NULL} // à compléter par des attaques spécifiques
+    champion_t character1 = {
+        .type = TYPE_COSMIC,
+		.effects = { 0 },
+		.stats = MAKE_STATS(5, 6, 5, 3, 8, 10),
+		.abilities = { NULL }
     };
 
 
-    character_t character2 = {
-        .intelligenceStat = 9,
-        .attackStat = 3,
-        .defenseStat = 4,
-        .magicAttackStat = 9,
-        .magicDefenseStat = 8,
-        .abilities = {NULL, NULL, NULL}
+    champion_t character2 = {
+        .type = TYPE_BLOOD,
+		.effects = { 0 },
+		.stats = MAKE_STATS(7, 1, 9, 4, 5, 21),
+		.abilities = { NULL }
     };
 
-    character_t character3 = {
-        .intelligenceStat = 70,
-        .attackStat = 75,
-        .defenseStat = 50,
-        .magicAttackStat = 40,
-        .magicDefenseStat = 45,
-        .abilities = {NULL, NULL, NULL}
+    champion_t character3 = {
+        .type = TYPE_DARK,
+		.effects = { 0 },
+		.stats = MAKE_STATS(7, 4, 3, 8, 8, 11),
+		.abilities = { NULL }
     };
 
     printf("setupExamples : Trois personnages créés.\n");
     return 0;
 }
 
-/** Renvoie un pointeur vers un character_t généré procéduralement.
- * - Il possède une attaque choisie au hasard parmi la pool. 
- * - Il a au minimum 1 point par catégorie, et les persos ont en moyenne 5 pts par stat.
-*/
-champion_t* generateRandomChampion(){
+int getRandomInt(int min, int max) { return min + rand() % (max - min); }
 
-    champion_t* champion = malloc( sizeof(champion_t) );
+int compare(const void* a, const void* b) { return (*(int*)a - *(int*)b); }
 
-    champion->type = rand()% TYPE_MAX;
+void generateChampion(unsigned seed, unsigned powerBudget, champion_t* champion) {
+	if (powerBudget < STAT_COUNT) { fprintf(stderr, "generateChampion: powerBudget lower than stat count"); exit(EXIT_FAILURE); }
+	srand(seed);
+	unsigned budgets[STAT_COUNT - 1];
 
-    //pas d'effets => 0 partout
-    memset(champion->effects, 0, sizeof(int)*EFFECT_COUNT);
+	for (unsigned n = 0; n < STAT_COUNT - 1; n++) {
+		budgets[n] = getRandomInt(0, powerBudget);
+	}
 
-    for ( int i=0; i< STAT_COUNT ; i++ ){
-        ( champion->stats )[randomStat] = 1; // init des stats à 1
-    }
-    for ( int pointsLeft = ( STAT_COUNT * AVERAGE_STARTING_POINTS ) ; pointsLeft>0 ; pointsLeft-- ){ //décrémenter le stock de points jusqu'à ce qu'il n'y en ait plus à distribuer
-        STAT randomStat = (rand() % STAT_COUNT); //choisir l'une des stat au hasard
-        ( ( champion->stats )[randomStat] ) ++ ; //et l'incrémenter
-    }
+	qsort(budgets, STAT_COUNT - 1, sizeof(unsigned), compare);
+	champion->stats[0] = MAKE_STAT(budgets[0]);
 
-    champion->abilities = {NULL, NULL, NULL}; //todo abilities;
+	for (unsigned n = 1; n < STAT_COUNT - 1; n++) {
+		champion->stats[n] = MAKE_STAT(budgets[n] - budgets[n - 1]);
+	}
 
-
-    return champion;
+	champion->stats[STAT_COUNT - 1] = MAKE_STAT(powerBudget - budgets[STAT_COUNT - 2]);
 }
 
 void setStat(stat_value_t* stat, int value) {
