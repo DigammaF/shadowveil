@@ -144,8 +144,11 @@ int mainClient(int argc, const char* argv[]) {
 // ====== BOTH SERVER AND CLIENT ====== //
 
 int main(int argc, const char* argv[]) {
-	if (strcmp(argv[1], "server") == 0) { mainServer(argc, argv); }
-	if (strcmp(argv[1], "client") == 0) { mainClient(argc, argv); }
+
+	if (argc > 1) {
+		if (strcmp(argv[1], "server") == 0) { mainServer(argc, argv); }
+		if (strcmp(argv[1], "client") == 0) { mainClient(argc, argv); }
+	}
 
 	vector_t vec;
 	initVector(&vec);
