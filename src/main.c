@@ -16,13 +16,16 @@
 #define UNUSED(x) (void)(x)
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 
+
+// ====== SERVER ====== //
+
 void setupServer(server_t* server) {
 	account_t* account = malloc(sizeof(account_t));
 	CHECKM(account, "account");
 	createAccount(server, account, "admin", "admin\n", ADMIN_FLAG);
 }
 
-void setupFileDescriptorSet(
+void setupServerFileDescriptorSet(
 	server_t* server, fd_set* fileDescriptorSet, int* maxFileDescriptor
 ) {
 	FD_ZERO(fileDescriptorSet);
@@ -39,13 +42,13 @@ void setupFileDescriptorSet(
 	}
 }
 
-void handleSockets(server_t* server, fd_set* fileDescriptorSet) {
+void handleServerSockets(server_t* server, fd_set* fileDescriptorSet) {
 	if (FD_ISSET(server->socket.fileDescriptor, fileDescriptorSet)) {
 		handleNewConnection(server);
 	}
 
 	for (unsigned n = 0; n < MAX_USERS; n++) {
-		if (server->users[n] == NULL) { continue; }
+		if (server->users[n] == NULL) { continue; } //todo mettre vecteur
 		user_t* user = server->users[n];
 		if (FD_ISSET(user->socket->fileDescriptor, fileDescriptorSet)) {
 			handleUserRequest(server, user);
@@ -62,6 +65,7 @@ int mainServer(int argc, const char* argv[]) {
 	serverSTREAM(&server.socket, "127.0.0.1", SERVER_PORT, 5);
 	printf("(+) server ready\n");
 
+
 	while (server.running) {
 		update(&server);
 		struct timeval timeout = { 0, SERVER_TICK };
@@ -77,21 +81,21 @@ int mainServer(int argc, const char* argv[]) {
 	return 0;
 }
 
-void getInput(char* input) {
-	printf(": ");
-	scanf("%s", input);
-	size_t len = strlen(input);
-	if (len > 0 && input[len - 1] == '\n') {
-		input[len - 1] = '\0';
-	}
-}
+
+
+// ====== CLIENT ====== //
 
 int mainClient(int argc, const char* argv[]) {
 	UNUSED(argc); UNUSED(argv);
 	socket_t socket;
 	connectServer(&socket, "127.0.0.1", SERVER_PORT);
+	
 
 	while (1) {
+		fd_set fileDescriptorSet;
+		int maxFileDescriptor;
+		setupFileDescriptorSet(&TODO
+	
 		sendData(&socket, "COMMAND");
 		char data[1024];
 		size_t length = 1024;
@@ -103,6 +107,9 @@ int mainClient(int argc, const char* argv[]) {
 		} while (1);
 	}
 }
+
+
+// ====== BOTH SERVER AND CLIENT ====== //
 
 int main(int argc, const char* argv[]) {
 	if (strcmp(argv[1], "server") == 0) { mainServer(argc, argv); }
@@ -123,4 +130,14 @@ int main(int argc, const char* argv[]) {
 	dumpVector(&vec);
 
 	return 0;
+}
+
+
+void getInput(char* input) {
+	printf(": ");
+	scanf("%s", input);
+	size_t len = strlen(input);
+	if (len > 0 && input[len - 1] == '\n') {
+		input[len - 1] = '\0';
+	}
 }
