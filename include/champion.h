@@ -29,7 +29,7 @@ typedef enum {
 /** Structure représentant un personnage jouable. */
 typedef struct {
     champion_type_t type;
-    uint64_t effects;
+    int effects[EFFECT_COUNT];
     stat_value_t stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */
     ability_t abilities[ABILITY_COUNT];
 } champion_t;
