@@ -73,7 +73,7 @@ int mainServer(int argc, const char* argv[]) {
 		int maxFileDescriptor;
 		setupFileDescriptorSet(&server, &fileDescriptorSet, &maxFileDescriptor);
 		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
-		handleSockets(&server, &fileDescriptorSet);
+		handleServerSockets(&server, &fileDescriptorSet);
 	}
 
 	closeSocket(&server.socket);
@@ -106,22 +106,35 @@ int mainClient(int argc, const char* argv[]) {
 	socket_t clientSocket;
 	connectServer(&clientSocket, "127.0.0.1", SERVER_PORT);
 	
-
 	while (1) {
 		fd_set fileDescriptorSet;
 		int maxFileDescriptor;
-		setupFileDescriptorSet(&TODO
+		struct timeval timeout = { 0, SERVER_TICK };
+		setupClientFileDescriptorSet( clientSocket, &fileDescriptorSet, &maxFileDescriptor );
+		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
+		handleClientSockets(&clientSocket, &fileDescriptorSet);
+	}
+}
+
+void handleClientSockets(socket_t* clientSocket, fd_set* fileDescriptorSet){
+	TODO//checker fileDescriptorSet pour savoir quoi faire
 	
-		sendData(&clientSocket, "COMMAND");
+	//si message reçu du serveur
+	if (TODO){
 		char data[1024];
 		size_t length = 1024;
+		memset(data, 0, sizeof(data));
+		
+		recvData(&socket, data, length);
+		printf("<<< '%s'\n", data);
 
-		do {
-			memset(data, 0, sizeof(data));
-			recvData(&socket, data, length);
-			printf("<<< '%s'\n", data);
-		} while (1);
+	} else {
+		//si input clavier
+		TODO lire input et le mettre dans stringToSend
+		sendData(clientSocket, stringToSend);
 	}
+	
+	return;
 }
 
 
