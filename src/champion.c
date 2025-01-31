@@ -50,7 +50,8 @@ champion_t* generateRandomChampion(){
 
     champion->type = rand()% TYPE_MAX;
 
-    champion->effects = 0; //pas d'effets => 0 partout
+    //pas d'effets => 0 partout
+    memset(champion->effects, 0, sizeof(int)*EFFECT_COUNT);
 
     for ( int i=0; i< STAT_COUNT ; i++ ){
         ( champion->stats )[randomStat] = 1; // init des stats à 1

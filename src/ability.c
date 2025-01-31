@@ -31,17 +31,17 @@ void applyAbility(champion_t* source, champion_t* destination, ability_t* abilit
                 break;
 
             case ADD_EFFECT:
-                target->effects |= EFFECTS[arg];
+                target->effects[arg] = 1;
                 reader += 2;
                 break;
 
             case REM_EFFECT:
-                target->effects &= ~EFFECTS[arg];
+                target->effects[arg] = 0;
                 reader += 2;
                 break;
 
             case IF_EFFECT:
-                if (!(target->effects & EFFECTS[arg])) { return; }
+                if (!(target->effects[arg])) { return; }
                 reader++;
                 break;
 
