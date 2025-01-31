@@ -10,7 +10,7 @@ typedef struct {
 } function_stack_node_t;
 
 typedef struct {
-	function_stack_node_t* node;
+	function_stack_node_t* node; //topNode
 } function_stack_t;
 
 void initFunctionStack(function_stack_t* stack);

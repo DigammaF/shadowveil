@@ -72,7 +72,3 @@ void setStat(stat_value_t* stat, int value) {
     if (value > stat->maxValue) { stat->value = stat->maxValue; return; }
     stat->value = value;
 }
-
-
-1 point partout, 9*STAT_COUNT points à distribuer
-1+(quantité de 0 à 9 inclus)
