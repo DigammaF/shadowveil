@@ -58,7 +58,7 @@ void* vectorPop(vector_t* vector, unsigned key) {
 }
 
 void increaseCapacity(vector_t* vector) {
-    unsigned newCapacity = vector->capacity*GROWTH_RATE + 3;
+    unsigned newCapacity = vector->capacity*VECTOR_GROWTH_RATE + 3;
     if (newCapacity <= vector->capacity) { fprintf(stderr, "cannot increase vector capacity\n"); exit(EXIT_FAILURE); }
     vector->capacity = newCapacity;
     vector->elements = realloc(vector->elements, vector->capacity*sizeof(void*));
