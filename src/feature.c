@@ -13,7 +13,7 @@ void initFeature(feature_t* feature) {
 }
 
 void dropFeature(feature_t* feature) {
-
+	UNUSED(feature);
 }
 
 feature_t* makeRock() {

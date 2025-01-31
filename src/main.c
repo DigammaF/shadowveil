@@ -71,7 +71,7 @@ int mainServer(int argc, const char* argv[]) {
 		struct timeval timeout = { 0, SERVER_TICK };
 		fd_set fileDescriptorSet;
 		int maxFileDescriptor;
-		setupFileDescriptorSet(&server, &fileDescriptorSet, &maxFileDescriptor);
+		setupServerFileDescriptorSet(&server, &fileDescriptorSet, &maxFileDescriptor);
 		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
 		handleServerSockets(&server, &fileDescriptorSet);
 	}
@@ -103,6 +103,28 @@ void setupClientFileDescriptorSet(
 	return;
 }
 
+void handleClientSockets(socket_t* clientSocket, fd_set* fileDescriptorSet){
+	UNUSED(fileDescriptorSet);
+	// TODO checker fileDescriptorSet pour savoir quoi faire
+	
+	//si message reçu du serveur
+	if (0){
+		char data[1024];
+		size_t length = 1024;
+		memset(data, 0, sizeof(data));
+		
+		recvData(clientSocket, data, length);
+		printf("<<< '%s'\n", data);
+
+	} else {
+		//si input clavier
+		// TODO lire input et le mettre dans stringToSend
+		// sendData(clientSocket, stringToSend);
+	}
+	
+	return;
+}
+
 int mainClient(int argc, const char* argv[]) {
 	UNUSED(argc); UNUSED(argv);
 	socket_t clientSocket;
@@ -118,27 +140,6 @@ int mainClient(int argc, const char* argv[]) {
 	}
 }
 
-void handleClientSockets(socket_t* clientSocket, fd_set* fileDescriptorSet){
-	// TODO checker fileDescriptorSet pour savoir quoi faire
-	
-	//si message reçu du serveur
-	if (0){
-		char data[1024];
-		size_t length = 1024;
-		memset(data, 0, sizeof(data));
-		
-		recvData(&socket, data, length);
-		printf("<<< '%s'\n", data);
-
-	} else {
-		//si input clavier
-		// TODO lire input et le mettre dans stringToSend
-		// sendData(clientSocket, stringToSend);
-	}
-	
-	return;
-}
-
 
 // ====== BOTH SERVER AND CLIENT ====== //
 
@@ -152,7 +153,7 @@ int main(int argc, const char* argv[]) {
 	vectorAppend(&vec, (void*)8);
 	vectorAppend(&vec, (void*)16);
 	dumpVector(&vec);
-	printf("%i\n", (unsigned)vectorGet(&vec, 1));
+	// printf("%i\n", (unsigned)vectorGet(&vec, 1));
 	vectorSet(&vec, 1, (void*)42);
 	dumpVector(&vec);
 	vectorInsert(&vec, 0, (void*)23);

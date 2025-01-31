@@ -13,7 +13,7 @@ void initPawn(pawn_t* pawn) {
 }
 
 void dropPawn(pawn_t* pawn) {
-
+	UNUSED(pawn);
 }
 
 void sendPawnEvent(server_t* server, pawn_t* pawn, pawn_event_t* event) {

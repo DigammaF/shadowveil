@@ -2,8 +2,6 @@
 #ifndef ABILITY_H
 #define ABILITY_H
 
-#include "champion.h"
-
 #define MAX_ABILITY_OP_CODES 10
 
 /**
@@ -34,7 +32,5 @@ typedef struct {
     unsigned opCodes[MAX_ABILITY_OP_CODES];
     int monoTarget;
 } ability_t;
-
-void applyAbility(champion_t* source, champion_t* destination, ability_t* ability);
 
 #endif

@@ -15,7 +15,7 @@ void dropFunctionStack(function_stack_t* stack) {
 	while (!functionStackEmpty(stack)) { popFunction(stack); }
 }
 
-int isFunctionStackEmpty(function_stack_t* stack) {
+int functionStackEmpty(function_stack_t* stack) {
 	return stack->node == NULL;
 }
 

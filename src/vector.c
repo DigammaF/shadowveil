@@ -69,7 +69,7 @@ void dumpVector(vector_t* vector) {
     printf("\n- VECTOR DUMP -\n");
 
     for (unsigned n = 0; n < vector->length; n++) {
-        printf("%i ", (unsigned)vector->elements[n]);
+        //printf("%i ", (unsigned)vector->elements[n]);
     }
 
     printf("\n---\n");

@@ -2,8 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "constants.h"
+#include "ability.h"
 #include "champion.h"
 
+#define UNUSED(x) (void)(x)
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 
@@ -14,7 +17,7 @@ int setupExamples() {
     champion_t character1 = {
         .type = TYPE_COSMIC,
 		.effects = { 0 },
-		.stats = MAKE_STATS(5, 6, 5, 3, 8, 10),
+		.stats = { MAKE_STATS(5, 6, 5, 3, 8, 10) },
 		.abilities = { NULL }
     };
 
@@ -22,17 +25,18 @@ int setupExamples() {
     champion_t character2 = {
         .type = TYPE_BLOOD,
 		.effects = { 0 },
-		.stats = MAKE_STATS(7, 1, 9, 4, 5, 21),
+		.stats = { MAKE_STATS(7, 1, 9, 4, 5, 21) },
 		.abilities = { NULL }
     };
 
     champion_t character3 = {
         .type = TYPE_DARK,
 		.effects = { 0 },
-		.stats = MAKE_STATS(7, 4, 3, 8, 8, 11),
+		.stats = { MAKE_STATS(7, 4, 3, 8, 8, 11) },
 		.abilities = { NULL }
     };
 
+	UNUSED(character1); UNUSED(character2); UNUSED(character3);
     printf("setupExamples : Trois personnages créés.\n");
     return 0;
 }
@@ -64,4 +68,52 @@ void setStat(stat_value_t* stat, int value) {
     if (value < stat->minValue) { stat->value = stat->minValue; return; }
     if (value > stat->maxValue) { stat->value = stat->maxValue; return; }
     stat->value = value;
+}
+
+void applyAbility(champion_t* source, champion_t* destination, ability_t* ability) {
+    unsigned reader = 0;
+    champion_t* target = destination;
+
+    while (reader < MAX_ABILITY_OP_CODES) {
+        unsigned opCode = ability->opCodes[reader];
+        unsigned arg = 0;
+        if (reader + 1 < MAX_ABILITY_OP_CODES) { arg = ability->opCodes[reader + 1]; }
+
+        switch (opCode) {
+            case NOOP:
+                reader++;
+                break;
+
+            case SET_TARGET:
+                if (arg == 0) { target = source; }
+                if (arg == 1) { target = destination; }
+                reader += 2;
+                break;
+
+            case SET_HEALTH:
+                setStat(&target->stats[HEALTH], target->stats[HEALTH].value + arg);
+                reader += 2;
+                break;
+
+            case ADD_EFFECT:
+                target->effects[arg] = 1;
+                reader += 2;
+                break;
+
+            case REM_EFFECT:
+                target->effects[arg] = 0;
+                reader += 2;
+                break;
+
+            case IF_EFFECT:
+                if (!(target->effects[arg])) { return; }
+                reader++;
+                break;
+
+            case IF_TYPE:
+                if (target->type != arg) { return; }
+                reader++;
+                break;
+        }
+    }
 }

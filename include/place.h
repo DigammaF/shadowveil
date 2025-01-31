@@ -9,10 +9,15 @@
 
 typedef struct {
     char* name;
-    link_t* links[MAX_LINK_COUNT];
+    struct link_t* links[MAX_LINK_COUNT];
     hashmap_t* pawns; // *pawn_t
     hashmap_t* features; // feature_t*
 } place_t;
+
+typedef struct {
+    char* name;
+    place_t* target;
+} link_t;
 
 void initPlace(place_t* place);
 void dropPlace(place_t* place);

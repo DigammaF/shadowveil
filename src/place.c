@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "link.h"
 #include "place.h"
@@ -8,7 +9,7 @@
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 
 void initPlace(place_t* place) {
-    memset(place->links, NULL, sizeof(link_t*)*MAX_LINK_COUNT);
+	for (unsigned n = 0; n < MAX_LINK_COUNT; n++) { place->links[n] = NULL; }
     initHashmap(place->pawns);
     initHashmap(place->features);
 }

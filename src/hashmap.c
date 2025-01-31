@@ -24,7 +24,7 @@ void* hashmapGet(hashmap_t* hashmap, unsigned key) {
 }
 
 void hashmapSet(hashmap_t* hashmap, unsigned key, void* value) {
-    while (key >= hashmap->capacity) { increaseHashmapCapacity(&hashmap); }
+    while (key >= hashmap->capacity) { increaseHashmapCapacity(hashmap); }
     hashmap->elements[key] = value;
 }
 
@@ -39,6 +39,6 @@ void increaseHashmapCapacity(hashmap_t* hashmap) {
 void dumpHashmap(hashmap_t* hashmap) {
     for (unsigned n = 0; n < hashmap->capacity; n++) {
         if (hashmap->elements[n] == NULL) { continue; }
-        printf("%i -> %i ", n, (unsigned)hashmap->elements[n]);
+        //printf("%i -> %i ", n, (unsigned)hashmap->elements[n]);
     }
 }

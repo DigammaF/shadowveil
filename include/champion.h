@@ -9,14 +9,12 @@
 
 #define MAKE_STAT(n) (stat_value_t){ .value = 0, .maxValue = (n), .minValue = 0 }
 #define MAKE_STATS(atk, dfe, matk, mdfe, intel, health) \
-    ((stat_value_t[]) { \
-        MAKE_STAT(atk), \
-        MAKE_STAT(dfe), \
-        MAKE_STAT(matk), \
-        MAKE_STAT(mdfe), \
-        MAKE_STAT(intel), \
-        MAKE_STAT(health) \
-    })
+	{ .value = 0, .maxValue = atk, .minValue = 0 }, \
+	{ .value = 0, .maxValue = dfe, .minValue = 0 }, \
+	{ .value = 0, .maxValue = matk, .minValue = 0 }, \
+	{ .value = 0, .maxValue = mdfe, .minValue = 0 }, \
+	{ .value = 0, .maxValue = intel, .minValue = 0 }, \
+	{ .value = 0, .maxValue = health, .minValue = 0 }
 
 #define ABILITY_COUNT 3 /** nombre maximum d'attaques par personnage */
 
@@ -47,5 +45,6 @@ typedef struct {
 void setStat(stat_value_t* stat, int value);
 
 void generateChampion(unsigned seed, unsigned powerBudget, champion_t* champion);
+void applyAbility(champion_t* source, champion_t* destination, ability_t* ability);
 
 #endif
