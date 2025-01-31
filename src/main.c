@@ -85,10 +85,26 @@ int mainServer(int argc, const char* argv[]) {
 
 // ====== CLIENT ====== //
 
+
+void setupClientFileDescriptorSet(
+	socket_t* clientSocket, fd_set* fileDescriptorSet, int* maxFileDescriptor
+) {	
+	FD_ZERO(fileDescriptorSet);
+	
+	//écoute du serveur via le socket client
+	FD_SET(clientSocket, fileDescriptorSet);
+	*maxFileDescriptor = clientSocket.fileDescriptor;
+	
+	//écoute du clavier local
+	FD_SET(fileno(stdin), fileDescriptorSet);
+	
+	return;
+}
+
 int mainClient(int argc, const char* argv[]) {
 	UNUSED(argc); UNUSED(argv);
-	socket_t socket;
-	connectServer(&socket, "127.0.0.1", SERVER_PORT);
+	socket_t clientSocket;
+	connectServer(&clientSocket, "127.0.0.1", SERVER_PORT);
 	
 
 	while (1) {
@@ -96,7 +112,7 @@ int mainClient(int argc, const char* argv[]) {
 		int maxFileDescriptor;
 		setupFileDescriptorSet(&TODO
 	
-		sendData(&socket, "COMMAND");
+		sendData(&clientSocket, "COMMAND");
 		char data[1024];
 		size_t length = 1024;
 
