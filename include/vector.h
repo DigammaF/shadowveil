@@ -2,7 +2,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#define GROWTH_RATE 1.1
+#define VECTOR_GROWTH_RATE 1.1
 
 typedef struct {
     void** elements;
