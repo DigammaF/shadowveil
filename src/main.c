@@ -113,25 +113,28 @@ int mainClient(int argc, const char* argv[]) {
 		setupClientFileDescriptorSet( clientSocket, &fileDescriptorSet, &maxFileDescriptor );
 		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
 		handleClientSockets(&clientSocket, &fileDescriptorSet);
-		
-		
-	/** TODO : ancien à trier 
-	
-		sendData(&clientSocket, "COMMAND");
-		char data[1024];
-		size_t length = 1024;
-
-		do {
-			memset(data, 0, sizeof(data));
-			recvData(&socket, data, length);
-			printf("<<< '%s'\n", data);
-		} while (1);
-		*/
 	}
 }
 
-void handleClientSockets(socket_t clientSocket, fd_set* fileDescriptorSet){
-	//TODO
+void handleClientSockets(socket_t* clientSocket, fd_set* fileDescriptorSet){
+	TODO//checker fileDescriptorSet pour savoir quoi faire
+	
+	//si message reçu du serveur
+	if (TODO){
+		char data[1024];
+		size_t length = 1024;
+		memset(data, 0, sizeof(data));
+		
+		recvData(&socket, data, length);
+		printf("<<< '%s'\n", data);
+
+	} else {
+		//si input clavier
+		TODO lire input et le mettre dans stringToSend
+		sendData(clientSocket, stringToSend);
+	}
+	
+	return;
 }
 
 
