@@ -29,6 +29,9 @@ typedef struct {
     user_t* user; // possiblement NULL si le joueur n'est pas connecté
 } pawn_t;
 
+void initPawn(pawn_t* pawn);
+void dropPawn(pawn_t* pawn);
+
 /**
  * 
  *  Envoie un évènement à l'entité

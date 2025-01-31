@@ -6,6 +6,8 @@
 
 #define SERVER_PORT 58420
 
+void* noHandler(void* arg);
+
 typedef enum {
 	INITIAL, ADMIN, GAMEWORLD, COMBAT
 } context_t;

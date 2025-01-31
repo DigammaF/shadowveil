@@ -9,7 +9,9 @@
 #define WORLD_SIZE 65535
 
 typedef struct {
-    place_t* places[WORLD_SIZE][WORLD_SIZE];
+    place_t* places[WORLD_SIZE][WORLD_SIZE]; // possède place_t*
 } world_t;
+
+void generateWorld(world_t* world);
 
 #endif
