@@ -1,17 +1,30 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -pthread -Iinclude -Ilantern/include -Llantern
-LDFLAGS = -llantern -pthread -g
 
 # Directories
 SRC_DIR = src
 OBJ_DIR = obj
+DATA_STRUCTURES = data_structures
+GAME = game
+NETWORKING = networking
+COMMON = common
+
+CC = gcc
+CFLAGS =\
+	-Wall -Wextra -pthread\
+	-Iinclude -Iinclude/$(DATA_STRUCTURES) -Iinclude/$(GAME) -Iinclude/$(NETWORKING) -Iinclude/$(COMMON)\
+	-Ilantern/include\
+	-Llantern
+LDFLAGS = -llantern -pthread -g
 
 # Source files
 SRC =\
-	$(SRC_DIR)/main.c $(SRC_DIR)/function_stack.c $(SRC_DIR)/string_utils.c $(SRC_DIR)/stack.c\
-	$(SRC_DIR)/server.c $(SRC_DIR)/user.c $(SRC_DIR)/command_handlers.c $(SRC_DIR)/vector.c $(SRC_DIR)/constants.c\
-	$(SRC_DIR)/ability.c $(SRC_DIR)/champion.c $(SRC_DIR)/feature.c $(SRC_DIR)/hashmap.c\
-	$(SRC_DIR)/pawn.c $(SRC_DIR)/place.c $(SRC_DIR)/world.c
+	$(SRC_DIR)/main.c\
+	$(SRC_DIR)/$(COMMON)/constants.c $(SRC_DIR)/$(COMMON)/string_utils.c\
+	$(SRC_DIR)/$(DATA_STRUCTURES)/function_stack.c $(SRC_DIR)/$(DATA_STRUCTURES)/hashmap.c\
+	$(SRC_DIR)/$(DATA_STRUCTURES)/stack.c $(SRC_DIR)/$(DATA_STRUCTURES)/vector.c\
+	$(SRC_DIR)/$(GAME)/ability.c $(SRC_DIR)/$(GAME)/champion.c $(SRC_DIR)/$(GAME)/feature.c\
+	$(SRC_DIR)/$(GAME)/pawn.c $(SRC_DIR)/$(GAME)/place.c $(SRC_DIR)/$(GAME)/world.c\
+	$(SRC_DIR)/$(NETWORKING)/command_handlers.c $(SRC_DIR)/$(NETWORKING)/server.c\
+	$(SRC_DIR)/$(NETWORKING)/user.c
 
 # Object files
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
@@ -29,6 +42,10 @@ $(BIN): $(OBJ)
 # Compile object code
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(OBJ_DIR)/$(DATA_STRUCTURES)
+	@mkdir -p $(OBJ_DIR)/$(GAME)
+	@mkdir -p $(OBJ_DIR)/$(NETWORKING)
+	@mkdir -p $(OBJ_DIR)/$(COMMON)
 	$(CC) $(CFLAGS) -c $< -o $@ $(LDFLAGS)
 
 # Clean build artifacts
