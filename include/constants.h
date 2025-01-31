@@ -13,8 +13,7 @@ typedef enum {
 } context_t;
 
 typedef enum {
-	TYPE_FIRE = 0,
-	TYPE_WATER,
+	TYPE_WATER = 0,
 	TYPE_GRASS,
 	TYPE_ELECTRIC,
 	TYPE_ICE,
