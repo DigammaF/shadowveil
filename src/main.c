@@ -92,11 +92,13 @@ void setupClientFileDescriptorSet(
 	FD_ZERO(fileDescriptorSet);
 	
 	//écoute du serveur via le socket client
-	FD_SET(clientSocket, fileDescriptorSet);
-	*maxFileDescriptor = clientSocket.fileDescriptor;
+	FD_SET(clientSocket->fileDescriptor, fileDescriptorSet);
+	*maxFileDescriptor = clientSocket->fileDescriptor;
 	
 	//écoute du clavier local
-	FD_SET(fileno(stdin), fileDescriptorSet);
+	int stdinFileDescriptor = fileno(stdin);
+	FD_SET(stdinFileDescriptor, fileDescriptorSet);
+	if (stdinFileDescriptor > *maxFileDescriptor) { *maxFileDescriptor = stdinFileDescriptor; }
 	
 	return;
 }
@@ -110,17 +112,17 @@ int mainClient(int argc, const char* argv[]) {
 		fd_set fileDescriptorSet;
 		int maxFileDescriptor;
 		struct timeval timeout = { 0, SERVER_TICK };
-		setupClientFileDescriptorSet( clientSocket, &fileDescriptorSet, &maxFileDescriptor );
+		setupClientFileDescriptorSet( &clientSocket, &fileDescriptorSet, &maxFileDescriptor );
 		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
 		handleClientSockets(&clientSocket, &fileDescriptorSet);
 	}
 }
 
 void handleClientSockets(socket_t* clientSocket, fd_set* fileDescriptorSet){
-	TODO//checker fileDescriptorSet pour savoir quoi faire
+	// TODO checker fileDescriptorSet pour savoir quoi faire
 	
 	//si message reçu du serveur
-	if (TODO){
+	if (0){
 		char data[1024];
 		size_t length = 1024;
 		memset(data, 0, sizeof(data));
@@ -130,8 +132,8 @@ void handleClientSockets(socket_t* clientSocket, fd_set* fileDescriptorSet){
 
 	} else {
 		//si input clavier
-		TODO lire input et le mettre dans stringToSend
-		sendData(clientSocket, stringToSend);
+		// TODO lire input et le mettre dans stringToSend
+		// sendData(clientSocket, stringToSend);
 	}
 	
 	return;
