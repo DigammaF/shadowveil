@@ -136,13 +136,13 @@ void* adminHandler(void* arg) {
 	return NULL;
 }
 
-/**
- * Appelé durant la phase handleRegister()
- * Assigne un premier personnage au joueur
- */
-void* fillAccountHandler(void* arg){
-	character_t firstChampion = todo 
-	//
+// /**
+//  * Appelé durant la phase handleRegister()
+//  * Assigne un premier personnage au joueur
+//  */
+// void* fillAccountHandler(void* arg){
+// 	character_t firstChampion = todo 
+// 	//
 
-// 	pushFunction(&user->commandHandlers, gameworldHandler);
-// }
+// // 	pushFunction(&user->commandHandlers, gameworldHandler);
+// // }
