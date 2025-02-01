@@ -26,7 +26,6 @@ void setupClientFileDescriptorSet(socket_t* clientSocket, fd_set* fileDescriptor
 }
 
 void handleClientSockets(socket_t* clientSocket, fd_set* fileDescriptorSet){
-	UNUSED(fileDescriptorSet);
 	char line[1024];
 
 	if (FD_ISSET(clientSocket->fileDescriptor, fileDescriptorSet)) {
