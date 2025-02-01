@@ -11,7 +11,7 @@
 
 typedef struct {
 	socket_t* socket;
-	account_t* account;
+	account_t* account; // peut être NULL
 	time_t lastActivity;
 	unsigned address;
 	function_stack_t commandHandlers;

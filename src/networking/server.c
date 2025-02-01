@@ -35,12 +35,15 @@ void dropServer(server_t* server) {
 		if (server->users[n] != NULL) {
 			dropUser(server->users[n]);
 			free(server->users[n]);
+			server->users[n] = NULL;
 		}
 	}
 
 	for (unsigned n = 0; n < MAX_ACCOUNTS; n++) {
 		if (server->accounts[n] != NULL) {
+			dropAccount(server->accounts[n]);
 			free(server->accounts[n]);
+			server->accounts[n] = NULL;
 		}
 	}
 

@@ -33,4 +33,7 @@ typedef struct {
     int monoTarget;
 } ability_t;
 
+void initAbility(ability_t* ability);
+void dropAbility(ability_t* ability);
+
 #endif

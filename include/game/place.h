@@ -9,7 +9,7 @@
 
 typedef struct {
     char* name;
-    struct link_t* links[MAX_LINK_COUNT];
+    struct link_t* links[MAX_LINK_COUNT]; // possède la valeur
     hashmap_t* pawns; // *pawn_t
     hashmap_t* features; // feature_t*
 } place_t;

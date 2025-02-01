@@ -15,6 +15,11 @@ void initPlace(place_t* place) {
 }
 
 void dropPlace(place_t* place) {
+	for (unsigned n = 0; n < MAX_LINK_COUNT; n++) {
+		if (place->links[n] == NULL) { continue; }
+		free(place->links[n]);
+		place->links[n] = NULL;
+	}
     dropHashmap(place->pawns);
     dropHashmap(place->features);
 }

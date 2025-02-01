@@ -13,9 +13,9 @@
 typedef struct {
 	int running;
 	socket_t socket;
-	user_t* users[MAX_USERS];
+	user_t* users[MAX_USERS]; // possède la valeur
 	stack_t freeUsers;
-	account_t* accounts[MAX_ACCOUNTS];
+	account_t* accounts[MAX_ACCOUNTS]; // possède la valeur
 	stack_t freeAccounts;
 } server_t;
 

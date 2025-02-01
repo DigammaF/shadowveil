@@ -12,4 +12,7 @@ typedef struct {
 	unsigned address;
 } account_t;
 
+void initAccount(account_t* account);
+void dropAccount(account_t* account);
+
 #endif

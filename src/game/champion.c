@@ -10,7 +10,21 @@
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 
-#define AVERAGE_STARTING_POINTS 5
+void initChampion(champion_t* champion) {
+	champion->type = 0;
+	for (unsigned n = 0; n < EFFECT_COUNT; n++) { champion->effects[n] = 0; }
+	for (unsigned n = 0; n < STAT_COUNT; n++) { champion->stats[n] = MAKE_STAT(0); }
+	for (unsigned n = 0; n < ABILITY_COUNT; n++) { champion->abilities[n] = NULL; }
+}
+
+void dropChampion(champion_t* champion) {
+	for (unsigned n = 0; n < ABILITY_COUNT; n++) {
+		if (champion->abilities[n] == NULL) { continue; }
+		dropAbility(champion->abilities[n]);
+		free(champion->abilities[n]);
+		champion->abilities[n] = NULL;
+	}
+}
 
 /** Crée des personnages définis. */
 int setupExamples() {
