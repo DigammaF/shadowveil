@@ -5,6 +5,7 @@
 #include "constants.h"
 #include "ability.h"
 #include "champion.h"
+#include "random_utils.h"
 
 #define UNUSED(x) (void)(x)
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
@@ -54,8 +55,6 @@ int setupExamples() {
     printf("setupExamples : Trois personnages créés.\n");
     return 0;
 }
-
-int getRandomInt(int min, int max) { return min + rand() % (max - min); }
 
 int compare(const void* a, const void* b) { return (*(int*)a - *(int*)b); }
 

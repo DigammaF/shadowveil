@@ -19,6 +19,7 @@ LDFLAGS = -llantern -pthread -g
 SRC =\
 	$(SRC_DIR)/main.c\
 	$(SRC_DIR)/$(COMMON)/constants.c $(SRC_DIR)/$(COMMON)/string_utils.c\
+	$(SRC_DIR)/$(COMMON)/random_utils.c\
 	$(SRC_DIR)/$(DATA_STRUCTURES)/function_stack.c $(SRC_DIR)/$(DATA_STRUCTURES)/hashmap.c\
 	$(SRC_DIR)/$(DATA_STRUCTURES)/stack.c $(SRC_DIR)/$(DATA_STRUCTURES)/vector.c\
 	$(SRC_DIR)/$(GAME)/ability.c $(SRC_DIR)/$(GAME)/champion.c $(SRC_DIR)/$(GAME)/feature.c\
