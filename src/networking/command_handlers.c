@@ -142,7 +142,7 @@ void* debugEchoHandler(void* arg) {
 	user_t* user = context->user;
 	char message[1024];
 	char* line = joinString(context->args, " ");
-	printf("(received) '%s'\n", line);
+	printf("(received from %i) '%s'\n", user->address, line);
 	sprintf(message, "OUTPUT '%s'", line);
 	sendData(user->socket, message);
 	return NULL;

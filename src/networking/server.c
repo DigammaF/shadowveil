@@ -53,7 +53,7 @@ void dropServer(server_t* server) {
 
 int createUser(server_t* server, user_t* user, socket_t* socket) {
 	if (stackEmpty(&server->freeUsers)) {
-		printf("(!) impossible de trouver un emplacement utilisateur libre\n");
+		printf("(!) unable to find a free spot for new user\n");
 		return 0;
 	}
 
@@ -62,6 +62,7 @@ int createUser(server_t* server, user_t* user, socket_t* socket) {
 	user->lastActivity = time(NULL);
 	user->address = pop(&server->freeUsers);
 	pushFunction(&user->commandHandlers, debugEchoHandler);
+	server->users[user->address] = user;
 	return 1;
 }
 
@@ -74,7 +75,7 @@ int createAccount(
 	server_t* server, account_t* account, char* name, char* password, unsigned flags
 ) {
 	if (stackEmpty(&server->freeAccounts)) {
-		printf("(!) impossible de trouver un emplacement de compte libre\n");
+		printf("(!) unable to find a free spot for new account\n");
 		return 0;
 	}
 
@@ -151,10 +152,15 @@ void handleUserKeepAlive(user_t* user) {
 
 void handleUserRequest(server_t* server, user_t* user) {
 	char data[1024];
-	recvData(user->socket, data, 1024);
-	printf("(received) '%s'\n", data);
+	int byteCount = recvData(user->socket, data, 1024);
 	unsigned argCount;
 	char** args = splitString(data, &argCount);
+
+	if (byteCount == 0) {
+		printf("(-) user disconnected\n");
+		user->running = 0;
+		return;
+	}
 
 	if (argCount <= 0) {
 		printf("(!) user sent no data\n");
@@ -179,13 +185,7 @@ void handleUserRequest(server_t* server, user_t* user) {
 	}
 
 	if (!processed) {
-		char message[255];
-		sprintf(
-			message,
-			"ERROR argument invalide '%s' (attendu: COMMAND|END|KEEP-ALIVE)",
-			args[0]
-		);
-		sendData(user->socket, message);
+		printf("invalid argument '%s' (awaiting: COMMAND|END|KEEP-ALIVE)\n", args[0]);
 	}
 
 	freeSplit(args, argCount);

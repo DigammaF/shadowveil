@@ -51,10 +51,8 @@ void handleServerSockets(server_t* server, fd_set* fileDescriptorSet) {
 
 	for (unsigned n = 0; n < MAX_USERS; n++) {
 		if (server->users[n] == NULL) { continue; }
-		printf("checking %i\n", n);
 		user_t* user = server->users[n];
 		if (FD_ISSET(user->socket->fileDescriptor, fileDescriptorSet)) {
-			printf("handling incoming data from user\n");
 			handleUserRequest(server, user);
 		}
 	}
