@@ -22,7 +22,13 @@ typedef struct {
 void initPlace(place_t* place);
 void dropPlace(place_t* place);
 
-place_t* makePlain();
-place_t* makeDesert();
+void initLink(link_t* link);
+void dropLink(link_t* link);
+
+link_t* createLink(place_t* source, place_t* destination, char* name);
+void deleteLink(place_t* place, unsigned key);
+
+void makePlain(place_t* place);
+void makeDesert(place_t* place);
 
 #endif

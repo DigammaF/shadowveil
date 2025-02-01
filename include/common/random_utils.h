@@ -10,4 +10,11 @@
  */
 int getRandomInt(int min, int max);
 
+/**
+ * 
+ * 	Même chose avec [min; max]
+ * 
+ */
+int getRandomIntInclusive(int min, int max);
+
 #endif

@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "link.h"
 #include "place.h"
@@ -24,16 +25,38 @@ void dropPlace(place_t* place) {
     dropHashmap(place->features);
 }
 
-place_t* makePlain() {
-    place_t* place = malloc(sizeof(place_t));
-    CHECKM(place, "malloc place");
-    place->name = "Plaine";
-    return place;
+void initLink(link_t* link) {
+	link->target = NULL;
 }
 
-place_t* makeDesert() {
-    place_t* place = malloc(sizeof(place_t));
-    CHECKM(place, "malloc place");
+void dropLink(link_t* link) {
+	link->name = NULL;
+}
+
+link_t* createLink(place_t* source, place_t* destination, char* name) {
+	for (unsigned n = 0; n < MAX_LINK_COUNT; n++) {
+		if (source->links[n] != NULL) { continue; }
+		link_t* link = malloc(sizeof(link_t));
+		CHECKM(link, "malloc link");
+		link->target = destination;
+		link->name = name;
+		source->links[n] = (struct link_t*)link;
+		return link;
+	}
+	fprintf(stderr, "unable to find free key for new link\n");
+	exit(EXIT_FAILURE);
+}
+
+void deleteLink(place_t* place, unsigned key) {
+	dropLink((link_t*)place->links[key]);
+	free(place->links[key]);
+	place->links[key] = NULL;
+}
+
+void makePlain(place_t* place) {
+    place->name = "Plaine";
+}
+
+void makeDesert(place_t* place) {
     place->name = "Désert";
-    return place;
 }
