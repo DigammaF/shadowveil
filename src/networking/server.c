@@ -61,7 +61,7 @@ int createUser(server_t* server, user_t* user, socket_t* socket) {
 	user->socket = socket;
 	user->lastActivity = time(NULL);
 	user->address = pop(&server->freeUsers);
-	pushFunction(&user->commandHandlers, initialHandler);
+	pushFunction(&user->commandHandlers, debugEchoHandler);
 	return 1;
 }
 
@@ -152,7 +152,8 @@ void handleUserKeepAlive(user_t* user) {
 void handleUserRequest(server_t* server, user_t* user) {
 	char data[1024];
 	recvData(user->socket, data, 1024);
-	int argCount;
+	printf("(received) '%s'\n", data);
+	unsigned argCount;
 	char** args = splitString(data, &argCount);
 
 	if (argCount <= 0) {
@@ -160,7 +161,7 @@ void handleUserRequest(server_t* server, user_t* user) {
 		return;
 	}
 
-	int processed = 0;
+	unsigned processed = 0;
 
 	if (strcmp(args[0], "COMMAND") == 0) {
 		processed = 1;

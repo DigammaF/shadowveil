@@ -10,7 +10,7 @@ client
 		LOGIN <name> <password>
 		REGISTER <name> <password>
 		- gameworld
-		MOVE <E|W|N|S>
+		MOVE <int>
 		INTERACT <int>
 		MESSAGE <int> <word>+
 		GLOBAL-MESSAGE <word>+
@@ -24,6 +24,7 @@ client
 		BUY-CHAMPION <int>
 		SELL-ITEM <int> <int>
 		BUY-ITEM <int>
+		CHECK-MARKET
 		SEE
 		- combat
 		ATTACK <int> <int> <int>

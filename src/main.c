@@ -10,6 +10,7 @@
 #include "vector.h"
 #include "server.h"
 #include "constants.h"
+#include "string_utils.h"
 
 #define SERVER_TICK 500 // ms
 
@@ -18,6 +19,7 @@
 
 
 // ====== SERVER ====== //
+
 
 void setupServer(server_t* server) {
 	account_t* account = malloc(sizeof(account_t));
@@ -48,9 +50,11 @@ void handleServerSockets(server_t* server, fd_set* fileDescriptorSet) {
 	}
 
 	for (unsigned n = 0; n < MAX_USERS; n++) {
-		if (server->users[n] == NULL) { continue; } //todo mettre vecteur
+		if (server->users[n] == NULL) { continue; }
+		printf("checking %i\n", n);
 		user_t* user = server->users[n];
 		if (FD_ISSET(user->socket->fileDescriptor, fileDescriptorSet)) {
+			printf("handling incoming data from user\n");
 			handleUserRequest(server, user);
 		}
 	}
@@ -64,7 +68,6 @@ int mainServer(int argc, const char* argv[]) {
 	server.running = 1;
 	serverSTREAM(&server.socket, "127.0.0.1", SERVER_PORT, 5);
 	printf("(+) server ready\n");
-
 
 	while (server.running) {
 		update(&server);
@@ -80,7 +83,6 @@ int mainServer(int argc, const char* argv[]) {
 	dropServer(&server);
 	return 0;
 }
-
 
 
 // ====== CLIENT ====== //
@@ -105,21 +107,19 @@ void setupClientFileDescriptorSet(
 
 void handleClientSockets(socket_t* clientSocket, fd_set* fileDescriptorSet){
 	UNUSED(fileDescriptorSet);
-	// TODO checker fileDescriptorSet pour savoir quoi faire
-	
-	//si message reçu du serveur
-	if (0){
-		char data[1024];
-		size_t length = 1024;
-		memset(data, 0, sizeof(data));
-		
-		recvData(clientSocket, data, length);
-		printf("<<< '%s'\n", data);
+	char line[1024];
 
-	} else {
-		//si input clavier
-		// TODO lire input et le mettre dans stringToSend
-		// sendData(clientSocket, stringToSend);
+	if (FD_ISSET(clientSocket->fileDescriptor, fileDescriptorSet)) {
+		int byteCount = recvData(clientSocket, line, 1024);
+		if (!byteCount) { printf("server closed connection!\n"); exit(EXIT_SUCCESS); }
+		printf("(received) '%s'\n", line);
+	}
+
+	if (FD_ISSET(fileno(stdin), fileDescriptorSet)) {
+		fgets(line, sizeof(line), stdin);
+		line[strlen(line) - 1] = '\0';
+		printf("(sending) '%s'\n", line);
+		sendData(clientSocket, line);
 	}
 	
 	return;
@@ -134,7 +134,7 @@ int mainClient(int argc, const char* argv[]) {
 		fd_set fileDescriptorSet;
 		int maxFileDescriptor;
 		struct timeval timeout = { 0, SERVER_TICK };
-		setupClientFileDescriptorSet( &clientSocket, &fileDescriptorSet, &maxFileDescriptor );
+		setupClientFileDescriptorSet(&clientSocket, &fileDescriptorSet, &maxFileDescriptor);
 		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
 		handleClientSockets(&clientSocket, &fileDescriptorSet);
 	}
@@ -143,6 +143,7 @@ int mainClient(int argc, const char* argv[]) {
 
 // ====== BOTH SERVER AND CLIENT ====== //
 
+
 int main(int argc, const char* argv[]) {
 
 	if (argc > 1) {
@@ -150,23 +151,18 @@ int main(int argc, const char* argv[]) {
 		if (strcmp(argv[1], "client") == 0) { mainClient(argc, argv); }
 	}
 
-	vector_t vec;
-	initVector(&vec);
-	dumpVector(&vec);
-	vectorAppend(&vec, (void*)8);
-	vectorAppend(&vec, (void*)16);
-	dumpVector(&vec);
-	// printf("%i\n", (unsigned)vectorGet(&vec, 1));
-	vectorSet(&vec, 1, (void*)42);
-	dumpVector(&vec);
-	vectorInsert(&vec, 0, (void*)23);
-	dumpVector(&vec);
-	vectorPop(&vec, 1);
-	dumpVector(&vec);
+	unsigned count;
+	char** parts = splitString("ONE TWO THREE", &count);
+
+	for (unsigned n = 0; n < count; n++) {
+		printf("'%s'\n", parts[n]);
+	}
+
+	char* text = joinString(parts, "-");
+	printf("'%s'\n", text);
 
 	return 0;
 }
-
 
 void getInput(char* input) {
 	printf(": ");

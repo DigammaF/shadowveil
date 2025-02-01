@@ -6,4 +6,6 @@ void* initialHandler(void* arg);
 void* gameWorldHandler(void* arg);
 void* adminHandler(void* arg);
 
+void* debugEchoHandler(void* arg);
+
 #endif

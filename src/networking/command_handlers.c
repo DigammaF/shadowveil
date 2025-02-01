@@ -10,6 +10,7 @@
 #include "account.h"
 #include "constants.h"
 #include "function_stack.h"
+#include "string_utils.h"
 
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 #define UNUSED(x) (void)(x)
@@ -133,6 +134,17 @@ void* gameWorldHandler(void* arg) {
 
 void* adminHandler(void* arg) {
 	UNUSED(arg);
+	return NULL;
+}
+
+void* debugEchoHandler(void* arg) {
+	commandContext_t* context = (commandContext_t*)arg;
+	user_t* user = context->user;
+	char message[1024];
+	char* line = joinString(context->args, " ");
+	printf("(received) '%s'\n", line);
+	sprintf(message, "OUTPUT '%s'", line);
+	sendData(user->socket, message);
 	return NULL;
 }
 

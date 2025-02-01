@@ -2,7 +2,10 @@
 #ifndef STRING_UTILS_H
 #define STRING_UTILS_H
 
-char** splitString(const char* str, int* count);
-void freeSplit(char** result, int count);
+char** splitString(const char* str, unsigned* count);
+void freeSplit(char** result, unsigned count);
+
+char* joinString(char** str, const char* joiner);
+void freeJoin(char* str);
 
 #endif

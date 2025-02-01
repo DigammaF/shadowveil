@@ -7,7 +7,7 @@
 
 #include "string_utils.h"
 
-char** splitString(const char* str, int* count) {
+char** splitString(const char* str, unsigned* count) {
     if (!str) {
         *count = 0;
         return NULL;
@@ -55,9 +55,50 @@ char** splitString(const char* str, int* count) {
     return result;
 }
 
-void freeSplit(char** result, int count) {
-    for (int i = 0; i < count; i++) {
+void freeSplit(char** result, unsigned count) {
+    for (unsigned i = 0; i < count; i++) {
         free(result[i]);
     }
     free(result);
+}
+
+char* joinString(char** str, const char* joiner) {
+	if (!str || !joiner) {
+		return NULL;
+	}
+
+	size_t joinerLen = strlen(joiner);
+	size_t totalLen = 0;
+	int count = 0;
+
+	// Calculate the total length of the resulting string
+	while (str[count]) {
+		totalLen += strlen(str[count]);
+		if (str[count + 1]) {
+			totalLen += joinerLen;
+		}
+		count++;
+	}
+
+	char* result = malloc(totalLen + 1);
+	if (!result) {
+		perror("joinString: malloc");
+		exit(EXIT_FAILURE);
+	}
+
+	result[0] = '\0';
+
+	// Concatenate the strings with the joiner
+	for (int i = 0; i < count; i++) {
+		strcat(result, str[i]);
+		if (i < count - 1) {
+			strcat(result, joiner);
+		}
+	}
+
+	return result;
+}
+
+void freeJoin(char* str) {
+	free(str);
 }
