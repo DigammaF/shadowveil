@@ -43,4 +43,6 @@ int checkPassword(account_t* account, char* password);
 void update(server_t* server);
 void updateUser(server_t* server, user_t* user);
 
+int mainServer(int argc, const char* argv[]);
+
 #endif

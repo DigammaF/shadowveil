@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "lantern.h"
 #include "constants.h"
@@ -14,6 +15,7 @@
 
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
+#define UNUSED(x) (void)(x)
 
 void initServer(server_t* server) {
 	initStack(&server->freeUsers);
@@ -203,4 +205,65 @@ void updateUser(server_t* server, user_t* user) {
 		deleteUser(server, user);
 		dropUser(user);
 	}
+}
+
+void setupServer(server_t* server) {
+	account_t* account = malloc(sizeof(account_t));
+	CHECKM(account, "account");
+	createAccount(server, account, "admin", "admin\n", ADMIN_FLAG);
+}
+
+void setupServerFileDescriptorSet(
+	server_t* server, fd_set* fileDescriptorSet, int* maxFileDescriptor
+) {
+	FD_ZERO(fileDescriptorSet);
+	FD_SET(server->socket.fileDescriptor, fileDescriptorSet);
+	*maxFileDescriptor = server->socket.fileDescriptor;
+
+	for (unsigned n = 0; n < MAX_USERS; n++) {
+		if (server->users[n] == NULL) { continue; }
+		user_t* user = server->users[n];
+		FD_SET(user->socket->fileDescriptor, fileDescriptorSet);
+		if (user->socket->fileDescriptor > *maxFileDescriptor) {
+			*maxFileDescriptor = user->socket->fileDescriptor;
+		}
+	}
+}
+
+void handleServerSockets(server_t* server, fd_set* fileDescriptorSet) {
+	if (FD_ISSET(server->socket.fileDescriptor, fileDescriptorSet)) {
+		handleNewConnection(server);
+	}
+
+	for (unsigned n = 0; n < MAX_USERS; n++) {
+		if (server->users[n] == NULL) { continue; }
+		user_t* user = server->users[n];
+		if (FD_ISSET(user->socket->fileDescriptor, fileDescriptorSet)) {
+			handleUserRequest(server, user);
+		}
+	}
+}
+
+int mainServer(int argc, const char* argv[]) {
+	UNUSED(argc); UNUSED(argv);
+	server_t server;
+	initServer(&server);
+	setupServer(&server);
+	server.running = 1;
+	serverSTREAM(&server.socket, "127.0.0.1", SERVER_PORT, 5);
+	printf("(+) server ready\n");
+
+	while (server.running) {
+		update(&server);
+		struct timeval timeout = { 0, SERVER_TICK };
+		fd_set fileDescriptorSet;
+		int maxFileDescriptor;
+		setupServerFileDescriptorSet(&server, &fileDescriptorSet, &maxFileDescriptor);
+		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
+		handleServerSockets(&server, &fileDescriptorSet);
+	}
+
+	closeSocket(&server.socket);
+	dropServer(&server);
+	return 0;
 }
