@@ -130,7 +130,7 @@ void setRemote(socket_t* socket, const char* address, const short port) {
 	memset(&addressObject, 0, sizeof(addressObject));
 	addressObject.sin_family = AF_INET;
 	addressObject.sin_port = htons(port);
-	CHECK(inet_pton(AF_INET, address, &addressObject.sin_addr), "inet_pton");
+	inet_pton(AF_INET, address, &addressObject.sin_addr);
 	socket->remote = addressObject;
 }
 

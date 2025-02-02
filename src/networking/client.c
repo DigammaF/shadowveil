@@ -5,12 +5,18 @@
 #include <sys/select.h>
 #include <string.h>
 
+#include "client.h"
 #include "lantern.h"
 #include "constants.h"
 
 #define UNUSED(x) (void)(x)
 
-void setupClientFileDescriptorSet(socket_t* clientSocket, fd_set* fileDescriptorSet, int* maxFileDescriptor) {
+void initClient(client_t* client) { UNUSED(client); }
+
+void dropClient(client_t* client) { UNUSED(client); }
+
+void setupClientFileDescriptorSet(client_t* client, fd_set* fileDescriptorSet, int* maxFileDescriptor) {
+	socket_t* clientSocket = &client->socket;
 	FD_ZERO(fileDescriptorSet);
 	
 	//écoute du serveur via le socket client
@@ -25,20 +31,28 @@ void setupClientFileDescriptorSet(socket_t* clientSocket, fd_set* fileDescriptor
 	return;
 }
 
-void handleClientSockets(socket_t* clientSocket, fd_set* fileDescriptorSet){
-	char line[1024];
+void handleClientSockets(client_t* client, fd_set* fileDescriptorSet){
+	socket_t* clientSocket = &client->socket;
 
 	if (FD_ISSET(clientSocket->fileDescriptor, fileDescriptorSet)) {
+		char line[1024];
 		int byteCount = recvData(clientSocket, line, 1024);
-		if (!byteCount) { printf("server closed connection!\n"); exit(EXIT_SUCCESS); }
+		if (byteCount == 0) {
+			printf("(-) le serveur a mis fin à la connexion\n");
+			client->running = 0;
+			return;
+		}
 		printf("(received) '%s'\n", line);
 	}
 
 	if (FD_ISSET(fileno(stdin), fileDescriptorSet)) {
+		char line[512];
 		fgets(line, sizeof(line), stdin);
 		line[strlen(line) - 1] = '\0';
 		printf("(sending) '%s'\n", line);
-		sendData(clientSocket, line);
+		char sent[1024];
+		sprintf(sent, "COMMAND %s", line);
+		sendData(clientSocket, sent);
 	}
 	
 	return;
@@ -48,13 +62,22 @@ int mainClient(int argc, const char* argv[]) {
 	UNUSED(argc); UNUSED(argv);
 	socket_t clientSocket;
 	connectServer(&clientSocket, "127.0.0.1", SERVER_PORT);
+	client_t client;
+	initClient(&client);
+	client.socket = clientSocket;
+	client.prompt = "( )";
+	client.running = 1;
 	
-	while (1) {
+	while (client.running) {
 		fd_set fileDescriptorSet;
 		int maxFileDescriptor;
 		struct timeval timeout = { 0, SERVER_TICK };
-		setupClientFileDescriptorSet(&clientSocket, &fileDescriptorSet, &maxFileDescriptor);
+		setupClientFileDescriptorSet(&client, &fileDescriptorSet, &maxFileDescriptor);
 		select(maxFileDescriptor + 1, &fileDescriptorSet, NULL, NULL, &timeout);
-		handleClientSockets(&clientSocket, &fileDescriptorSet);
+		handleClientSockets(&client, &fileDescriptorSet);
 	}
+
+	closeSocket(&clientSocket);
+	dropClient(&client);
+	return 0;
 }

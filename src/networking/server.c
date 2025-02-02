@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <sys/time.h>
+#include <arpa/inet.h>
 
 #include "lantern.h"
 #include "constants.h"
@@ -63,7 +64,7 @@ int createUser(server_t* server, user_t* user, socket_t* socket) {
 	user->socket = socket;
 	user->lastActivity = time(NULL);
 	user->address = pop(&server->freeUsers);
-	pushFunction(&user->commandHandlers, debugEchoHandler);
+	pushFunction(&user->commandHandlers, initialHandler);
 	server->users[user->address] = user;
 	return 1;
 }
@@ -73,16 +74,14 @@ void deleteUser(server_t* server, user_t* user) {
 	push(&server->freeUsers, user->address);
 }
 
-int createAccount(
-	server_t* server, account_t* account, char* name, char* password, unsigned flags
-) {
+int createAccount(server_t* server, account_t* account, char* name, char* password, unsigned flags) {
 	if (stackEmpty(&server->freeAccounts)) {
 		printf("(!) unable to find a free spot for new account\n");
 		return 0;
 	}
 
-	account->name = name;
-	account->password = password;
+	account->name = strdup(name);
+	account->password = strdup(password);
 	account->flags = flags;
 	account->address = pop(&server->freeAccounts);
 	server->accounts[account->address] = account;
@@ -117,7 +116,9 @@ void handleNewConnection(server_t* server) {
 	initUser(user);
 	user->socket = socket;
 	if (createUser(server, user, socket)) {
-		printf("(+) created new user\n");
+		char IPAddress[512];
+		inet_ntop(AF_INET, &(socket->remote.sin_addr), IPAddress, sizeof(IPAddress));
+		printf("(+) created user %i for remote host %s:%i\n", user->address, IPAddress, socket->remote.sin_port);
 	} else {
 		printf("(!) unable to create new user\n");
 		closeSocket(socket);
@@ -159,16 +160,17 @@ void handleUserRequest(server_t* server, user_t* user) {
 	char** args = splitString(data, &argCount);
 
 	if (byteCount == 0) {
-		printf("(-) user disconnected\n");
+		printf("(-) [%i] user disconnected\n", user->address);
 		user->running = 0;
 		return;
 	}
 
 	if (argCount <= 0) {
-		printf("(!) user sent no data\n");
+		printf("(!) [%i] user sent no data\n", user->address);
 		return;
 	}
 
+	printf("(&) [%i] %s\n", user->address, data);
 	unsigned processed = 0;
 
 	if (strcmp(args[0], "COMMAND") == 0) {

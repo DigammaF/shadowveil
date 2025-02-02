@@ -15,14 +15,9 @@
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 #define UNUSED(x) (void)(x)
 
-int checkArgCount(socket_t* socket, int count, int expected) {
+int checkArgCount(user_t* user, int count, int expected) {
 	if (count == expected) { return 1; }
-	char message[255];
-	sprintf(
-		message,
-		"ERROR mauvais nombre d'arguments: %i (attendu: %i)", count, expected
-	);
-	sendData(socket, message);
+	printf("(!) [%i] user sent %i args (expected: %i)", user->address, count, expected);
 	return 0;
 }
 
@@ -30,34 +25,34 @@ void handleLogin(server_t* server, user_t* user, commandContext_t* context) {
 	account_t* account = locateAccount(server, context->args[2]);
 
 	if (account == NULL) {
-		printf("\t[introuvable]\n");
+		printf("\t[cannot find]\n");
 		sendData(user->socket, "OUTPUT ce compte n'existe pas");
 		return;
 	}
 
-	if (account->flags | BANNED_FLAG) {
-		printf("\t[banni]\n");
+	if (account->flags & BANNED_FLAG) {
+		printf("\t[banned]\n");
 		sendData(user->socket, "OUTPUT ce compte est banni");
 		return;
 	}
 
 	if (!checkPassword(account, context->args[3])) {
-		printf("\t[mot de passe incorrect]\n");
+		printf("\t[wrong password]\n");
 		sendData(user->socket, "OUTPUT mauvais mot de passe");
 		return;
 	}
 
-	if (account->flags | ADMIN_FLAG) {
+	if (account->flags & ADMIN_FLAG) {
 		printf("\t[admin]\n");
 		popFunction(&user->commandHandlers);
 		pushFunction(&user->commandHandlers, adminHandler);
 		char message[255];
-		sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
+		sprintf(message, "SET-CONTEXT %i", ADMIN);
 		sendData(user->socket, message);
 		return;
 	}
 
-	printf("\t[basique]\n");
+	printf("\t[standard]\n");
 	popFunction(&user->commandHandlers);
 	pushFunction(&user->commandHandlers, gameWorldHandler);
 	user->account = account;
@@ -70,18 +65,17 @@ void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
 	account_t* account = locateAccount(server, context->args[2]);
 
 	if (account != NULL) {
-		printf("\t[existe déjà]\n");
+		printf("\t[already exists]\n");
 		sendData(user->socket, "OUTPUT ce compte existe déjà");
 		return;
 	}
 
-	printf("\t[allocation...]\n");
 	account = malloc(sizeof(account_t));
 	CHECKM(account, "account");
-	printf("\t[création...]\n");
+	printf("\t[creation of '%s' with password '%s']\n", context->args[2], context->args[3]);
 
 	if (createAccount(server, account, context->args[2], context->args[3], 0)) {
-		printf("\t[réussi]\n");
+		printf("\t[success]\n");
 		user->account = account;
 		popFunction(&user->commandHandlers);
 		pushFunction(&user->commandHandlers, gameWorldHandler);
@@ -101,25 +95,21 @@ void* initialHandler(void* arg) {
 	user_t* user = context->user;
 	server_t* server = context->server;
 
-	if (!checkArgCount(user->socket, context->count, 4)) { return NULL; }
+	if (!checkArgCount(user, context->count, 4)) { return NULL; }
 
 	if (strcmp(context->args[1], "LOGIN") == 0) {
-		printf("(+) chargement de compte\n");
+		printf("(+) fetching account\n");
 		handleLogin(server, user, context);
 		return NULL;
 	}
 
 	if (strcmp(context->args[1], "REGISTER") == 0) {
-		printf("(+) création d'un compte\n");
+		printf("(+) creating account\n");
 		handleRegister(server, user, context);
+		return NULL;
 	}
 
-	char message[255];
-	sprintf(
-		message,
-		"ERROR argument invalide '%s' (attendu: LOGIN|REGISTER)", context->args[1]
-	);
-	sendData(user->socket, message);
+	printf("(!) invalid argument '%s' (expected: LOGIN|REGISTER)\n", context->args[1]);
 	return NULL;
 }
 
