@@ -3,18 +3,20 @@
 #define PAWN_H
 
 #include "function_stack.h"
-#include "server.h"
-#include "account.h"
-#include "user.h"
-#include "place.h"
 
-typedef struct {
+struct account_t;
+struct user_t;
+struct server_t;
+struct place_t;
+
+typedef struct pawn_t {
     char* name;
     unsigned exhaustion;
-    place_t* place;
+    struct place_t* place;
     function_t eventHandler; // void* eventHandler(pawn_event_t*)
-    account_t* account; // possiblement NULL si entité non joueur
-    user_t* user; // possiblement NULL si le joueur n'est pas connecté
+    struct account_t* account; // possiblement NULL si entité non joueur
+    struct user_t* user; // possiblement NULL si le joueur n'est pas connecté
+	unsigned pawnKey; // la clé de l'entité dans le dictionnaire .pawns de la place_t dans laquelle elle se situe
 } pawn_t;
 
 typedef enum {
@@ -24,10 +26,12 @@ typedef enum {
 
 typedef struct {
     pawn_event_type_t type;
-    server_t* server;
+    struct server_t* server;
     pawn_t* pawn;
     void* args;
 } pawn_event_t;
+
+#define MAKE_EVENT(t, a) (pawn_event_t) { .type = t, .server = NULL, .pawn = NULL, .args = a }
 
 void initPawn(pawn_t* pawn);
 void dropPawn(pawn_t* pawn);
@@ -38,6 +42,10 @@ void dropPawn(pawn_t* pawn);
  *  il suffit de renseigner event.type et event.args
  * 
  */
-void sendPawnEvent(server_t* server, pawn_t* pawn, pawn_event_t* event);
+void sendPawnEvent(struct server_t* server, pawn_t* pawn, pawn_event_t* event);
+
+typedef struct {
+	pawn_t* pawn;
+} pawn_move_args_t;
 
 #endif

@@ -5,13 +5,14 @@
 #include <time.h>
 
 #include "lantern.h"
-#include "account.h"
 #include "function_stack.h"
 #include "vector.h"
 
-typedef struct {
+struct account_t;
+
+typedef struct user_t {
 	socket_t socket;
-	account_t* account; // peut être NULL
+	struct account_t* account; // peut être NULL
 	time_t lastActivity;
 	unsigned id;
 	function_stack_t commandHandlers;

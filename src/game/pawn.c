@@ -1,4 +1,7 @@
 
+#include <stdlib.h>
+
+#include "server.h"
 #include "pawn.h"
 #include "constants.h"
 

@@ -6,14 +6,14 @@
 #include <sys/time.h>
 #include <arpa/inet.h>
 
-#include "lantern.h"
-#include "constants.h"
 #include "server.h"
-#include "stack.h"
-#include "function_stack.h"
+#include "lantern.h"
+#include "user.h"
+#include "account.h"
+#include "constants.h"
 #include "command_handlers.h"
 #include "string_utils.h"
-#include "hashmap.h"
+#include "world.h"
 
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
@@ -187,11 +187,10 @@ void setupServer(server_t* server) {
 	account_t* account = malloc(sizeof(account_t));
 	CHECKM(account, "account");
 	createAccount(server, account, "admin", "admin\n", ADMIN_FLAG);
+	generateWorld(&server->world);
 }
 
-void setupServerFileDescriptorSet(
-	server_t* server, fd_set* fileDescriptorSet, int* maxFileDescriptor
-) {
+void setupServerFileDescriptorSet(server_t* server, fd_set* fileDescriptorSet, int* maxFileDescriptor) {
 	FD_ZERO(fileDescriptorSet);
 	FD_SET(server->socket.fileDescriptor, fileDescriptorSet);
 	*maxFileDescriptor = server->socket.fileDescriptor;
@@ -222,7 +221,7 @@ void handleServerSockets(server_t* server, fd_set* fileDescriptorSet) {
 	}
 }
 
-int mainServer(int argc, const char* argv[]) {
+int mainServer(int argc, const char** argv) {
 	UNUSED(argc); UNUSED(argv);
 	server_t server;
 	initServer(&server);

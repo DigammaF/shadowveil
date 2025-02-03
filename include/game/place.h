@@ -2,18 +2,20 @@
 #ifndef PLACE_H
 #define PLACE_H
 
-#include "link.h"
 #include "hashmap.h"
 #include "vector.h"
 
-typedef struct {
+struct pawn_t;
+struct server_t;
+
+typedef struct place_t {
     char* name;
     hashmap_t links; // link_t*, possède la valeur
     hashmap_t pawns; // pawn_t*
     hashmap_t features; // feature_t*
 } place_t;
 
-typedef struct {
+typedef struct link_t {
     char* name;
     place_t* target;
 	unsigned id;
@@ -30,5 +32,12 @@ void deleteLink(place_t* place, unsigned key);
 
 void makePlain(place_t* place);
 void makeDesert(place_t* place);
+
+void addPawn(place_t* place, struct pawn_t* pawn);
+void remPawn(place_t* place, struct pawn_t* pawn);
+
+void notifyPawnLeft(struct server_t* server, place_t* place, struct pawn_t* pawn);
+void notifyPawnArrived(struct server_t* server, place_t* place, struct pawn_t* pawn);
+void movePawn(struct server_t* server, struct pawn_t* pawn, link_t* link);
 
 #endif

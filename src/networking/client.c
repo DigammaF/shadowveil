@@ -58,7 +58,7 @@ void handleClientSockets(client_t* client, fd_set* fileDescriptorSet){
 	return;
 }
 
-int mainClient(int argc, const char* argv[]) {
+int mainClient(int argc, const char** argv) {
 	UNUSED(argc); UNUSED(argv);
 	socket_t clientSocket;
 	connectServer(&clientSocket, "127.0.0.1", SERVER_PORT);

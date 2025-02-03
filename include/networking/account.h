@@ -5,7 +5,7 @@
 #define ADMIN_FLAG (1 << 0)
 #define BANNED_FLAG (1 << 1)
 
-typedef struct {
+typedef struct account_t {
 	char* name;
 	char* password;
 	unsigned flags;
