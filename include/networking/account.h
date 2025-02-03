@@ -9,7 +9,7 @@ typedef struct {
 	char* name;
 	char* password;
 	unsigned flags;
-	unsigned address;
+	unsigned id;
 } account_t;
 
 void initAccount(account_t* account);

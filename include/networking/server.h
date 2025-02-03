@@ -6,17 +6,14 @@
 #include "account.h"
 #include "user.h"
 #include "stack.h"
-
-#define MAX_USERS 1024
-#define MAX_ACCOUNTS 1024
+#include "hashmap.h"
 
 typedef struct {
 	int running;
 	socket_t socket;
-	user_t* users[MAX_USERS]; // possède la valeur
-	stack_t freeUsers;
-	account_t* accounts[MAX_ACCOUNTS]; // possède la valeur
-	stack_t freeAccounts;
+	hashmap_t users; // user_t*, possède la valeur
+	hashmap_t accounts; // account_t*, possède la valeur
+	unsigned long long nextId;
 } server_t;
 
 typedef struct {
@@ -32,10 +29,10 @@ void handleUserRequest(server_t* server, user_t* user);
 void initServer(server_t* server);
 void dropServer(server_t* server);
 
-int createUser(server_t* server, user_t* user, socket_t* socket);
+void createUser(server_t* server, user_t* user, socket_t* socket);
 void deleteUser(server_t* server, user_t* user);
 
-int createAccount(server_t* server, account_t* account, char* name, char* password, unsigned flags);
+void createAccount(server_t* server, account_t* account, char* name, char* password, unsigned flags);
 void deleteAccount(server_t* server, account_t* account);
 account_t* locateAccount(server_t* server, char* name);
 int checkPassword(account_t* account, char* password);

@@ -13,7 +13,7 @@ typedef struct {
 	socket_t socket;
 	account_t* account; // peut être NULL
 	time_t lastActivity;
-	unsigned address;
+	unsigned id;
 	function_stack_t commandHandlers;
 	int running;
 } user_t;

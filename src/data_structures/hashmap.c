@@ -28,6 +28,16 @@ void hashmapSet(hashmap_t* hashmap, unsigned key, void* value) {
     hashmap->elements[key] = value;
 }
 
+unsigned hashmapLocateUnusedKey(hashmap_t* hashmap) {
+	for (unsigned key = 0; key < hashmap->capacity; key++) {
+		if (hashmap->elements[key] == NULL) { return key; }
+	}
+
+	unsigned key = hashmap->capacity;
+	increaseHashmapCapacity(hashmap);
+	return key;
+}
+
 void increaseHashmapCapacity(hashmap_t* hashmap) {
     unsigned newCapacity = hashmap->capacity*HASHMAP_GROWTH_RATE + 3;
     if (newCapacity <= hashmap->capacity) { fprintf(stderr, "cannot increase hashmap capacity\n"); exit(EXIT_FAILURE); }

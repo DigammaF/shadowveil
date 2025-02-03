@@ -17,7 +17,7 @@
 
 int checkArgCount(user_t* user, int count, int expected) {
 	if (count == expected) { return 1; }
-	printf("(!) [%i] user sent %i args (expected: %i)", user->address, count, expected);
+	printf("(!) [%i] user sent %i args (expected: %i)", user->id, count, expected);
 	return 0;
 }
 
@@ -72,22 +72,17 @@ void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
 
 	account = malloc(sizeof(account_t));
 	CHECKM(account, "account");
+	initAccount(account);
 	printf("\t[creation of '%s' with password '%s']\n", context->args[2], context->args[3]);
-
-	if (createAccount(server, account, context->args[2], context->args[3], 0)) {
-		printf("\t[success]\n");
-		user->account = account;
-		popFunction(&user->commandHandlers);
-		pushFunction(&user->commandHandlers, gameWorldHandler);
-		char message[255];
-		sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
-		sendData(&user->socket, message);
-		return;
-	} else {
-		printf("\t[impossible]\n");
-		sendData(&user->socket, "ERROR impossible de créer le compte");
-		return;
-	}
+	createAccount(server, account, context->args[2], context->args[3], 0);
+	printf("\t[success]\n");
+	user->account = account;
+	popFunction(&user->commandHandlers);
+	pushFunction(&user->commandHandlers, gameWorldHandler);
+	char message[255];
+	sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
+	sendData(&user->socket, message);
+	return;
 }
 
 void* initialHandler(void* arg) {
@@ -132,7 +127,7 @@ void* debugEchoHandler(void* arg) {
 	user_t* user = context->user;
 	char message[1024];
 	char* line = joinString(context->args, " ");
-	printf("(received from %i) '%s'\n", user->address, line);
+	printf("(received from %i) '%s'\n", user->id, line);
 	sprintf(message, "OUTPUT '%s'", line);
 	sendData(&user->socket, message);
 	return NULL;
