@@ -22,7 +22,6 @@
 void initServer(server_t* server) {
 	initHashmap(&server->users);
 	initHashmap(&server->accounts);
-	server->nextId = 0;
 }
 
 void dropServer(server_t* server) {
@@ -30,6 +29,12 @@ void dropServer(server_t* server) {
 		user_t* user = server->users.elements[n];
 		if (user == NULL) { continue; }
 		dropUser(user);
+	}
+
+	for (unsigned n = 0; n < server->accounts.capacity; n++) {
+		account_t* account = server->accounts.elements[n];
+		if (account == NULL) { continue; }
+		dropAccount(account);
 	}
 
 	dropHashmap(&server->users);

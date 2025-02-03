@@ -13,7 +13,6 @@ typedef struct {
 	socket_t socket;
 	hashmap_t users; // user_t*, possède la valeur
 	hashmap_t accounts; // account_t*, possède la valeur
-	unsigned long long nextId;
 } server_t;
 
 typedef struct {

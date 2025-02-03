@@ -8,14 +8,15 @@
 
 typedef struct {
     char* name;
-    vector_t links; // possède la valeur
-    hashmap_t pawns; // *pawn_t
+    hashmap_t links; // link_t*, possède la valeur
+    hashmap_t pawns; // pawn_t*
     hashmap_t features; // feature_t*
 } place_t;
 
 typedef struct {
     char* name;
     place_t* target;
+	unsigned id;
 } link_t;
 
 void initPlace(place_t* place);

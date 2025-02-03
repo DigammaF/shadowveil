@@ -14,19 +14,20 @@
 void initPlace(place_t* place) {
     initHashmap(&place->pawns);
     initHashmap(&place->features);
-	initVector(&place->links);
+	initHashmap(&place->links);
 }
 
 void dropPlace(place_t* place) {
-	for (unsigned n = 0; n < place->links.length; n++) {
+	for (unsigned n = 0; n < place->links.capacity; n++) {
 		link_t* link = place->links.elements[n];
+		if (link == NULL) { continue; }
 		dropLink(link);
 		free(link);
 	}
 
     dropHashmap(&place->pawns);
     dropHashmap(&place->features);
-	dropVector(&place->links);
+	dropHashmap(&place->links);
 }
 
 void initLink(link_t* link) {
@@ -40,14 +41,13 @@ link_t* createLink(place_t* source, place_t* destination, char* name) {
 	CHECKM(link, "malloc link");
 	link->target = destination;
 	link->name = name;
-	vectorAppend(&source->links, link);
+	link->id = hashmapLocateUnusedKey(&source->links);
+	hashmapSet(&source->links, link->id, link);
 	return link;
 }
 
 void deleteLink(place_t* place, unsigned key) {
-	link_t* link = vectorPop(&place->links, key);
-	dropLink(link);
-	free(link);
+	hashmapSet(&place->links, key, NULL);
 }
 
 void makePlain(place_t* place) {
