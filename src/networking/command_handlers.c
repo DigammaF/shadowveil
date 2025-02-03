@@ -26,19 +26,19 @@ void handleLogin(server_t* server, user_t* user, commandContext_t* context) {
 
 	if (account == NULL) {
 		printf("\t[cannot find]\n");
-		sendData(user->socket, "OUTPUT ce compte n'existe pas");
+		sendData(&user->socket, "OUTPUT ce compte n'existe pas");
 		return;
 	}
 
 	if (account->flags & BANNED_FLAG) {
 		printf("\t[banned]\n");
-		sendData(user->socket, "OUTPUT ce compte est banni");
+		sendData(&user->socket, "OUTPUT ce compte est banni");
 		return;
 	}
 
 	if (!checkPassword(account, context->args[3])) {
 		printf("\t[wrong password]\n");
-		sendData(user->socket, "OUTPUT mauvais mot de passe");
+		sendData(&user->socket, "OUTPUT mauvais mot de passe");
 		return;
 	}
 
@@ -48,7 +48,7 @@ void handleLogin(server_t* server, user_t* user, commandContext_t* context) {
 		pushFunction(&user->commandHandlers, adminHandler);
 		char message[255];
 		sprintf(message, "SET-CONTEXT %i", ADMIN);
-		sendData(user->socket, message);
+		sendData(&user->socket, message);
 		return;
 	}
 
@@ -58,7 +58,7 @@ void handleLogin(server_t* server, user_t* user, commandContext_t* context) {
 	user->account = account;
 	char message[255];
 	sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
-	sendData(user->socket, message);
+	sendData(&user->socket, message);
 }
 
 void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
@@ -66,7 +66,7 @@ void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
 
 	if (account != NULL) {
 		printf("\t[already exists]\n");
-		sendData(user->socket, "OUTPUT ce compte existe déjà");
+		sendData(&user->socket, "OUTPUT ce compte existe déjà");
 		return;
 	}
 
@@ -81,11 +81,11 @@ void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
 		pushFunction(&user->commandHandlers, gameWorldHandler);
 		char message[255];
 		sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
-		sendData(user->socket, message);
+		sendData(&user->socket, message);
 		return;
 	} else {
 		printf("\t[impossible]\n");
-		sendData(user->socket, "ERROR impossible de créer le compte");
+		sendData(&user->socket, "ERROR impossible de créer le compte");
 		return;
 	}
 }
@@ -118,7 +118,7 @@ void* gameWorldHandler(void* arg) {
 	user_t* user = context->user;
 	char message[255];
 	sprintf(message, "OUTPUT '%s'", context->args[1]);
-	sendData(user->socket, message);
+	sendData(&user->socket, message);
 	return NULL;
 }
 
@@ -134,7 +134,7 @@ void* debugEchoHandler(void* arg) {
 	char* line = joinString(context->args, " ");
 	printf("(received from %i) '%s'\n", user->address, line);
 	sprintf(message, "OUTPUT '%s'", line);
-	sendData(user->socket, message);
+	sendData(&user->socket, message);
 	return NULL;
 }
 

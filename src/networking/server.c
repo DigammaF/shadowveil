@@ -54,6 +54,11 @@ void dropServer(server_t* server) {
 	dropStack(&server->freeAccounts);
 }
 
+/**
+ * 
+ * 	\param socket	Prends possession de la valeur
+ * 
+ */
 int createUser(server_t* server, user_t* user, socket_t* socket) {
 	if (stackEmpty(&server->freeUsers)) {
 		printf("(!) unable to find a free spot for new user\n");
@@ -61,7 +66,7 @@ int createUser(server_t* server, user_t* user, socket_t* socket) {
 	}
 
 	user->running = 1;
-	user->socket = socket;
+	user->socket = *socket;
 	user->lastActivity = time(NULL);
 	user->address = pop(&server->freeUsers);
 	pushFunction(&user->commandHandlers, initialHandler);
@@ -108,20 +113,19 @@ int checkPassword(account_t* account, char* password) {
 
 void handleNewConnection(server_t* server) {
 	printf("(+) accepting client\n");
-	socket_t* socket = malloc(sizeof(socket_t));
-	CHECKM(socket, "malloc socket");
-	acceptRemote(&server->socket, socket);
+	socket_t socket;
+	acceptRemote(&server->socket, &socket);
 	user_t* user = malloc(sizeof(user_t));
 	CHECKM(user, "malloc user");
 	initUser(user);
-	user->socket = socket;
-	if (createUser(server, user, socket)) {
+
+	if (createUser(server, user, &socket)) {
 		char IPAddress[512];
-		inet_ntop(AF_INET, &(socket->remote.sin_addr), IPAddress, sizeof(IPAddress));
-		printf("(+) created user %i for remote host %s:%i\n", user->address, IPAddress, socket->remote.sin_port);
+		inet_ntop(AF_INET, &(socket.remote.sin_addr), IPAddress, sizeof(IPAddress));
+		printf("(+) created user %i for remote host %s:%i\n", user->address, IPAddress, socket.remote.sin_port);
 	} else {
 		printf("(!) unable to create new user\n");
-		closeSocket(socket);
+		closeSocket(&socket);
 	}
 }
 
@@ -145,7 +149,7 @@ void handleUserCommand(server_t* server, user_t* user, char**args, int argCount)
 }
 
 void handleUserEnd(user_t* user) {
-	closeSocket(user->socket);
+	closeSocket(&user->socket);
 	user->running = 0;
 }
 
@@ -155,7 +159,7 @@ void handleUserKeepAlive(user_t* user) {
 
 void handleUserRequest(server_t* server, user_t* user) {
 	char data[1024];
-	int byteCount = recvData(user->socket, data, 1024);
+	int byteCount = recvData(&user->socket, data, 1024);
 	unsigned argCount;
 	char** args = splitString(data, &argCount);
 
@@ -225,9 +229,9 @@ void setupServerFileDescriptorSet(
 	for (unsigned n = 0; n < MAX_USERS; n++) {
 		if (server->users[n] == NULL) { continue; }
 		user_t* user = server->users[n];
-		FD_SET(user->socket->fileDescriptor, fileDescriptorSet);
-		if (user->socket->fileDescriptor > *maxFileDescriptor) {
-			*maxFileDescriptor = user->socket->fileDescriptor;
+		FD_SET(user->socket.fileDescriptor, fileDescriptorSet);
+		if (user->socket.fileDescriptor > *maxFileDescriptor) {
+			*maxFileDescriptor = user->socket.fileDescriptor;
 		}
 	}
 }
@@ -240,7 +244,7 @@ void handleServerSockets(server_t* server, fd_set* fileDescriptorSet) {
 	for (unsigned n = 0; n < MAX_USERS; n++) {
 		if (server->users[n] == NULL) { continue; }
 		user_t* user = server->users[n];
-		if (FD_ISSET(user->socket->fileDescriptor, fileDescriptorSet)) {
+		if (FD_ISSET(user->socket.fileDescriptor, fileDescriptorSet)) {
 			handleUserRequest(server, user);
 		}
 	}

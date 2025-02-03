@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-#define SERVER_PORT 58420
+#define SERVER_PORT (short)20100
 #define SERVER_TICK 500 // ms
 
 void* noHandler(void* arg);

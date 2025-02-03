@@ -39,7 +39,7 @@ typedef struct {
     champion_type_t type;
     int effects[EFFECT_COUNT];
     stat_value_t stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */
-    ability_t* abilities[ABILITY_COUNT]; // possède la valeur
+    ability_t* abilities[ABILITY_COUNT]; // possède la valeur, peut être NULL
 } champion_t;
 
 void initChampion(champion_t* champion);

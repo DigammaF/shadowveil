@@ -10,7 +10,7 @@
 #include "vector.h"
 
 typedef struct {
-	socket_t* socket;
+	socket_t socket;
 	account_t* account; // peut être NULL
 	time_t lastActivity;
 	unsigned address;
