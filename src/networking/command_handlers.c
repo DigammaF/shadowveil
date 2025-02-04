@@ -182,6 +182,8 @@ void handleMessage(command_context_t* context) {
 		if (localPawn == NULL) { continue; }
 		sendPawnEvent(context->server, localPawn, &event);
 	}
+
+	freeJoin(text);
 }
 
 void handleGlobalMessage(command_context_t* context) {
@@ -202,6 +204,8 @@ void handleGlobalMessage(command_context_t* context) {
 		if (localPawn == NULL) { continue; }
 		sendPawnEvent(context->server, localPawn, &event);
 	}
+	
+	freeJoin(text);
 }
 
 void handleMove(command_context_t* context){
