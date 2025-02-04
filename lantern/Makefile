@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Iinclude -Wall -Werror
+CFLAGS = -Iinclude -Wall -Werror -g
 SRC = src/data.c src/session.c
 OBJ = $(SRC:src/%.c=obj/%.o)
 AR = ar

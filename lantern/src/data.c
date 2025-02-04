@@ -46,10 +46,20 @@ int sendDGRAM(socket_t* socket, const char* address, const short port, const cha
  * 
  */
 int recvData(socket_t* socket, char* data, size_t maxDataLength) {
-	ssize_t bytesReceived = recv(socket->fileDescriptor, data, maxDataLength - 1, 0);
-	if (bytesReceived < 0) { return -1; }
-	data[bytesReceived] = '\0';
-	return (int)bytesReceived;
+	size_t head = 0;
+
+	while (1) {
+		if (head >= maxDataLength - 1) { perror("lantern recv failed due to reaching communication size limit before reaching delimiter"); exit(EXIT_FAILURE); }
+		char character;
+		ssize_t bytesReceived = recv(socket->fileDescriptor, &character, 1, 0);
+		if (bytesReceived < 0) { perror("lantern recv failed due to stopping the communication before reaching delimiter"); exit(EXIT_FAILURE); }
+		if (character == '\0') { break; }
+		data[head] = character;
+		head += bytesReceived;
+	}
+
+	data[head] = '\0';
+	return (int)head;
 }
 
 int recvDGRAM(socket_t* socket, char* data, size_t maxDataLength) {
