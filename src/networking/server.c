@@ -29,12 +29,14 @@ void dropServer(server_t* server) {
 		user_t* user = server->users.elements[n];
 		if (user == NULL) { continue; }
 		dropUser(user);
+		free(user);
 	}
 
 	for (unsigned n = 0; n < server->accounts.capacity; n++) {
 		account_t* account = server->accounts.elements[n];
 		if (account == NULL) { continue; }
 		dropAccount(account);
+		free(account);
 	}
 
 	dropHashmap(&server->users);
@@ -186,6 +188,7 @@ void updateUser(server_t* server, user_t* user) {
 void setupServer(server_t* server) {
 	account_t* account = malloc(sizeof(account_t));
 	CHECKM(account, "account");
+	initAccount(account);
 	createAccount(server, account, "admin", "admin\n", ADMIN_FLAG);
 	generateWorld(&server->world);
 }

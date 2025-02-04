@@ -7,6 +7,7 @@
 
 struct pawn_t;
 struct server_t;
+struct event_t;
 
 typedef struct place_t {
     char* name;
@@ -33,11 +34,15 @@ void deleteLink(place_t* place, unsigned key);
 void makePlain(place_t* place);
 void makeDesert(place_t* place);
 
-void addPawn(place_t* place, struct pawn_t* pawn);
-void remPawn(place_t* place, struct pawn_t* pawn);
+void addPawnToPlace(place_t* place, struct pawn_t* pawn);
+void removePawnFromPlace(place_t* place, struct pawn_t* pawn);
+
+void notifyPlace(struct server_t* server, place_t* place, struct event_t* event);
 
 void notifyPawnLeft(struct server_t* server, place_t* place, struct pawn_t* pawn);
 void notifyPawnArrived(struct server_t* server, place_t* place, struct pawn_t* pawn);
+void notifyPawnSpawned(struct server_t* server, place_t* place, struct pawn_t* pawn);
+
 void movePawn(struct server_t* server, struct pawn_t* pawn, link_t* link);
 
 #endif

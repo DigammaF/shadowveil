@@ -4,6 +4,10 @@
 
 #include "world.h"
 #include "random_utils.h"
+#include "hashmap.h"
+#include "server.h"
+#include "place.h"
+#include "pawn.h"
 
 #define UNUSED(x) (void)(x)
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
@@ -14,6 +18,8 @@ void initWorld(world_t* world) {
 			world->places[x][y] = NULL;
 		}
 	}
+
+	initHashmap(&world->pawns);
 }
 
 void dropWorld(world_t* world) {
@@ -25,6 +31,15 @@ void dropWorld(world_t* world) {
 			free(place);
 		}
 	}
+
+	for (unsigned n = 0; n < world->pawns.capacity; n++) {
+		pawn_t* pawn = world->pawns.elements[n];
+		if (pawn == NULL) { continue; }
+		dropPawn(pawn);
+		free(pawn);
+	}
+
+	dropHashmap(&world->pawns);
 }
 
 void connectToNeighbors(world_t* world, unsigned x, unsigned y) {
@@ -60,6 +75,15 @@ void connectToNeighbors(world_t* world, unsigned x, unsigned y) {
 	}
 }
 
+void addPawnToWorld(world_t* world, pawn_t* pawn) {
+	pawn->worldKey = hashmapLocateUnusedKey(&world->pawns);
+	hashmapSet(&world->pawns, pawn->worldKey, pawn);
+}
+
+void removePawnFromWorld(world_t* world, pawn_t* pawn) {
+	hashmapSet(&world->pawns, pawn->worldKey, NULL);
+}
+
 void generateWorld(world_t* world) {
 	UNUSED(world);
     
@@ -84,4 +108,10 @@ void generateWorld(world_t* world) {
 			connectToNeighbors(world, x, y);
 		}
 	}
+}
+
+void spawnPawn(server_t* server, place_t* place, pawn_t* pawn) {
+	addPawnToWorld(&server->world, pawn);
+	addPawnToPlace(place, pawn);
+	notifyPawnSpawned(server, place, pawn);
 }

@@ -11,6 +11,9 @@
 #include "constants.h"
 #include "function_stack.h"
 #include "string_utils.h"
+#include "pawn.h"
+#include "place.h"
+#include "event_handlers.h"
 
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 #define UNUSED(x) (void)(x)
@@ -61,6 +64,19 @@ void handleLogin(server_t* server, user_t* user, commandContext_t* context) {
 	sendData(&user->socket, message);
 }
 
+pawn_t* setupPawn(server_t* server, account_t* account, user_t* user) {
+	pawn_t* pawn = malloc(sizeof(pawn_t));
+	initPawn(pawn);
+	pawn->account = account;
+	account->pawn = pawn;
+	pawn->name = strdup(account->name);
+	pawn->user = user;
+	pawn->eventHandler = playerEventHandler;
+	place_t* spawnPoint = server->world.places[1][1];
+	spawnPawn(server, spawnPoint, pawn);
+	return pawn;
+}
+
 void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
 	account_t* account = locateAccount(server, context->args[2]);
 
@@ -75,8 +91,10 @@ void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
 	initAccount(account);
 	printf("\t[creation of '%s' with password '%s']\n", context->args[2], context->args[3]);
 	createAccount(server, account, context->args[2], context->args[3], 0);
-	printf("\t[success]\n");
 	user->account = account;
+	printf("\t[spawning pawn]\n");
+	setupPawn(server, account, user);
+	printf("\t[success]\n");
 	popFunction(&user->commandHandlers);
 	pushFunction(&user->commandHandlers, gameWorldHandler);
 	char message[255];

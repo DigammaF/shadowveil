@@ -19,7 +19,7 @@ void dropPawn(pawn_t* pawn) {
 	UNUSED(pawn);
 }
 
-void sendPawnEvent(server_t* server, pawn_t* pawn, pawn_event_t* event) {
+void sendPawnEvent(server_t* server, pawn_t* pawn, event_t* event) {
     event->server = server;
     event->pawn = pawn;
     pawn->eventHandler((void*)event);

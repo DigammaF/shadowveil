@@ -10,6 +10,7 @@
 #include "pawn.h"
 
 struct server_t;
+struct event_t;
 
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 #define UNUSED(x) (void)(x)
@@ -61,48 +62,52 @@ void makeDesert(place_t* place) {
     place->name = "Désert";
 }
 
-void addPawn(place_t* place, pawn_t* pawn) {
-	pawn->pawnKey = hashmapLocateUnusedKey(&place->pawns);
-	hashmapSet(&place->pawns, pawn->pawnKey, pawn);
+void addPawnToPlace(place_t* place, pawn_t* pawn) {
+	pawn->placeKey = hashmapLocateUnusedKey(&place->pawns);
+	hashmapSet(&place->pawns, pawn->placeKey, pawn);
 	pawn->place = place;
 }
 
-void remPawn(place_t* place, pawn_t* pawn) {
-	hashmapSet(&place->pawns, pawn->pawnKey, NULL);
+void removePawnFromPlace(place_t* place, pawn_t* pawn) {
+	hashmapSet(&place->pawns, pawn->placeKey, NULL);
 	pawn->place = NULL;
 }
 
-void notifyPawnLeft(struct server_t* server, place_t* place, pawn_t* pawn) {
-	pawn_move_args_t args = { .pawn = pawn };
-	pawn_event_t event = MAKE_EVENT(PAWN_LEFT, &args);
-
+void notifyPlace(struct server_t* server, place_t* place, struct event_t* event) {
 	for (unsigned n = 0; n < place->pawns.capacity; n++) {
 		pawn_t* localPawn = place->pawns.elements[n];
 		if (localPawn == NULL) { continue; }
-		sendPawnEvent(server, localPawn, &event);
+		sendPawnEvent(server, localPawn, event);
 	}
 }
 
-void notifyPawnArrived(struct server_t* server, place_t* place, pawn_t* pawn) {
-	pawn_move_args_t args = { .pawn = pawn };
-	pawn_event_t event = MAKE_EVENT(PAWN_ARRIVED, &args);
+void notifyPawnLeft(struct server_t* server, place_t* place, pawn_t* pawn) {
+	pawn_event_args args = { .pawn = pawn };
+	event_t event = MAKE_EVENT(PAWN_LEFT, &args);
+	notifyPlace(server, place, &event);
+}
 
-	for (unsigned n = 0; n < place->pawns.capacity; n++) {
-		pawn_t* localPawn = place->pawns.elements[n];
-		if (localPawn == NULL) { continue; }
-		sendPawnEvent(server, localPawn, &event);
-	}
+void notifyPawnArrived(struct server_t* server, place_t* place, pawn_t* pawn) {
+	pawn_event_args args = { .pawn = pawn };
+	event_t event = MAKE_EVENT(PAWN_ARRIVED, &args);
+	notifyPlace(server, place, &event);
+}
+
+void notifyPawnSpawned(struct server_t* server, place_t* place, pawn_t* pawn) {
+	pawn_event_args args = { .pawn = pawn };
+	event_t event = MAKE_EVENT(PAWN_SPAWNED, &args);
+	notifyPlace(server, place, &event);
 }
 
 void movePawn(struct server_t* server, pawn_t* pawn, link_t* link) {
 	place_t* place = pawn->place;
 
 	if (place != NULL) {
-		remPawn(place, pawn);
+		removePawnFromPlace(place, pawn);
 		notifyPawnLeft(server, place, pawn);
 	}
 
 	place = link->target;
-	addPawn(place, pawn);
+	addPawnToPlace(place, pawn);
 	notifyPawnArrived(server, place, pawn);
 }

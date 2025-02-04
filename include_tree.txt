@@ -1,0 +1,8 @@
+
+world
+	place
+		pawn
+			champion
+				ability
+
+		feature

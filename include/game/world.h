@@ -4,7 +4,11 @@
 
 #include <stdint.h>
 
-#include "place.h"
+#include "hashmap.h"
+
+struct pawn_t;
+struct server_t;
+struct place_t;
 
 /**
  * 
@@ -24,12 +28,17 @@ server = <error reading variable server (value of type `server_t' requires 34358
 #define WORLD_SIZE 600
 
 typedef struct {
-    place_t* places[WORLD_SIZE][WORLD_SIZE]; // possède la valeur
+    struct place_t* places[WORLD_SIZE][WORLD_SIZE]; // possède la valeur
+	hashmap_t pawns; // pawn_t*, possède la valeur
 } world_t;
 
 void initWorld(world_t* world);
 void dropWorld(world_t* world);
 
+void addPawnToWorld(world_t* world, struct pawn_t* pawn);
+void removePawnFromWorld(world_t* world, struct pawn_t* pawn);
+
 void generateWorld(world_t* world);
+void spawnPawn(struct server_t* server, struct place_t* place, struct pawn_t* pawn);
 
 #endif

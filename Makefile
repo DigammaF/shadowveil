@@ -26,7 +26,7 @@ SRC =\
 	$(SRC_DIR)/$(GAME)/pawn.c $(SRC_DIR)/$(GAME)/place.c $(SRC_DIR)/$(GAME)/world.c\
 	$(SRC_DIR)/$(NETWORKING)/command_handlers.c $(SRC_DIR)/$(NETWORKING)/server.c\
 	$(SRC_DIR)/$(NETWORKING)/user.c $(SRC_DIR)/$(NETWORKING)/account.c\
-	$(SRC_DIR)/$(NETWORKING)/client.c
+	$(SRC_DIR)/$(NETWORKING)/client.c $(SRC_DIR)/$(NETWORKING)/event_handlers.c
 
 # Object files
 OBJ = $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
