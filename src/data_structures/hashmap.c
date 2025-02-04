@@ -30,7 +30,9 @@ void hashmapSet(hashmap_t* hashmap, unsigned key, void* value) {
 
 unsigned hashmapLocateUnusedKey(hashmap_t* hashmap) {
 	for (unsigned key = 0; key < hashmap->capacity; key++) {
-		if (hashmap->elements[key] == NULL) { return key; }
+		if (hashmap->elements[key] == NULL) {
+			return key;
+		}
 	}
 
 	unsigned key = hashmap->capacity;
@@ -39,16 +41,26 @@ unsigned hashmapLocateUnusedKey(hashmap_t* hashmap) {
 }
 
 void increaseHashmapCapacity(hashmap_t* hashmap) {
-    unsigned newCapacity = hashmap->capacity*HASHMAP_GROWTH_RATE + 3;
+	unsigned previousCapacity = hashmap->capacity;
+    unsigned newCapacity = hashmap->capacity*HASHMAP_GROWTH_RATE + HASHMAP_GROWTH_CONSTANT;
     if (newCapacity <= hashmap->capacity) { fprintf(stderr, "cannot increase hashmap capacity\n"); exit(EXIT_FAILURE); }
     hashmap->capacity = newCapacity;
     hashmap->elements = realloc(hashmap->elements, hashmap->capacity*sizeof(void*));
     CHECKM(hashmap->elements, "realloc(hashmap->elements)");
+
+	for (unsigned n = previousCapacity; n < hashmap->capacity; n++) {
+		hashmap->elements[n] = NULL;
+	}
 }
 
 void dumpHashmap(hashmap_t* hashmap) {
+	printf("--- Dumping Hashmap ---\n");
+	printf("capacity: %i\n", hashmap->capacity);
     for (unsigned n = 0; n < hashmap->capacity; n++) {
-        if (hashmap->elements[n] == NULL) { continue; }
-        //printf("%i -> %i ", n, (unsigned)hashmap->elements[n]);
+        if (hashmap->elements[n] == NULL) {
+			printf("%i -> NULL\n", n);
+			continue;
+		}
+        printf("%i -> %i\n", n, *(unsigned*)hashmap->elements[n]);
     }
 }

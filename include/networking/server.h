@@ -23,7 +23,7 @@ typedef struct {
 	struct user_t* user;
 	char** args;
 	unsigned count;
-} commandContext_t;
+} command_context_t;
 
 void handleNewConnection(server_t* server);
 void handleUserRequest(server_t* server, struct user_t* user);

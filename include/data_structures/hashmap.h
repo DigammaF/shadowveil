@@ -3,6 +3,7 @@
 #define HASHMAP_H
 
 #define HASHMAP_GROWTH_RATE 1.1
+#define HASHMAP_GROWTH_CONSTANT 20
 
 /**
  * 

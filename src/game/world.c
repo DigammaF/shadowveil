@@ -48,9 +48,15 @@ void connectToNeighbors(world_t* world, unsigned x, unsigned y) {
 	for (int dx = -1; dx <= 1; dx++) {
 		for (int dy = -1; dy <= 1; dy++) {
 			if (dx == 0 && dy == 0) { continue; }
-			if (getRandomIntInclusive(1, 3) == 1) { continue; }
-			unsigned wx = (x + dx) % WORLD_SIZE;
-			unsigned wy = (y + dy) % WORLD_SIZE;
+			//if (getRandomIntInclusive(1, 3) == 1) { continue; }
+			int twx = ((int)x + dx);
+			int twy = ((int)y + dy);
+			if (twx < 0) { twx += WORLD_SIZE; }
+			if (twy < 0) { twy += WORLD_SIZE; }
+			if (twx >= WORLD_SIZE) { twx -= WORLD_SIZE; }
+			if (twy >= WORLD_SIZE) { twy -= WORLD_SIZE; }
+			unsigned wx = twx;
+			unsigned wy = twy;
 			char* name;
 			if (dx == 0 && dy > 0) {
 				name = "Nord";
@@ -86,6 +92,7 @@ void removePawnFromWorld(world_t* world, pawn_t* pawn) {
 
 void generateWorld(world_t* world) {
 	UNUSED(world);
+	printf("(...) Generating world\n");
     
 	for (unsigned x = 0; x < WORLD_SIZE; x++) {
 		for (unsigned y = 0; y < WORLD_SIZE; y++) {

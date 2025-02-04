@@ -3,6 +3,9 @@ server
 	SET-CONTEXT <int>
 	OUTPUT <word>+
 	ERROR <word>+
+	LIST-LINK <int> <word>
+	LIST-PAWN <int> <word>
+	LIST-FEATURE <int> <word>
 
 client
 	COMMAND <word>+

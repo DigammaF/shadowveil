@@ -44,7 +44,7 @@ link_t* createLink(place_t* source, place_t* destination, char* name) {
 	link_t* link = malloc(sizeof(link_t));
 	CHECKM(link, "malloc link");
 	link->target = destination;
-	link->name = name;
+	link->name = strdup(name);
 	link->id = hashmapLocateUnusedKey(&source->links);
 	hashmapSet(&source->links, link->id, link);
 	return link;

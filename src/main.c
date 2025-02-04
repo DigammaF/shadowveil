@@ -1,8 +1,12 @@
 
+#include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "server.h"
 #include "client.h"
+
+#include "hashmap.h"
 
 int main(int argc, const char** argv) {
 	if (argc > 1) {

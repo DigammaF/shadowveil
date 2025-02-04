@@ -14,6 +14,7 @@
 #include "pawn.h"
 #include "place.h"
 #include "event_handlers.h"
+#include "feature.h"
 
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 #define UNUSED(x) (void)(x)
@@ -24,7 +25,7 @@ int checkArgCount(user_t* user, int count, int expected) {
 	return 0;
 }
 
-void handleLogin(server_t* server, user_t* user, commandContext_t* context) {
+void handleLogin(server_t* server, user_t* user, command_context_t* context) {
 	account_t* account = locateAccount(server, context->args[2]);
 
 	if (account == NULL) {
@@ -77,7 +78,7 @@ pawn_t* setupPawn(server_t* server, account_t* account, user_t* user) {
 	return pawn;
 }
 
-void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
+void handleRegister(server_t* server, user_t* user, command_context_t* context) {
 	account_t* account = locateAccount(server, context->args[2]);
 
 	if (account != NULL) {
@@ -104,7 +105,7 @@ void handleRegister(server_t* server, user_t* user, commandContext_t* context) {
 }
 
 void* initialHandler(void* arg) {
-	commandContext_t* context = (commandContext_t*)arg;
+	command_context_t* context = (command_context_t*)arg;
 	user_t* user = context->user;
 	server_t* server = context->server;
 
@@ -126,12 +127,54 @@ void* initialHandler(void* arg) {
 	return NULL;
 }
 
-void* gameWorldHandler(void* arg) {
-	commandContext_t* context = (commandContext_t*)arg;
+void handleSee(command_context_t* context) {
 	user_t* user = context->user;
-	char message[255];
-	sprintf(message, "OUTPUT '%s'", context->args[1]);
-	sendData(&user->socket, message);
+	server_t* server = context->server;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	place_t* place = pawn->place;
+
+	for (unsigned n = 0; n < place->links.capacity; n++) {
+		link_t* link = place->links.elements[n];
+		if (link == NULL) { continue; }
+		char message[1024];
+		sprintf(message, "LIST-LINK %i %s", n, link->name);
+		printf("(sending) %s\n", message);
+		sendData(&user->socket, message);
+	}
+
+	for (unsigned n = 0; n < place->features.capacity; n++) {
+		feature_t* feature = place->features.elements[n];
+		if (feature == NULL) { continue; }
+		char message[1024];
+		sprintf(message, "LIST-FEATURE %i %s", n, feature->name);
+		printf("(sending) %s\n", message);
+		sendData(&user->socket, message);
+	}
+
+	for (unsigned n = 0; n < place->pawns.capacity; n++) {
+		pawn_t* pawn = place->pawns.elements[n];
+		if (pawn == NULL) { continue; }
+		char message[1024];
+		sprintf(message, "LIST-PAWN %i %s", n, pawn->name);
+		printf("(sending) %s\n", message);
+		sendData(&user->socket, message);
+	}
+}
+
+void* gameWorldHandler(void* arg) {
+	command_context_t* context = (command_context_t*)arg;
+	user_t* user = context->user;
+	server_t* server = context->server;
+
+	if (context->count == 2) {
+		if (strcmp(context->args[1], "SEE") == 0) {
+			handleSee(context);
+			return NULL;
+		}
+	}
+	
+	printf("(!) unable to parse command\n");
 	return NULL;
 }
 
@@ -141,7 +184,7 @@ void* adminHandler(void* arg) {
 }
 
 void* debugEchoHandler(void* arg) {
-	commandContext_t* context = (commandContext_t*)arg;
+	command_context_t* context = (command_context_t*)arg;
 	user_t* user = context->user;
 	char message[1024];
 	char* line = joinString(context->args, " ");

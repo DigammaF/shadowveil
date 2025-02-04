@@ -14,6 +14,7 @@
 #include "command_handlers.h"
 #include "string_utils.h"
 #include "world.h"
+#include "pawn.h"
 
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
@@ -106,7 +107,7 @@ void handleUserCommand(server_t* server, user_t* user, char**args, int argCount)
 		return;
 	}
 
-	commandContext_t* commandContext = malloc(sizeof(commandContext_t));
+	command_context_t* commandContext = malloc(sizeof(command_context_t));
 	CHECKM(commandContext, "malloc commandContext");
 	commandContext->args = args;
 	commandContext->count = argCount;
@@ -180,6 +181,7 @@ void update(server_t* server) {
 
 void updateUser(server_t* server, user_t* user) {
 	if (!user->running) {
+		user->account->pawn->user = NULL;
 		deleteUser(server, user);
 		dropUser(user);
 	}
