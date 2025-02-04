@@ -181,7 +181,8 @@ void update(server_t* server) {
 
 void updateUser(server_t* server, user_t* user) {
 	if (!user->running) {
-		user->account->pawn->user = NULL;
+		account_t* account = user->account;
+		if (account != NULL) { user->account->pawn->user = NULL; }
 		deleteUser(server, user);
 		dropUser(user);
 	}

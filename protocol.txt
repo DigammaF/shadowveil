@@ -7,6 +7,9 @@ server
 	LIST-PAWN <int> <word>
 	LIST-FEATURE <int> <word>
 	ABOUT-PLACE <word>
+	PAWN-SPAWN <word>
+	PAWN-ARRIVED <word>
+	PAWN-LEFT <word>
 
 client
 	COMMAND <word>+
