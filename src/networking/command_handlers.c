@@ -165,6 +165,46 @@ void handleSee(command_context_t* context) {
 	}
 }
 
+void handleMessage(command_context_t* context) {
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	place_t* place = pawn->place;
+
+	char* text = joinString(&context->args[2], " ");
+	char message[1024];
+	sprintf(message, "%s: %s", account->name, text);
+	message_event_args args = { .message = message};
+	event_t event = MAKE_EVENT(EVENT_MESSAGE, &args);
+
+	for (unsigned n = 0; n < place->pawns.capacity; n++) {
+		pawn_t* localPawn = place->pawns.elements[n];
+		if (localPawn == NULL) { continue; }
+		sendPawnEvent(context->server, localPawn, &event);
+	}
+}
+
+void handleGlobalMessage(command_context_t* context) {
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	place_t* place = pawn->place;
+	server_t* server = context->server;
+	world_t* world = &server->world;
+
+	char* text = joinString(&context->args[2], " ");
+	char message[1024];
+	sprintf(message, "%s: %s", account->name, text);
+	message_event_args args = { .message = message};
+	event_t event = MAKE_EVENT(EVENT_MESSAGE, &args);
+
+	for (unsigned n = 0; n < world->pawns.capacity; n++) {
+		pawn_t* localPawn = place->pawns.elements[n];
+		if (localPawn == NULL) { continue; }
+		sendPawnEvent(context->server, localPawn, &event);
+	}
+}
+
 void handleMove(command_context_t* context, int destination){
 	user_t* user = context->user;
 	server_t* server = context->server;
@@ -192,6 +232,18 @@ void* gameWorldHandler(void* arg) {
 		}
 		if (strcmp(context->args[1], "MOVE") == 0){
 			handleMove(context, destination);
+			return NULL;
+		}
+	}
+
+	if (context->count > 2) {
+		if (strcmp(context->args[1], "MESSAGE") == 0) {
+			handleMessage(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "GLOBAL-MESSAGE") == 0) {
+			handleGlobalMessage(context);
 			return NULL;
 		}
 	}
