@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "world.h"
 #include "random_utils.h"
@@ -107,6 +108,9 @@ void generateWorld(world_t* world) {
 			}
 
 			world->places[x][y] = place;
+			char name[200];
+			sprintf(name, "%s (%i;%i)", place->name, x, y);
+			place->name = strdup(name);
 		}
 	}
 

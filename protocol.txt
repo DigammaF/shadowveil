@@ -6,6 +6,7 @@ server
 	LIST-LINK <int> <word>
 	LIST-PAWN <int> <word>
 	LIST-FEATURE <int> <word>
+	ABOUT-PLACE <word>
 
 client
 	COMMAND <word>+

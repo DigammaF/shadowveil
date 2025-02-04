@@ -134,6 +134,10 @@ void handleSee(command_context_t* context) {
 	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
 
+	char message[1024];
+	sprintf(message, "ABOUT-PLACE %s", place->name);
+	sendData(&user->socket, message);
+
 	for (unsigned n = 0; n < place->links.capacity; n++) {
 		link_t* link = place->links.elements[n];
 		if (link == NULL) { continue; }
