@@ -192,7 +192,7 @@ void setupServer(server_t* server) {
 	CHECKM(account, "account");
 	initAccount(account);
 	createAccount(server, account, "admin", "admin\n", ADMIN_FLAG);
-	generateWorld(&server->world);
+	generateWorld(WORLD_SEED, &server->world);
 }
 
 void setupServerFileDescriptorSet(server_t* server, fd_set* fileDescriptorSet, int* maxFileDescriptor) {

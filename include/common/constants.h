@@ -2,10 +2,10 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-#include <stdint.h>
-
 #define SERVER_PORT (short)20100
 #define SERVER_TICK 500 // ms
+
+#define WORLD_SEED 555
 
 void* noHandler(void* arg);
 

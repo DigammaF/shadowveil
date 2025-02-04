@@ -38,7 +38,7 @@ void dropWorld(world_t* world);
 void addPawnToWorld(world_t* world, struct pawn_t* pawn);
 void removePawnFromWorld(world_t* world, struct pawn_t* pawn);
 
-void generateWorld(world_t* world);
+void generateWorld(unsigned seed, world_t* world);
 void spawnPawn(struct server_t* server, struct place_t* place, struct pawn_t* pawn);
 
 #endif

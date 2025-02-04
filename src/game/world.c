@@ -91,8 +91,8 @@ void removePawnFromWorld(world_t* world, pawn_t* pawn) {
 	hashmapSet(&world->pawns, pawn->worldKey, NULL);
 }
 
-void generateWorld(world_t* world) {
-	UNUSED(world);
+void generateWorld(unsigned seed, world_t* world) {
+	srand(seed);
 	printf("(...) Generating world\n");
     
 	for (unsigned x = 0; x < WORLD_SIZE; x++) {
