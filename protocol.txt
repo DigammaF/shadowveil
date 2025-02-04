@@ -57,17 +57,21 @@ client
 		ATTACK <int>
 			int: clé du pion dans la place
 		SELL-CHAMPION <int> <int>
-			int: clé du champion
+			int: clé du champion dans l'inventaire
 			int: prix
 		BUY-CHAMPION <int>
 			int: clé du deal
 		SELL-ITEM <int> <int>
-			int: clé de l'objet
+			int: clé de l'objet dans l'inventaire
 			int: prix
 		BUY-ITEM <int>
 			int: clé du deal
 		CHECK-MARKET
 		SEE
+		SEE-CHAMPIONS
+		SELECT-CHAMPION <int> <int>
+			int: clé du champion dans l'inventaire
+			int: numéro de la place d'équipe
 		- combat
 		ATTACK <int> <int> <int>
 			int: clé du champion source
