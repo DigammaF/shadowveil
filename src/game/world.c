@@ -68,13 +68,13 @@ void connectToNeighbors(world_t* world, unsigned x, unsigned y) {
 			} else if (dx < 0 && dy == 0) {
 				name = "Ouest";
 			} else if (dx > 0 && dy > 0) {
-				name = "Nord Est";
+				name = "Nord-Est";
 			} else if (dx > 0 && dy < 0) {
-				name = "Sud Est";
+				name = "Sud-Est";
 			} else if (dx < 0 && dy > 0) {
-				name = "Nord Ouest";
+				name = "Nord-Ouest";
 			} else if (dx < 0 && dy < 0) {
-				name = "Sud Ouest";
+				name = "Sud-Ouest";
 			}
 			place_t* destination = world->places[wx][wy];
 			createLink(place, destination, name);
@@ -109,7 +109,7 @@ void generateWorld(unsigned seed, world_t* world) {
 
 			world->places[x][y] = place;
 			char name[200];
-			sprintf(name, "%s (%i;%i)", place->name, x, y);
+			sprintf(name, "%s(%i;%i)", place->name, x, y);
 			place->name = strdup(name);
 		}
 	}

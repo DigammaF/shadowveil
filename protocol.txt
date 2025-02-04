@@ -1,15 +1,41 @@
 
 server
 	SET-CONTEXT <int>
-	OUTPUT <word>+
-	ERROR <word>+
+		int: context_t
+	OUTPUT <word+>
+		word+: text générique sans métadonnées
+	ERROR <word+>
+		word+: erreur générique sans métadonnées
 	LIST-LINK <int> <word>
+		fait savoir l'existence d'un lien
+		int: clé du lien dans la place
+		word: nom du lien
 	LIST-PAWN <int> <word>
+		fait savoir l'existence d'un pion
+		int: clé du pion dans la place
+		word: nom du pion
 	LIST-FEATURE <int> <word>
+		fait savoir l'existence d'une feature
+		int: clé de la feature dans la place
+		word: nom de la feature
 	ABOUT-PLACE <word>
-	PAWN-SPAWN <word>
-	PAWN-ARRIVED <word>
+		amène l'attention sur une place
+		word: nom de la place
+	PAWN-SPAWN <int> <word>
+		un pion vient d'apparaître
+		int: clé du pion dans la place
+		word: nom du pion
+	PAWN-ARRIVED <int> <word>
+		un pion vient d'arriver dans la place
+		int: clé du pion dans la place
+		word: nom du pion
 	PAWN-LEFT <word>
+		un pion vient de quitter la place
+		word: nom du pion
+	MESSAGE <word+>
+	LIST-ACCOUNT <word>
+		fait savoir l'existence d'un compte
+		word: nom du compte
 	YOU-MOVED <int(destination link)>
 
 client
@@ -19,22 +45,39 @@ client
 		REGISTER <name> <password>
 		- gameworld
 		MOVE <int>
+			int: clé du lien dans la place
 		INTERACT <int>
+			int: clé de la feature dans la place
 		MESSAGE <word>+
 		GLOBAL-MESSAGE <word>+
 		LIST-ONLINE
-		SEARCH-ACCOUNTS <name>
 		DUEL-OFFER <int>
+			int: clé du pion dans la place
 		DUEL-ACCEPT <int>
-		DIG
+			int: clé de duel
+		ATTACK <int>
+			int: clé du pion dans la place
 		SELL-CHAMPION <int> <int>
+			int: clé du champion dans l'inventaire
+			int: prix
 		BUY-CHAMPION <int>
+			int: clé du deal
 		SELL-ITEM <int> <int>
+			int: clé de l'objet dans l'inventaire
+			int: prix
 		BUY-ITEM <int>
+			int: clé du deal
 		CHECK-MARKET
 		SEE
+		SEE-CHAMPIONS
+		SELECT-CHAMPION <int> <int>
+			int: clé du champion dans l'inventaire
+			int: numéro de la place d'équipe
 		- combat
 		ATTACK <int> <int> <int>
+			int: clé du champion source
+			int: clé du champion cible
+			int: clé de la compétence
 		SURREND
 		DRAW-OFFER
 		DRAW-ACCEPT

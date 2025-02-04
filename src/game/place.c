@@ -83,19 +83,19 @@ void notifyPlace(struct server_t* server, place_t* place, struct event_t* event)
 
 void notifyPawnLeft(struct server_t* server, place_t* place, pawn_t* pawn) {
 	pawn_event_args args = { .pawn = pawn };
-	event_t event = MAKE_EVENT(PAWN_LEFT, &args);
+	event_t event = MAKE_EVENT(EVENT_PAWN_LEFT, &args);
 	notifyPlace(server, place, &event);
 }
 
 void notifyPawnArrived(struct server_t* server, place_t* place, pawn_t* pawn) {
 	pawn_event_args args = { .pawn = pawn };
-	event_t event = MAKE_EVENT(PAWN_ARRIVED, &args);
+	event_t event = MAKE_EVENT(EVENT_PAWN_ARRIVED, &args);
 	notifyPlace(server, place, &event);
 }
 
 void notifyPawnSpawned(struct server_t* server, place_t* place, pawn_t* pawn) {
 	pawn_event_args args = { .pawn = pawn };
-	event_t event = MAKE_EVENT(PAWN_SPAWNED, &args);
+	event_t event = MAKE_EVENT(EVENT_PAWN_SPAWNED, &args);
 	notifyPlace(server, place, &event);
 }
 

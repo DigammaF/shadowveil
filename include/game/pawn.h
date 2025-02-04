@@ -21,9 +21,10 @@ typedef struct pawn_t {
 } pawn_t;
 
 typedef enum {
-    PAWN_ARRIVED,
-    PAWN_LEFT,
-	PAWN_SPAWNED,
+    EVENT_PAWN_ARRIVED, // pawn_event_args
+    EVENT_PAWN_LEFT, // pawn_event_args
+	EVENT_PAWN_SPAWNED, // pawn_event_args
+	EVENT_MESSAGE, // message_event_args
 } event_type_t;
 
 typedef struct event_t {
@@ -49,5 +50,9 @@ void sendPawnEvent(struct server_t* server, pawn_t* pawn, event_t* event);
 typedef struct pawn_event_args {
 	pawn_t* pawn;
 } pawn_event_args;
+
+typedef struct message_event_args {
+	char* message;
+} message_event_args;
 
 #endif

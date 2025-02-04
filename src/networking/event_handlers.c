@@ -24,25 +24,34 @@ void* playerEventHandler(void* _) {
 	if (user == NULL) { return NULL; }
 
 	char message[1024];
-	pawn_event_args* pawnEventArgs;
+	pawn_event_args* pawnEventArgs = NULL;
+	message_event_args* message_event_args = NULL;
 
 	switch (event->type) {
-		case PAWN_ARRIVED:
+		case EVENT_PAWN_ARRIVED:
 			pawnEventArgs = event->args;
-			sprintf(message, "PAWN-ARRIVED %s", pawnEventArgs->pawn->name);
+			sprintf(message, "PAWN-ARRIVED %i %s", pawnEventArgs->pawn->placeKey, pawnEventArgs->pawn->name);
+			sendData(&user->socket, message);
 			break;
 
-		case PAWN_LEFT:
+		case EVENT_PAWN_LEFT:
 			pawnEventArgs = event->args;
 			sprintf(message, "PAWN-LEFT %s", pawnEventArgs->pawn->name);
+			sendData(&user->socket, message);
 			break;
 
-		case PAWN_SPAWNED:
+		case EVENT_PAWN_SPAWNED:
 			pawnEventArgs = event->args;
-			sprintf(message, "PAWN-SPAWN %s", pawnEventArgs->pawn->name);
+			sprintf(message, "PAWN-SPAWN %i %s", pawnEventArgs->pawn->placeKey, pawnEventArgs->pawn->name);
+			sendData(&user->socket, message);
+			break;
+
+		case EVENT_MESSAGE:
+			message_event_args = event->args;
+			sprintf(message, "MESSAGE %s", message_event_args->message);
+			sendData(&user->socket, message);
 			break;
 	}
 
-	sendData(&user->socket, message);
 	return NULL;
 }
