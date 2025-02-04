@@ -1,0 +1,3 @@
+
+lantern message:
+	LANTERN-START some data LANTERN-STOP

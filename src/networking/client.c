@@ -43,6 +43,11 @@ void handleClientSockets(client_t* client, fd_set* fileDescriptorSet){
 			return;
 		}
 		printf("(received) '%s'\n", line);
+
+		for (unsigned n = 0; n < 1024; n++) {
+			printf("%c", line[n]);
+		}
+		printf("\n");
 	}
 
 	if (FD_ISSET(fileno(stdin), fileDescriptorSet)) {
