@@ -30,7 +30,7 @@ void* playerEventHandler(void* _) {
 	switch (event->type) {
 		case EVENT_PAWN_ARRIVED:
 			pawnEventArgs = event->args;
-			sprintf(message, "PAWN-ARRIVED %s", pawnEventArgs->pawn->name);
+			sprintf(message, "PAWN-ARRIVED %i %s", pawnEventArgs->pawn->placeKey, pawnEventArgs->pawn->name);
 			sendData(&user->socket, message);
 			break;
 
@@ -42,7 +42,7 @@ void* playerEventHandler(void* _) {
 
 		case EVENT_PAWN_SPAWNED:
 			pawnEventArgs = event->args;
-			sprintf(message, "PAWN-SPAWN %s", pawnEventArgs->pawn->name);
+			sprintf(message, "PAWN-SPAWN %i %s", pawnEventArgs->pawn->placeKey, pawnEventArgs->pawn->name);
 			sendData(&user->socket, message);
 			break;
 
