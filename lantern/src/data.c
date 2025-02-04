@@ -46,25 +46,21 @@ int sendDGRAM(socket_t* socket, const char* address, const short port, const cha
  * 
  */
 int recvData(socket_t* socket, char* data, size_t maxDataLength) {
-	if (socket->mode == SOCK_STREAM) {
-		ssize_t bytesReceived = recv(socket->fileDescriptor, data, maxDataLength - 1, 0);
-		if (bytesReceived < 0) { return -1; }
-		data[bytesReceived] = '\0';
-		return (int)bytesReceived;
-	} else if (socket->mode == SOCK_DGRAM) {
-		struct sockaddr_in client_address;
-		socklen_t client_address_length = sizeof(client_address);
-		ssize_t bytesReceived = recvfrom(
-			socket->fileDescriptor, data, maxDataLength - 1, 0,
-			(struct sockaddr*)&client_address, &client_address_length
-		);
-		if (bytesReceived < 0) { return -1; }
-		socket->remote = client_address;
-		data[bytesReceived] = '\0';
-		return (int)bytesReceived;
-	} else {
-		errno = EPFNOSUPPORT;
-		return -1;
-	}
-	
+	ssize_t bytesReceived = recv(socket->fileDescriptor, data, maxDataLength - 1, 0);
+	if (bytesReceived < 0) { return -1; }
+	data[bytesReceived] = '\0';
+	return (int)bytesReceived;
+}
+
+int recvDGRAM(socket_t* socket, char* data, size_t maxDataLength) {
+	struct sockaddr_in client_address;
+	socklen_t client_address_length = sizeof(client_address);
+	ssize_t bytesReceived = recvfrom(
+		socket->fileDescriptor, data, maxDataLength - 1, 0,
+		(struct sockaddr*)&client_address, &client_address_length
+	);
+	if (bytesReceived < 0) { return -1; }
+	socket->remote = client_address;
+	data[bytesReceived] = '\0';
+	return (int)bytesReceived;
 }
