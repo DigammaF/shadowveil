@@ -11,6 +11,7 @@ server
 	PAWN-ARRIVED <word>
 	PAWN-LEFT <word>
 	MESSAGE <word+>
+	LIST-ACCOUNT <word>
 
 client
 	COMMAND <word>+

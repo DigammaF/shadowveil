@@ -225,6 +225,22 @@ void handleMove(command_context_t* context){
 
 }
 
+void handleListOnline(command_context_t* context) {
+	user_t* user = context->user;
+	server_t* server = context->server;
+	world_t* world = &server->world;
+
+	for (unsigned n = 0; n < world->pawns.capacity; n++) {
+		pawn_t* localPawn = world->pawns.elements[n];
+		if (localPawn == NULL) { continue; }
+		account_t* localAccount = localPawn->account;
+		if (localAccount == NULL) { continue; }
+		char message[1024];
+		sprintf(message, "LIST-ACCOUNT %s", localAccount->name);
+		sendData(&user->socket, message);
+	}
+}
+
 void* gameWorldHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
 
@@ -233,8 +249,14 @@ void* gameWorldHandler(void* arg) {
 			handleSee(context);
 			return NULL;
 		}
-		if (strcmp(context->args[1], "MOVE") == 0){
+
+		if (strcmp(context->args[1], "MOVE") == 0) {
 			handleMove(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "LIST-ONLINE") == 0) {
+			handleListOnline(context);
 			return NULL;
 		}
 	}
