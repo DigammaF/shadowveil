@@ -24,10 +24,9 @@ client
 		MESSAGE <word>+
 		GLOBAL-MESSAGE <word>+
 		LIST-ONLINE
-		SEARCH-ACCOUNTS <name>
 		DUEL-OFFER <int>
 		DUEL-ACCEPT <int>
-		DIG
+		ATTACK <int>
 		SELL-CHAMPION <int> <int>
 		BUY-CHAMPION <int>
 		SELL-ITEM <int> <int>
