@@ -19,11 +19,10 @@ client
 		- gameworld
 		MOVE <int>
 		INTERACT <int>
-		MESSAGE <int> <word>+
+		MESSAGE <word>+
 		GLOBAL-MESSAGE <word>+
 		LIST-ONLINE
 		SEARCH-ACCOUNTS <name>
-		PULL-MESSAGES
 		DUEL-OFFER <int>
 		DUEL-ACCEPT <int>
 		DIG
