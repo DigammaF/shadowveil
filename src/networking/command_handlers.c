@@ -174,7 +174,7 @@ void handleMessage(command_context_t* context) {
 	char* text = joinString(&context->args[2], " ");
 	char message[1024];
 	sprintf(message, "%s: %s", account->name, text);
-	message_event_args args = { .message = message};
+	message_event_args args = { .message = message };
 	event_t event = MAKE_EVENT(EVENT_MESSAGE, &args);
 
 	for (unsigned n = 0; n < place->pawns.capacity; n++) {
@@ -188,33 +188,32 @@ void handleGlobalMessage(command_context_t* context) {
 	user_t* user = context->user;
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
-	place_t* place = pawn->place;
 	server_t* server = context->server;
 	world_t* world = &server->world;
 
 	char* text = joinString(&context->args[2], " ");
 	char message[1024];
 	sprintf(message, "%s: %s", account->name, text);
-	message_event_args args = { .message = message};
+	message_event_args args = { .message = message };
 	event_t event = MAKE_EVENT(EVENT_MESSAGE, &args);
 
 	for (unsigned n = 0; n < world->pawns.capacity; n++) {
-		pawn_t* localPawn = place->pawns.elements[n];
+		pawn_t* localPawn = world->pawns.elements[n];
 		if (localPawn == NULL) { continue; }
 		sendPawnEvent(context->server, localPawn, &event);
 	}
 }
 
-void handleMove(command_context_t* context, int destination){
-	user_t* user = context->user;
-	server_t* server = context->server;
-	account_t* account = user->account;
-	pawn_t* pawn = account->pawn;
-	place_t* place = pawn->place;
+void handleMove(command_context_t* context){
+	// user_t* user = context->user;
+	// server_t* server = context->server;
+	// account_t* account = user->account;
+	// pawn_t* pawn = account->pawn;
+	// place_t* place = pawn->place;
 
-	char message[1024];
-	sprintf(message, "YOU-MOVED %d", destination);
-	sendData(&user->socket, message);
+	// char message[1024];
+	// sprintf(message, "YOU-MOVED %d", destination);
+	// sendData(&user->socket, message);
 
 	
 	
@@ -231,7 +230,7 @@ void* gameWorldHandler(void* arg) {
 			return NULL;
 		}
 		if (strcmp(context->args[1], "MOVE") == 0){
-			handleMove(context, destination);
+			handleMove(context);
 			return NULL;
 		}
 	}
@@ -267,14 +266,3 @@ void* debugEchoHandler(void* arg) {
 	sendData(&user->socket, message);
 	return NULL;
 }
-
-// /**
-//  * Appelé durant la phase handleRegister()
-//  * Assigne un premier personnage au joueur
-//  */
-// void* fillAccountHandler(void* arg){
-// 	character_t firstChampion = todo 
-// 	//
-
-// // 	pushFunction(&user->commandHandlers, gameworldHandler);
-// // }
