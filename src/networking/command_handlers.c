@@ -129,7 +129,6 @@ void* initialHandler(void* arg) {
 
 void handleSee(command_context_t* context) {
 	user_t* user = context->user;
-	server_t* server = context->server;
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
@@ -185,8 +184,6 @@ void handleMove(command_context_t* context, int destination){
 
 void* gameWorldHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
-	user_t* user = context->user;
-	server_t* server = context->server;
 
 	if (context->count == 2) {
 		if (strcmp(context->args[1], "SEE") == 0) {
