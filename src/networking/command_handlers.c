@@ -198,12 +198,15 @@ void* gameWorldHandler(void* arg) {
 			handleSee(context);
 			return NULL;
 		}
+	}
+
+	if (context->count == 3) {	
 		if (strcmp(context->args[1], "MOVE") == 0){
-			todo récuperer
-			handleMove(context, destination);
+			handleMove(context, args[2]);
 			return NULL;
 		}
 	}
+	
 	
 	printf("(!) unable to parse command\n");
 	return NULL;
