@@ -211,37 +211,26 @@ void handleGlobalMessage(command_context_t* context) {
 
 void handleMove(command_context_t* context){
 
-//TODO décommenter après merge
+	user_t* user = context->user;
+	server_t* server = context->server;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	place_t* place = pawn->place;
+	hashmap_t linksHashmap = place->links;
+	char message[1024];
 
-	// user_t* user = context->user;
-	// server_t* server = context->server;
-	// account_t* account = user->account;
-	// pawn_t* pawn = account->pawn;
-	// place_t* place = pawn->place;
+	bool isUserInputValid = (destinationKey < linksHashmap->capacity) && (key > 0);
 
-	// char message[1024];
-	// sprintf(message, "YOU-MOVED %d", destination);
-	// sendData(&user->socket, message);
-		hashmap_t linksHashmap = place->links;
-
-		bool isUserInputValid = (destinationKey < linksHashmap->capacity) && (key > 0);
-
-			if (isUserInputValid){
-				void* destinationValue = place.hashmapGet(linksHashmap, destinationKey);
-				movePawn(server, pawn, (link_t*) destinationValue);
-				sprintf(message, "YOU-MOVED %d", destinationKey);
-			} else {
-				sprintf(message, "ERROR This link does not exist!");
-			}
+	if (isUserInputValid){
+		void* destinationValue = place.hashmapGet(linksHashmap, destinationKey);
+		movePawn(server, pawn, (link_t*) destinationValue);
+		sprintf(message, "YOU-MOVED %d", destinationKey);
+	} else {
+		sprintf(message, "ERROR This link does not exist!");
+	}
 
 	sendData(&user->socket, message);
-
-	
-
-
-	
-
-
+	return;
 }
 
 void handleListOnline(command_context_t* context) {
