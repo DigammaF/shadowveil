@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "lantern.h"
 #include "command_handlers.h"
@@ -165,21 +166,28 @@ void handleSee(command_context_t* context) {
 	}
 }
 
-void handleMove(command_context_t* context, int destination){
+
+
+void handleMove(command_context_t* context, int destinationKey){
 	user_t* user = context->user;
 	server_t* server = context->server;
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
-
+	hashmap_t linksHashmap = place->links;
 	char message[1024];
-	sprintf(message, "YOU-MOVED %d", destination);
+
+	bool isUserInputValid = (destinationKey < linksHashmap->capacity) && (key > 0);
+
+	if (isUserInputValid){
+		void* destinationValue = place.hashmapGet(linksHashmap, destinationKey);
+		movePawn(server, pawn, (link_t*) destinationValue);
+		sprintf(message, "YOU-MOVED %d", destinationKey);
+	} else {
+		sprintf(message, "ERROR This link does not exist!");
+	}
+
 	sendData(&user->socket, message);
-
-	
-	
-
-
 }
 
 void* gameWorldHandler(void* arg) {
@@ -191,6 +199,7 @@ void* gameWorldHandler(void* arg) {
 			return NULL;
 		}
 		if (strcmp(context->args[1], "MOVE") == 0){
+			todo récuperer
 			handleMove(context, destination);
 			return NULL;
 		}

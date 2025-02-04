@@ -10,6 +10,7 @@ server
 	PAWN-SPAWN <word>
 	PAWN-ARRIVED <word>
 	PAWN-LEFT <word>
+	YOU-MOVED <int(destination link)>
 
 client
 	COMMAND <word>+
