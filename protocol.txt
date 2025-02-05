@@ -36,7 +36,9 @@ server
 	LIST-ACCOUNT <word>
 		fait savoir l'existence d'un compte
 		word: nom du compte
-	YOU-MOVED <int(destination link)>
+	YOU-MOVED <word>
+		fait savoir à l'utilisateur que son pion a été déplacé
+		word: nom de la place d'arrivée
 
 client
 	COMMAND <word>+

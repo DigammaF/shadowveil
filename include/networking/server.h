@@ -18,7 +18,7 @@ typedef struct server_t {
 	world_t world;
 } server_t;
 
-typedef struct {
+typedef struct command_context_t {
 	server_t* server;
 	struct user_t* user;
 	char** args;

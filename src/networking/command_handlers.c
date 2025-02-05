@@ -190,7 +190,6 @@ void handleMessage(command_context_t* context) {
 void handleGlobalMessage(command_context_t* context) {
 	user_t* user = context->user;
 	account_t* account = user->account;
-	pawn_t* pawn = account->pawn;
 	server_t* server = context->server;
 	world_t* world = &server->world;
 
@@ -210,23 +209,23 @@ void handleGlobalMessage(command_context_t* context) {
 }
 
 void handleMove(command_context_t* context){
-
 	user_t* user = context->user;
 	server_t* server = context->server;
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
-	hashmap_t linksHashmap = place->links;
+	hashmap_t* linksHashmap = &place->links;
 	char message[1024];
+	unsigned destinationKey = 0;
 
-	bool isUserInputValid = (destinationKey < linksHashmap->capacity) && (key > 0);
+	bool isUserInputValid = (destinationKey < linksHashmap->capacity) && (destinationKey > 0);
 
-	if (isUserInputValid){
-		void* destinationValue = place.hashmapGet(linksHashmap, destinationKey);
-		movePawn(server, pawn, (link_t*) destinationValue);
-		sprintf(message, "YOU-MOVED %d", destinationKey);
+	if (isUserInputValid) {
+		link_t* usedLink = hashmapGet(linksHashmap, destinationKey);
+		movePawn(server, pawn, usedLink);
+		sprintf(message, "YOU-MOVED %s", usedLink->target->name);
 	} else {
-		sprintf(message, "ERROR This link does not exist!");
+		sprintf(message, "ERROR Cette sortie n'existe pas");
 	}
 
 	sendData(&user->socket, message);
@@ -291,13 +290,11 @@ void* gameWorldHandler(void* arg) {
 			handleGlobalMessage(context);
 			return NULL;
 		}
+
 		if (strcmp(context->args[1], "MOVE") == 0) {
 			handleMove(context);
 		}
-
-
 	}
-	
 	
 	printf("(!) unable to parse command\n");
 	return NULL;
