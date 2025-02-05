@@ -21,8 +21,8 @@ typedef struct server_t {
 typedef struct command_context_t {
 	server_t* server;
 	struct user_t* user;
-	char** args;
-	unsigned count;
+	char** args; // liste des mots qui composent la commande
+	unsigned count; // nombre de mots dans la commande
 } command_context_t;
 
 void handleNewConnection(server_t* server);
