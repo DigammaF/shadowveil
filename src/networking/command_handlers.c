@@ -181,7 +181,7 @@ void handleMessage(command_context_t* context) {
 	char* text = joinString(&context->args[2], " ");
 	char message[1024];
 	sprintf(message, "%s: %s", account->name, text);
-	message_event_args args = { .message = message };
+	message_event_args_t args = { .message = message };
 	event_t event = MAKE_EVENT(EVENT_MESSAGE, &args);
 
 	for (unsigned n = 0; n < place->pawns.capacity; n++) {
@@ -202,7 +202,7 @@ void handleGlobalMessage(command_context_t* context) {
 	char* text = joinString(&context->args[2], " ");
 	char message[1024];
 	sprintf(message, "%s: %s", account->name, text);
-	message_event_args args = { .message = message };
+	message_event_args_t args = { .message = message };
 	event_t event = MAKE_EVENT(EVENT_MESSAGE, &args);
 
 	for (unsigned n = 0; n < world->pawns.capacity; n++) {
