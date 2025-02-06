@@ -97,7 +97,9 @@ client
 			int: clé de l'objet
 			int: clé du champion
 		+SEE
+			décrire l'emplacement du joueur
 		ME
+			décrire le personnage du joueur (nom + inventaire + champions séléctionnés)
 		SEE-CHAMPIONS
 		SELECT-CHAMPION <int> <int>
 			int: clé du champion dans l'inventaire
