@@ -24,7 +24,7 @@ void* playerEventHandler(void* _) {
 	if (user == NULL) { return NULL; }
 
 	char message[1024];
-	pawn_event_args_t_t* pawnEventArgs = NULL;
+	pawn_event_args_t* pawnEventArgs = NULL;
 	message_event_args_t* messageEventArgs = NULL;
 
 	switch (event->type) {
