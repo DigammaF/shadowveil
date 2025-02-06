@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "constants.h"
 #include "ability.h"
@@ -18,6 +19,8 @@ void initChampion(champion_t* champion) {
 	for (unsigned n = 0; n < EFFECT_COUNT; n++) { champion->effects[n] = 0; }
 	for (unsigned n = 0; n < STAT_COUNT; n++) { champion->stats[n] = MAKE_STAT(0); }
 	initHashmap(&champion->abilities);
+	champion->hasInitiative = false;
+	champion->fleeing = false;
 }
 
 void dropChampion(champion_t* champion) {
@@ -29,6 +32,19 @@ void dropChampion(champion_t* champion) {
 	}
 
 	dropHashmap(&champion->abilities);
+}
+
+void setStats(
+	champion_t* champion,
+	unsigned attack, unsigned defense, unsigned magicAttack, unsigned magicDefense, unsigned intelligence,
+	unsigned health
+) {
+	champion->stats[ATTACK] = MAKE_STAT(attack);
+	champion->stats[DEFENSE] = MAKE_STAT(defense);
+	champion->stats[MAGIC_ATTACK] = MAKE_STAT(magicAttack);
+	champion->stats[MAGIC_DEFENSE] = MAKE_STAT(magicDefense);
+	champion->stats[INTELLIGENCE] = MAKE_STAT(intelligence);
+	champion->stats[HEALTH] = MAKE_STAT(health);
 }
 
 void addAbilityToChampion(champion_t* champion, ability_t* ability) {
@@ -147,4 +163,10 @@ void applyAbility(champion_t* source, champion_t* destination, ability_t* abilit
                 break;
         }
     }
+}
+
+void makeSpider(champion_t* champion) {
+	champion->name = "Araignee";
+	champion->type = TYPE_BUG;
+	setStats(champion, 5, 5, 5, 5, 10, 20);
 }

@@ -21,7 +21,7 @@ int functionStackEmpty(function_stack_t* stack) {
 
 void pushFunction(function_stack_t* stack, function_t value) {
 	function_stack_node_t* node = malloc(sizeof(function_stack_node_t));
-	CHECKM(node, "node");
+	CHECKM(node, "malloc node");
 	node->value = value;
 	node->previous = (struct function_stack_node_t*)stack->node;
 	stack->node = node;

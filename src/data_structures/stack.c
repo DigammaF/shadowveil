@@ -21,7 +21,7 @@ int stackEmpty(const stack_t* stack) {
 
 void push(stack_t* stack, const unsigned value) {
 	stack_node_t* node = malloc(sizeof(stack_node_t));
-	CHECKM(node, "node");
+	CHECKM(node, "malloc node");
 	node->value = value;
 	node->previous = (struct stack_node_t*)stack->node;
 	stack->node = node;

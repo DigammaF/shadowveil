@@ -62,6 +62,7 @@ void makePlain(place_t* place) {
 
 	for (unsigned n = 0; n < bushCount; n++) {
 		feature_t* feature = malloc(sizeof(feature_t));
+		CHECKM(feature, "malloc feature");
 		initFeature(feature);
 		makeBush(feature);
 		addFeatureToPlace(place, feature);
@@ -75,6 +76,7 @@ void makeDesert(place_t* place) {
 
 	for (unsigned n = 0; n < rockCount; n++) {
 		feature_t* feature = malloc(sizeof(feature_t));
+		CHECKM(feature, "malloc feature");
 		initFeature(feature);
 		makeRock(feature);
 		addFeatureToPlace(place, feature);

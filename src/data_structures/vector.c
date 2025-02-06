@@ -12,7 +12,7 @@ void initVector(vector_t* vector) {
     vector->capacity = 1;
     vector->length = 0;
     vector->elements = malloc(sizeof(void*));
-    CHECKM(vector->elements, "vector->elements");
+    CHECKM(vector->elements, "malloc vector->elements");
 }
 
 void dropVector(vector_t* vector) {

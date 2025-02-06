@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "lantern.h"
 #include "constants.h"
@@ -7,6 +8,9 @@
 #include "pawn.h"
 #include "place.h"
 #include "user.h"
+#include "champion.h"
+
+#define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 
 void initItem(item_t* item) {
 	item->params = NULL;
@@ -20,6 +24,7 @@ void dropItem(item_t* item) {
 void makeSqueaker(item_t* item) {
 	item->name = "Boite-a-couinement";
 	item->params = malloc(sizeof(no_item_params_t));
+	CHECKM(item->params, "malloc params");
 	item->useHandler = squeakerUseHandler;
 }
 
@@ -44,5 +49,14 @@ void* squeakerUseHandler(void* _) {
 	user_t* user = pawn->user;
 	if (user == NULL) { return NULL; }
 	sendData(&user->socket, "OUTPUT *couinement*");
+
+	if (use->type == USE_ON_CHAMPION) {
+		champion_use_args_t* args = use->args;
+		champion_t* champion = args->champion;
+		char message[1024];
+		sprintf(message, "OUTPUT champion: %s", champion->name);
+		sendData(&user->socket, message);
+	}
+
 	return NULL;
 }

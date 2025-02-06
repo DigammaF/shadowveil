@@ -12,7 +12,7 @@ void initHashmap(hashmap_t* hashmap) {
     hashmap->capacity = 1;
     hashmap->elements = malloc(sizeof(void*));
 	hashmap->elements[0] = NULL;
-    CHECKM(hashmap->elements, "hashmap->elements");
+    CHECKM(hashmap->elements, "malloc hashmap->elements");
 }
 
 void dropHashmap(hashmap_t* hashmap) {

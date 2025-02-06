@@ -7,6 +7,8 @@
 #include "function_stack.h"
 #include "item.h"
 
+#define TEAM_SIZE 3
+
 struct account_t;
 struct user_t;
 struct server_t;
@@ -18,7 +20,8 @@ struct use_t;
 
 typedef struct pawn_t {
     char* name;
-    unsigned exhaustion;
+    unsigned exhaustion; // un nombre non nul représente la présence de fatigue
+	unsigned gracePeriod; // un nombre non nul représente la présence d'une période de grâce
     struct place_t* place;
     function_t eventHandler; // void* eventHandler(event_t*)
     struct account_t* account; // possiblement NULL si entité non joueur
@@ -26,8 +29,9 @@ typedef struct pawn_t {
 	unsigned placeKey; // la clé de l'entité dans le dictionnaire .pawns de la place_t dans laquelle elle se situe
 	unsigned worldKey; // la clé de l'entité dans le dictionnaire .pawns de world_t
 	unsigned gold;
-	hashmap_t champions; // champion_t*, possède la valeur
+	hashmap_t champions; // collection de tous les champions possédés, champion_t*, possède la valeur
 	hashmap_t items; // item_t*, possède la valeur
+	struct champion_t* team[TEAM_SIZE]; // champions utilisés pour le combat, peut être NULL
 } pawn_t;
 
 typedef enum {

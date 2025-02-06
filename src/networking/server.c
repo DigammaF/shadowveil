@@ -190,7 +190,7 @@ void updateUser(server_t* server, user_t* user) {
 
 void setupServer(server_t* server) {
 	account_t* account = malloc(sizeof(account_t));
-	CHECKM(account, "account");
+	CHECKM(account, "malloc account");
 	initAccount(account);
 	createAccount(server, account, "admin", "admin\n", ADMIN_FLAG);
 	generateWorld(WORLD_SEED, &server->world);

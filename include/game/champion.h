@@ -53,6 +53,12 @@ typedef struct champion_t {
 void initChampion(champion_t* champion);
 void dropChampion(champion_t* champion);
 
+void setStats(
+	champion_t* champion,
+	unsigned attack, unsigned defense, unsigned magicAttack, unsigned magicDefense, unsigned intelligence,
+	unsigned health
+);
+
 void addAbilityToChampion(champion_t* champion, ability_t* ability);
 void removeAbilityToChampion(champion_t* champion, ability_t* ability);
 
@@ -60,5 +66,7 @@ void setStat(stat_value_t* stat, int value);
 
 void generateChampion(unsigned seed, unsigned powerBudget, champion_t* champion);
 void applyAbility(champion_t* source, champion_t* destination, ability_t* ability);
+
+void makeSpider(champion_t* champion);
 
 #endif

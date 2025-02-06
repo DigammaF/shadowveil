@@ -70,6 +70,7 @@ void handleLogin(server_t* server, user_t* user, command_context_t* context) {
 
 pawn_t* setupPawn(server_t* server, account_t* account, user_t* user) {
 	pawn_t* pawn = malloc(sizeof(pawn_t));
+	CHECKM(pawn, "malloc pawn");
 	initPawn(pawn);
 	pawn->account = account;
 	account->pawn = pawn;
@@ -83,13 +84,19 @@ pawn_t* setupPawn(server_t* server, account_t* account, user_t* user) {
 
 void setupItems(pawn_t* pawn) {
 	item_t* item = malloc(sizeof(item_t));
+	CHECKM(item, "malloc item");
 	initItem(item);
 	makeSqueaker(item);
 	addItemToPawn(pawn, item);
 }
 
 void setupChampions(pawn_t* pawn) {
-	UNUSED(pawn);
+	champion_t* spider = malloc(sizeof(champion_t));
+	CHECKM(spider, "malloc spider");
+	initChampion(spider);
+	makeSpider(spider);
+	addChampionToPawn(pawn, spider);
+	pawn->team[0] = spider;
 }
 
 void handleRegister(server_t* server, user_t* user, command_context_t* context) {
@@ -102,7 +109,7 @@ void handleRegister(server_t* server, user_t* user, command_context_t* context) 
 	}
 
 	account = malloc(sizeof(account_t));
-	CHECKM(account, "account");
+	CHECKM(account, "malloc account");
 	initAccount(account);
 	printf("\t[creation of '%s' with password '%s']\n", context->args[2], context->args[3]);
 	createAccount(server, account, context->args[2], context->args[3], 0);
@@ -304,6 +311,27 @@ void handleUseItem(command_context_t* context) {
 	triggerItemUse(context->server, item, &use);
 }
 
+void handleUseItemOnChampion(command_context_t* context) {
+	unsigned itemKey;
+	unsigned championKey;
+
+	if (!safeStrToUnsigned(context->args[2], &itemKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; };
+	if (!safeStrToUnsigned(context->args[3], &championKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[3]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	item_t* item = hashmapGet(&pawn->items, itemKey);
+	champion_t* champion = hashmapGet(&pawn->champions, championKey);
+
+	if (item == NULL) { fprintf(stderr, "(!) %i could not be found in items\n", itemKey); return; }
+	if (champion == NULL) { fprintf(stderr, "(!) %i could not be found in champions\n", championKey); return; }
+
+	champion_use_args_t args = { .champion = champion };
+	use_t use = MAKE_USE(USE_ON_CHAMPION, &args);
+	triggerItemUse(context->server, item, &use);
+}
+
 void handleMe(command_context_t* context) {
 	user_t* user = context->user;
 	account_t* account = user->account;
@@ -322,8 +350,8 @@ void handleMe(command_context_t* context) {
 
 	sendData(&user->socket, "END-LIST");
 
-	for (unsigned n = 0; n < pawn->champions.capacity; n++) {
-		champion_t* champion = pawn->champions.elements[n];
+	for (unsigned n = 0; n < TEAM_SIZE; n++) {
+		champion_t* champion = pawn->team[n];
 		if (champion == NULL) { continue; }
 		sprintf(message, "LIST-CHAMPION %i %s", n, champion->name);
 		sendData(&user->socket, message);
@@ -367,6 +395,11 @@ void* gameWorldHandler(void* arg) {
 	if (context->count == 4) {
 		if (strcmp(context->args[1], "INTERACT") == 0) {
 			handleInteract(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "USE-ITEM-ON-CHAMPION") == 0) {
+			handleUseItemOnChampion(context);
 			return NULL;
 		}
 	}
