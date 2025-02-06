@@ -10,7 +10,7 @@ struct place_t;
 
 typedef struct feature_t {
     char* name;
-    function_t useHandler;
+    function_t interactionHandler;
 	unsigned placeKey;
 	struct place_t* place; // can be NULL
 } feature_t;
@@ -35,18 +35,12 @@ typedef struct interaction_t {
 
 #define MAKE_INTERACTION(t, a) (interaction_t) { .type = t, .server = NULL, .feature = NULL, .args = a }
 
-/**
- * 
- *  Envoie un évènement à l'entité
- *  il suffit de renseigner event.type et event.args
- * 
- */
 void triggerFeatureInteraction(struct server_t* server, feature_t* feature, interaction_t* interaction);
 
 typedef struct pawn_interaction_args_t {
 	struct pawn_t* pawn;
 } pawn_interaction_args_t;
 
-void* debugUseHandler(void* _);
+void* debuginteractionHandler(void* _);
 
 #endif

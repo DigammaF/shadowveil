@@ -7,6 +7,8 @@
 #include "ability.h"
 #include "constants.h"
 
+struct pawn_t;
+
 #define MAKE_STAT(n) (stat_value_t){ .value = 0, .maxValue = (n), .minValue = 0 }
 #define MAKE_STATS(atk, dfe, matk, mdfe, intel, health) \
 	{ .value = 0, .maxValue = atk, .minValue = 0 }, \
@@ -35,7 +37,9 @@ typedef enum {
 } stat_t;
 
 /** Structure représentant un personnage jouable. */
-typedef struct {
+typedef struct champion_t {
+	struct pawn_t* pawn; // peut être NULL
+	unsigned pawnKey;
     champion_type_t type;
     int effects[EFFECT_COUNT];
     stat_value_t stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */

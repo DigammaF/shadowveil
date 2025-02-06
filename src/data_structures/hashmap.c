@@ -19,7 +19,7 @@ void dropHashmap(hashmap_t* hashmap) {
 }
 
 void* hashmapGet(hashmap_t* hashmap, unsigned key) {
-    CHECKKEY(hashmap, key);
+    if (key >= hashmap->capacity) { return NULL; }
     return hashmap->elements[key];
 }
 

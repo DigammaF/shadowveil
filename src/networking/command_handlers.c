@@ -16,6 +16,8 @@
 #include "place.h"
 #include "event_handlers.h"
 #include "feature.h"
+#include "item.h"
+#include "champion.h"
 
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 #define UNUSED(x) (void)(x)
@@ -79,6 +81,17 @@ pawn_t* setupPawn(server_t* server, account_t* account, user_t* user) {
 	return pawn;
 }
 
+void setupItems(pawn_t* pawn) {
+	item_t* item = malloc(sizeof(item_t));
+	initItem(item);
+	makeSqueaker(item);
+	addItemToPawn(pawn, item);
+}
+
+void setupChampions(pawn_t* pawn) {
+
+}
+
 void handleRegister(server_t* server, user_t* user, command_context_t* context) {
 	account_t* account = locateAccount(server, context->args[2]);
 
@@ -95,7 +108,11 @@ void handleRegister(server_t* server, user_t* user, command_context_t* context) 
 	createAccount(server, account, context->args[2], context->args[3], 0);
 	user->account = account;
 	printf("\t[spawning pawn]\n");
-	setupPawn(server, account, user);
+	pawn_t* pawn = setupPawn(server, account, user);
+	printf("\t[giving items]\n");
+	setupItems(pawn);
+	printf("\t[giving champions]\n");
+	setupChampions(pawn);
 	printf("\t[success]\n");
 	popFunction(&user->commandHandlers);
 	pushFunction(&user->commandHandlers, gameWorldHandler);
@@ -224,17 +241,13 @@ void handleMove(command_context_t* context){
 
 	unsigned destinationKey = 0;
 
-	if (!safeStrToUnsigned(context->args[2], &destinationKey)) { return; }
+	if (!safeStrToUnsigned(context->args[2], &destinationKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
 
-	bool isUserInputValid = (destinationKey < place->links.capacity) && (destinationKey > 0);
-
-	if (isUserInputValid) {
-		link_t* usedLink = hashmapGet(&place->links, destinationKey);
-		movePawn(server, pawn, usedLink);
-		sprintf(message, "YOU-MOVED %s", usedLink->target->name);
-		sendData(&user->socket, message);
-	}
-
+	link_t* usedLink = hashmapGet(&place->links, destinationKey);
+	if (usedLink == NULL) { fprintf(stderr, "(!) Tried to fetch an unexisting link %i", destinationKey); return; }
+	movePawn(server, pawn, usedLink);
+	sprintf(message, "YOU-MOVED %s", usedLink->target->name);
+	sendData(&user->socket, message);
 	return;
 }
 
@@ -257,10 +270,6 @@ void handleListOnline(command_context_t* context) {
 }
 
 void handleInteract(command_context_t* context) {
-	user_t* user = context->user;
-	account_t* account = user->account;
-	pawn_t* pawn = account->pawn;
-
 	unsigned featureKey;
 	unsigned interactionType;
 
@@ -268,6 +277,9 @@ void handleInteract(command_context_t* context) {
 	if (!safeStrToUnsigned(context->args[3], &interactionType)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[3]); return; }
 	if (interactionType >= INTERACTION_COUNT) { fprintf(stderr, "(!) %i is too big\n", interactionType); return; }
 
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
 	feature_t* feature = place->features.elements[featureKey];
 	
@@ -276,6 +288,13 @@ void handleInteract(command_context_t* context) {
 	pawn_interaction_args_t args = { .pawn = pawn };
 	interaction_t interaction = MAKE_INTERACTION((interaction_type_t)interactionType, &args);
 	triggerFeatureInteraction(context->server, feature, &interaction);
+}
+
+void handleUseItem(command_context_t* context) {
+	unsigned itemKey;
+
+	if (!safeStrToUnsigned(context->args[2], &itemKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; };
+
 }
 
 void* gameWorldHandler(void* arg) {
@@ -296,6 +315,11 @@ void* gameWorldHandler(void* arg) {
 	if (context->count == 3) {
 		if (strcmp(context->args[1], "MOVE") == 0) {
 			handleMove(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "USE-ITEM") == 0) {
+			handleUseItem(context);
 			return NULL;
 		}
 	}

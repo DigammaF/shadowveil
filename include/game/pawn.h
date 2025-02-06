@@ -2,14 +2,19 @@
 #ifndef PAWN_H
 #define PAWN_H
 
+#include "hashmap.h"
 #include "feature.h"
 #include "function_stack.h"
+#include "item.h"
 
 struct account_t;
 struct user_t;
 struct server_t;
 struct place_t;
 struct interaction_t;
+struct item_t;
+struct champion_t;
+struct use_t;
 
 typedef struct pawn_t {
     char* name;
@@ -21,6 +26,8 @@ typedef struct pawn_t {
 	unsigned placeKey; // la clé de l'entité dans le dictionnaire .pawns de la place_t dans laquelle elle se situe
 	unsigned worldKey; // la clé de l'entité dans le dictionnaire .pawns de world_t
 	unsigned gold;
+	hashmap_t champions; // champion_t*, possède la valeur
+	hashmap_t items; // item_t*, possède la valeur
 } pawn_t;
 
 typedef enum {
@@ -29,6 +36,7 @@ typedef enum {
 	EVENT_PAWN_SPAWNED, // pawn_event_args_t
 	EVENT_MESSAGE, // message_event_args_t
 	EVENT_INTERACTION, // interaction_event_args_t
+	EVENT_ITEM_USE, // item_use_event_args_t
 } event_type_t;
 
 typedef struct event_t {
@@ -42,6 +50,12 @@ typedef struct event_t {
 
 void initPawn(pawn_t* pawn);
 void dropPawn(pawn_t* pawn);
+
+void addItemToPawn(pawn_t* pawn, struct item_t* item);
+void removeItemFromPawn(pawn_t* pawn, struct item_t* item);
+
+void addChampionToPawn(pawn_t* pawn, struct champion_t* champion);
+void removeChampionToPawn(pawn_t* pawn, struct champion_t* champion);
 
 /**
  * 
@@ -62,5 +76,9 @@ typedef struct message_event_args_t {
 typedef struct interaction_event_args_t {
 	struct interaction_t* interaction;
 } interaction_event_args_t;
+
+typedef struct item_use_event_args_t {
+	struct use_t* use;
+} item_use_event_args_t;
 
 #endif

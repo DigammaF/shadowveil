@@ -18,6 +18,9 @@ server
 		fait savoir l'existence d'une feature
 		int: clé de la feature dans la place
 		word: nom de la feature
+	LIST-ITEM <int> <word>
+	LIST-CHAMPION <int> <word>
+	LIST-ABILITY <int> <word+>
 	END-LIST
 	ABOUT-PLACE <word>
 		amène l'attention sur une place
@@ -72,7 +75,15 @@ client
 		BUY-ITEM <int>
 			int: clé du deal
 		CHECK-MARKET
+		USE-ITEM <int>
+			utiliser un objet
+			int: clé de l'objet
+		USE-ITEM-ON-CHAMPION <int> <int>
+			utiliser un objet sur un champion
+			int: clé de l'objet
+			int: clé du champion
 		+SEE
+		ME
 		SEE-CHAMPIONS
 		SELECT-CHAMPION <int> <int>
 			int: clé du champion dans l'inventaire

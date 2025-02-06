@@ -13,7 +13,7 @@
 #define UNUSED(x) (void)(x)
 
 void initFeature(feature_t* feature) {
-    feature->useHandler = noHandler;
+    feature->interactionHandler = noHandler;
 }
 
 void dropFeature(feature_t* feature) {
@@ -23,7 +23,7 @@ void dropFeature(feature_t* feature) {
 void triggerFeatureInteraction(struct server_t* server, feature_t* feature, interaction_t* interaction) {
 	interaction->feature = feature;
 	interaction->server = server;
-	feature->useHandler((void*)interaction);
+	feature->interactionHandler((void*)interaction);
 	place_t* place = feature->place;
 	if (place == NULL) { return; }
 	interaction_event_args_t args = { .interaction = interaction };
@@ -33,15 +33,15 @@ void triggerFeatureInteraction(struct server_t* server, feature_t* feature, inte
 
 void makeRock(feature_t* feature) {
     feature->name = "Rocher";
-	feature->useHandler = debugUseHandler;
+	feature->interactionHandler = debuginteractionHandler;
 }
 
 void makeBush(feature_t* feature) {
     feature->name = "Buisson";
-	feature->useHandler = debugUseHandler;
+	feature->interactionHandler = debuginteractionHandler;
 }
 
-void* debugUseHandler(void* _) {
+void* debuginteractionHandler(void* _) {
 	interaction_t* interaction = (interaction_t*)_;
 	pawn_interaction_args_t* pawnInteractionArgs = NULL;
 	printf("in handler\n");
