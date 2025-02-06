@@ -147,6 +147,8 @@ void handleSee(command_context_t* context) {
 		sendData(&user->socket, message);
 	}
 
+	sendData(&user->socket, "END-LIST");
+
 	for (unsigned n = 0; n < place->features.capacity; n++) {
 		feature_t* feature = place->features.elements[n];
 		if (feature == NULL) { continue; }
@@ -156,6 +158,8 @@ void handleSee(command_context_t* context) {
 		sendData(&user->socket, message);
 	}
 
+	sendData(&user->socket, "END-LIST");
+
 	for (unsigned n = 0; n < place->pawns.capacity; n++) {
 		pawn_t* pawn = place->pawns.elements[n];
 		if (pawn == NULL) { continue; }
@@ -164,6 +168,8 @@ void handleSee(command_context_t* context) {
 		printf("(sending) %s\n", message);
 		sendData(&user->socket, message);
 	}
+
+	sendData(&user->socket, "END-LIST");
 }
 
 void handleMessage(command_context_t* context) {
@@ -252,6 +258,8 @@ void handleListOnline(command_context_t* context) {
 		sprintf(message, "LIST-ACCOUNT %s", localAccount->name);
 		sendData(&user->socket, message);
 	}
+
+	sendData(&user->socket, "END-LIST");
 }
 
 void* gameWorldHandler(void* arg) {

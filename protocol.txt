@@ -18,6 +18,7 @@ server
 		fait savoir l'existence d'une feature
 		int: clé de la feature dans la place
 		word: nom de la feature
+	END-LIST
 	ABOUT-PLACE <word>
 		amène l'attention sur une place
 		word: nom de la place
