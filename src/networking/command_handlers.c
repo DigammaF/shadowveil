@@ -353,6 +353,22 @@ void handleMe(command_context_t* context) {
 	for (unsigned n = 0; n < TEAM_SIZE; n++) {
 		champion_t* champion = pawn->team[n];
 		if (champion == NULL) { continue; }
+		sprintf(message, "LIST-CHAMPION %i %s", champion->pawnKey, champion->name);
+		sendData(&user->socket, message);
+	}
+
+	sendData(&user->socket, "END-LIST");
+}
+
+void handleSeeChampions(command_context_t* context) {
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	char message[1024];
+
+	for (unsigned n = 0; n < pawn->champions.capacity; n++) {
+		champion_t* champion = pawn->champions.elements[n];
+		if (champion == NULL) { continue; }
 		sprintf(message, "LIST-CHAMPION %i %s", n, champion->name);
 		sendData(&user->socket, message);
 	}
@@ -376,6 +392,11 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "ME") == 0) {
 			handleMe(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "SEE-CHAMPIONS") == 0) {
+			handleSeeChampions(context);
 			return NULL;
 		}
 	}
