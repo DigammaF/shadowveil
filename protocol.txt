@@ -1,6 +1,10 @@
 
+les messages émis par le server et reçus par un client sont détaillés ci-dessous.
+Chaque description est faite relativement au client, ou au personnage contrôlé par le client
+
 server
 	SET-CONTEXT <int>
+		le contexte dans lequel se trouve le client vient de changer
 		int: context_t
 	OUTPUT <word+>
 		word+: text générique sans métadonnées
@@ -19,12 +23,24 @@ server
 		int: clé de la feature dans la place
 		word: nom de la feature
 	LIST-ITEM <int> <word>
+		int: clé
+		word: nom
 	LIST-CHAMPION <int> <word>
+		int: clé
+		word: nom
 	LIST-ABILITY <int> <word+>
+		int: clé
+		word: description
+	LIST-ACCOUNT <word>
+		fait savoir l'existence d'un compte
+		word: nom du compte
 	END-LIST
+		signale la fin d'une 
 	ABOUT-PLACE <word>
 		amène l'attention sur une place
 		word: nom de la place
+	ABOUT-PAWN <word>
+		word: nom
 	PAWN-SPAWN <int> <word>
 		un pion vient d'apparaître
 		int: clé du pion dans la place
@@ -37,9 +53,7 @@ server
 		un pion vient de quitter la place
 		word: nom du pion
 	MESSAGE <word+>
-	LIST-ACCOUNT <word>
-		fait savoir l'existence d'un compte
-		word: nom du compte
+		un message addressé au client vient d'arriver
 	YOU-MOVED <word>
 		fait savoir à l'utilisateur que son pion a été déplacé
 		word: nom de la place d'arrivée
@@ -75,7 +89,7 @@ client
 		BUY-ITEM <int>
 			int: clé du deal
 		CHECK-MARKET
-		USE-ITEM <int>
+		+USE-ITEM <int>
 			utiliser un objet
 			int: clé de l'objet
 		USE-ITEM-ON-CHAMPION <int> <int>
