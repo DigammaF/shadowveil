@@ -44,4 +44,5 @@ void* squeakerUseHandler(void* _) {
 	user_t* user = pawn->user;
 	if (user == NULL) { return NULL; }
 	sendData(&user->socket, "OUTPUT *couinement*");
+	return NULL;
 }

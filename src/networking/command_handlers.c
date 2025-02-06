@@ -89,7 +89,7 @@ void setupItems(pawn_t* pawn) {
 }
 
 void setupChampions(pawn_t* pawn) {
-
+	UNUSED(pawn);
 }
 
 void handleRegister(server_t* server, user_t* user, command_context_t* context) {
@@ -244,7 +244,7 @@ void handleMove(command_context_t* context){
 	if (!safeStrToUnsigned(context->args[2], &destinationKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
 
 	link_t* usedLink = hashmapGet(&place->links, destinationKey);
-	if (usedLink == NULL) { fprintf(stderr, "(!) Tried to fetch an unexisting link %i", destinationKey); return; }
+	if (usedLink == NULL) { fprintf(stderr, "(!) %i could not be found", destinationKey); return; }
 	movePawn(server, pawn, usedLink);
 	sprintf(message, "YOU-MOVED %s", usedLink->target->name);
 	sendData(&user->socket, message);
@@ -281,7 +281,7 @@ void handleInteract(command_context_t* context) {
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
-	feature_t* feature = place->features.elements[featureKey];
+	feature_t* feature = hashmapGet(&place->features, featureKey);
 	
 	if (feature == NULL) { fprintf(stderr, "(!) %i could not be found in features\n", featureKey); return; }
 
@@ -295,6 +295,16 @@ void handleUseItem(command_context_t* context) {
 
 	if (!safeStrToUnsigned(context->args[2], &itemKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; };
 
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	item_t* item = hashmapGet(&pawn->items, itemKey);
+
+	if (item == NULL) { fprintf(stderr, "(!) %i could not be found in items\n", itemKey); return; }
+
+	solo_use_args_t args = { };
+	use_t use = MAKE_USE(USE_SOLO, &args);
+	triggerItemUse(context->server, item, &use);
 }
 
 void* gameWorldHandler(void* arg) {

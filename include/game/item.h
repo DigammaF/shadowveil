@@ -18,6 +18,7 @@ typedef struct item_t {
 
 typedef enum {
 	USE_ON_CHAMPION, // champion_use_args_t
+	USE_SOLO, // solo_use_args_t
 } use_type_t;
 
 typedef struct use_t {
@@ -37,6 +38,8 @@ void dropItem(item_t* item);
 void makeSqueaker(item_t* item);
 
 void triggerItemUse(struct server_t* server, item_t* item, use_t* use);
+
+typedef struct solo_use_args_t { } solo_use_args_t;
 
 typedef struct champion_use_args_t {
 	struct champion_t* champion;
