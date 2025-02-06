@@ -158,7 +158,6 @@ void handleSee(command_context_t* context) {
 	for (unsigned n = 0; n < place->links.capacity; n++) {
 		link_t* link = place->links.elements[n];
 		if (link == NULL) { continue; }
-		char message[1024];
 		sprintf(message, "LIST-LINK %i %s", n, link->name);
 		printf("(sending) %s\n", message);
 		sendData(&user->socket, message);
@@ -169,7 +168,6 @@ void handleSee(command_context_t* context) {
 	for (unsigned n = 0; n < place->features.capacity; n++) {
 		feature_t* feature = place->features.elements[n];
 		if (feature == NULL) { continue; }
-		char message[1024];
 		sprintf(message, "LIST-FEATURE %i %s", n, feature->name);
 		printf("(sending) %s\n", message);
 		sendData(&user->socket, message);
@@ -180,7 +178,6 @@ void handleSee(command_context_t* context) {
 	for (unsigned n = 0; n < place->pawns.capacity; n++) {
 		pawn_t* pawn = place->pawns.elements[n];
 		if (pawn == NULL) { continue; }
-		char message[1024];
 		sprintf(message, "LIST-PAWN %i %s", n, pawn->name);
 		printf("(sending) %s\n", message);
 		sendData(&user->socket, message);
@@ -307,6 +304,34 @@ void handleUseItem(command_context_t* context) {
 	triggerItemUse(context->server, item, &use);
 }
 
+void handleMe(command_context_t* context) {
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	char message[1024];
+
+	sprintf(message, "ABOUT-PAWN %s", pawn->name);
+	sendData(&user->socket, message);
+
+	for (unsigned n = 0; n < pawn->items.capacity; n++) {
+		item_t* item = pawn->items.elements[n];
+		if (item == NULL) { continue; }
+		sprintf(message, "LIST-ITEM %i %s", n, item->name);
+		sendData(&user->socket, message);
+	}
+
+	sendData(&user->socket, "END-LIST");
+
+	for (unsigned n = 0; n < pawn->champions.capacity; n++) {
+		champion_t* champion = pawn->champions.elements[n];
+		if (champion == NULL) { continue; }
+		sprintf(message, "LIST-CHAMPION %i %s", n, champion->name);
+		sendData(&user->socket, message);
+	}
+
+	sendData(&user->socket, "END-LIST");
+}
+
 void* gameWorldHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
 
@@ -318,6 +343,11 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "LIST-ONLINE") == 0) {
 			handleListOnline(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "ME") == 0) {
+			handleMe(context);
 			return NULL;
 		}
 	}

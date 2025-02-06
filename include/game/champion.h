@@ -38,6 +38,7 @@ typedef enum {
 
 /** Structure représentant un personnage jouable. */
 typedef struct champion_t {
+	char* name;
 	struct pawn_t* pawn; // peut être NULL
 	unsigned pawnKey;
     champion_type_t type;
