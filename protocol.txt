@@ -104,6 +104,8 @@ client
 		SELECT-CHAMPION <int> <int>
 			int: clé du champion dans l'inventaire
 			int: numéro de la place d'équipe
+		UNSELECT-CHAMPION <int>
+			int: numéro de place dans l'équipe
 		- combat
 		ATTACK <int> <int> <int>
 			int: clé du champion source
