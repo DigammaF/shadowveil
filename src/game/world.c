@@ -96,6 +96,7 @@ void generateWorld(unsigned seed, world_t* world) {
 	printf("(...) Generating world\n");
     
 	for (unsigned x = 0; x < WORLD_SIZE; x++) {
+		printf(".");
 		for (unsigned y = 0; y < WORLD_SIZE; y++) {
 			place_t* place = malloc(sizeof(place_t));
 			CHECKM(place, "malloc place_t");
@@ -113,6 +114,8 @@ void generateWorld(unsigned seed, world_t* world) {
 			place->name = strdup(name);
 		}
 	}
+
+	printf("\n");
 
 	for (unsigned x = 0; x < WORLD_SIZE; x++) {
 		for (unsigned y = 0; y < WORLD_SIZE; y++) {

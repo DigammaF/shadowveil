@@ -2,12 +2,14 @@
 #ifndef PAWN_H
 #define PAWN_H
 
+#include "feature.h"
 #include "function_stack.h"
 
 struct account_t;
 struct user_t;
 struct server_t;
 struct place_t;
+struct interaction_t;
 
 typedef struct pawn_t {
     char* name;
@@ -25,6 +27,7 @@ typedef enum {
     EVENT_PAWN_LEFT, // pawn_event_args_t
 	EVENT_PAWN_SPAWNED, // pawn_event_args_t
 	EVENT_MESSAGE, // message_event_args_t
+	EVENT_INTERACTION, // interaction_event_args_t
 } event_type_t;
 
 typedef struct event_t {
@@ -54,5 +57,9 @@ typedef struct pawn_event_args_t {
 typedef struct message_event_args_t {
 	char* message;
 } message_event_args_t;
+
+typedef struct interaction_event_args_t {
+	struct interaction_t* interaction;
+} interaction_event_args_t;
 
 #endif

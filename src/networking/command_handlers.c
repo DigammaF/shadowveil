@@ -224,11 +224,7 @@ void handleMove(command_context_t* context){
 
 	unsigned destinationKey = 0;
 
-	if (!safeStrToUnsigned(context->args[2], &destinationKey)) {
-		sprintf(message, "ERROR Ceci n'est pas un nombre");
-		sendData(&user->socket, message);
-		return;
-	}
+	if (!safeStrToUnsigned(context->args[2], &destinationKey)) { return; }
 
 	bool isUserInputValid = (destinationKey < place->links.capacity) && (destinationKey > 0);
 
@@ -236,11 +232,9 @@ void handleMove(command_context_t* context){
 		link_t* usedLink = hashmapGet(&place->links, destinationKey);
 		movePawn(server, pawn, usedLink);
 		sprintf(message, "YOU-MOVED %s", usedLink->target->name);
-	} else {
-		sprintf(message, "ERROR Cette sortie n'existe pas");
+		sendData(&user->socket, message);
 	}
 
-	sendData(&user->socket, message);
 	return;
 }
 
@@ -262,6 +256,28 @@ void handleListOnline(command_context_t* context) {
 	sendData(&user->socket, "END-LIST");
 }
 
+void handleInteract(command_context_t* context) {
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+
+	unsigned featureKey;
+	unsigned interactionType;
+
+	if (!safeStrToUnsigned(context->args[2], &featureKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+	if (!safeStrToUnsigned(context->args[3], &interactionType)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[3]); return; }
+	if (interactionType >= INTERACTION_COUNT) { fprintf(stderr, "(!) %i is too big\n", interactionType); return; }
+
+	place_t* place = pawn->place;
+	feature_t* feature = place->features.elements[featureKey];
+	
+	if (feature == NULL) { fprintf(stderr, "(!) %i could not be found in features\n", featureKey); return; }
+
+	pawn_interaction_args_t args = { .pawn = pawn };
+	interaction_t interaction = MAKE_INTERACTION((interaction_type_t)interactionType, &args);
+	triggerFeatureInteraction(context->server, feature, &interaction);
+}
+
 void* gameWorldHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
 
@@ -277,14 +293,16 @@ void* gameWorldHandler(void* arg) {
 		}
 	}
 
-	if (context->count > 2) {
-		if (strcmp(context->args[1], "MESSAGE") == 0) {
-			handleMessage(context);
+	if (context->count == 3) {
+		if (strcmp(context->args[1], "MOVE") == 0) {
+			handleMove(context);
 			return NULL;
 		}
+	}
 
-		if (strcmp(context->args[1], "GLOBAL-MESSAGE") == 0) {
-			handleGlobalMessage(context);
+	if (context->count == 4) {
+		if (strcmp(context->args[1], "INTERACT") == 0) {
+			handleInteract(context);
 			return NULL;
 		}
 	}
@@ -297,11 +315,6 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "GLOBAL-MESSAGE") == 0) {
 			handleGlobalMessage(context);
-			return NULL;
-		}
-
-		if (strcmp(context->args[1], "MOVE") == 0) {
-			handleMove(context);
 			return NULL;
 		}
 	}

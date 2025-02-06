@@ -51,6 +51,9 @@ void* playerEventHandler(void* _) {
 			sprintf(message, "MESSAGE %s", messageEventArgs->message);
 			sendData(&user->socket, message);
 			break;
+
+		default:
+			return NULL;
 	}
 
 	return NULL;

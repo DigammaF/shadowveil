@@ -49,7 +49,7 @@ client
 		- gameworld
 		+MOVE <int>
 			int: clé du lien dans la place
-		INTERACT <int> <int>
+		+INTERACT <int> <int>
 			int: clé de la feature dans la place
 			int: numéro de l'interaction
 		+MESSAGE <word>+

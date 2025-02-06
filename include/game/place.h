@@ -8,6 +8,7 @@
 struct pawn_t;
 struct server_t;
 struct event_t;
+struct feature_t;
 
 typedef struct place_t {
     char* name;
@@ -36,6 +37,9 @@ void makeDesert(place_t* place);
 
 void addPawnToPlace(place_t* place, struct pawn_t* pawn);
 void removePawnFromPlace(place_t* place, struct pawn_t* pawn);
+
+void addFeatureToPlace(place_t* place, struct feature_t* feature);
+void removeFeatureFromPlace(place_t* place, struct feature_t* feature);
 
 void notifyPlace(struct server_t* server, place_t* place, struct event_t* event);
 

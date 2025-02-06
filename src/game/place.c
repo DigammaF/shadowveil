@@ -8,6 +8,7 @@
 #include "hashmap.h"
 #include "vector.h"
 #include "pawn.h"
+#include "random_utils.h"
 
 struct server_t;
 struct event_t;
@@ -56,10 +57,28 @@ void deleteLink(place_t* place, unsigned key) {
 
 void makePlain(place_t* place) {
     place->name = "Plaine";
+	
+	unsigned bushCount = getRandomInt(2, 6);
+
+	for (unsigned n = 0; n < bushCount; n++) {
+		feature_t* feature = malloc(sizeof(feature_t));
+		initFeature(feature);
+		makeBush(feature);
+		addFeatureToPlace(place, feature);
+	}
 }
 
 void makeDesert(place_t* place) {
     place->name = "Désert";
+
+	unsigned rockCount = getRandomInt(2, 6);
+
+	for (unsigned n = 0; n < rockCount; n++) {
+		feature_t* feature = malloc(sizeof(feature_t));
+		initFeature(feature);
+		makeRock(feature);
+		addFeatureToPlace(place, feature);
+	}
 }
 
 void addPawnToPlace(place_t* place, pawn_t* pawn) {
@@ -71,6 +90,17 @@ void addPawnToPlace(place_t* place, pawn_t* pawn) {
 void removePawnFromPlace(place_t* place, pawn_t* pawn) {
 	hashmapSet(&place->pawns, pawn->placeKey, NULL);
 	pawn->place = NULL;
+}
+
+void addFeatureToPlace(place_t* place, struct feature_t* feature) {
+	feature->placeKey = hashmapLocateUnusedKey(&place->features);
+	hashmapSet(&place->features, feature->placeKey, feature);
+	feature->place = place;
+}
+
+void removeFeatureFromPlace(place_t* place, struct feature_t* feature) {
+	hashmapSet(&place->features, feature->placeKey, NULL);
+	feature->place = NULL;
 }
 
 void notifyPlace(struct server_t* server, place_t* place, struct event_t* event) {
