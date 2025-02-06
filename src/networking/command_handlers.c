@@ -376,6 +376,44 @@ void handleSeeChampions(command_context_t* context) {
 	sendData(&user->socket, "END-LIST");
 }
 
+void handleSelectChampion(command_context_t* context) {
+	unsigned teamSpot;
+	unsigned championKey;
+
+	if (!safeStrToUnsigned(context->args[3], &teamSpot)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[3]); return; };
+	if (!safeStrToUnsigned(context->args[2], &championKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	champion_t* champion = hashmapGet(&pawn->champions, championKey);
+
+	if (champion == NULL) { fprintf(stderr, "(!) could not fetch champion %i", championKey); return; }
+	if (teamSpot >= TEAM_SIZE) { fprintf(stderr, "(!) team spot too big (%i)", teamSpot); return; }
+
+	for (unsigned n = 0; n < TEAM_SIZE; n++) {
+		champion_t* localChampion = pawn->team[n];
+		if (localChampion == NULL) { continue; }
+		if (localChampion == champion) { pawn->team[n] = NULL; }
+	}
+
+	pawn->team[teamSpot] = champion;
+}
+
+void handleUnselectChampion(command_context_t* context) {
+	unsigned teamSpot;
+
+	if (!safeStrToUnsigned(context->args[2], &teamSpot)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+
+	if (teamSpot >= TEAM_SIZE) { fprintf(stderr, "(!) team spot too big (%i)", teamSpot); return; }
+
+	pawn->team[teamSpot] = NULL;
+}
+
 void* gameWorldHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
 
@@ -411,6 +449,11 @@ void* gameWorldHandler(void* arg) {
 			handleUseItem(context);
 			return NULL;
 		}
+
+		if (strcmp(context->args[1], "UNSELECT-CHAMPION") == 0) {
+			handleUnselectChampion(context);
+			return NULL;
+		}
 	}
 
 	if (context->count == 4) {
@@ -421,6 +464,11 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "USE-ITEM-ON-CHAMPION") == 0) {
 			handleUseItemOnChampion(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "SELECT-CHAMPION") == 0) {
+			handleSelectChampion(context);
 			return NULL;
 		}
 	}

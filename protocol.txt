@@ -101,10 +101,10 @@ client
 		+ME
 			décrire le personnage du joueur (nom + inventaire + champions séléctionnés)
 		+SEE-CHAMPIONS
-		SELECT-CHAMPION <int> <int>
+		+SELECT-CHAMPION <int> <int>
 			int: clé du champion dans l'inventaire
 			int: numéro de la place d'équipe
-		UNSELECT-CHAMPION <int>
+		+UNSELECT-CHAMPION <int>
 			int: numéro de place dans l'équipe
 		- combat
 		ATTACK <int> <int> <int>
