@@ -214,14 +214,20 @@ void handleMove(command_context_t* context){
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
-	hashmap_t* linksHashmap = &place->links;
 	char message[1024];
+
 	unsigned destinationKey = 0;
 
-	bool isUserInputValid = (destinationKey < linksHashmap->capacity) && (destinationKey > 0);
+	if (!safeStrToUnsigned(context->args[2], &destinationKey)) {
+		sprintf(message, "ERROR Ceci n'est pas un nombre");
+		sendData(&user->socket, message);
+		return;
+	}
+
+	bool isUserInputValid = (destinationKey < place->links.capacity) && (destinationKey > 0);
 
 	if (isUserInputValid) {
-		link_t* usedLink = hashmapGet(linksHashmap, destinationKey);
+		link_t* usedLink = hashmapGet(&place->links, destinationKey);
 		movePawn(server, pawn, usedLink);
 		sprintf(message, "YOU-MOVED %s", usedLink->target->name);
 	} else {
@@ -257,11 +263,6 @@ void* gameWorldHandler(void* arg) {
 			return NULL;
 		}
 
-		if (strcmp(context->args[1], "MOVE") == 0) {
-			handleMove(context);
-			return NULL;
-		}
-
 		if (strcmp(context->args[1], "LIST-ONLINE") == 0) {
 			handleListOnline(context);
 			return NULL;
@@ -293,6 +294,7 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "MOVE") == 0) {
 			handleMove(context);
+			return NULL;
 		}
 	}
 	

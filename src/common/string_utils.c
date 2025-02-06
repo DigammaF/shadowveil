@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <netinet/in.h>
+#include <errno.h>
+#include <limits.h>
 
 #include "string_utils.h"
 
@@ -101,4 +103,30 @@ char* joinString(char** str, const char* joiner) {
 
 void freeJoin(char* str) {
 	free(str);
+}
+
+int safeStrToUnsigned(const char *str, unsigned *out) {
+    if (str == NULL || *str == '\0') {
+        return 0; // Invalid input
+    }
+
+    char *endptr;
+    errno = 0;  // Reset errno before call
+    long val = strtol(str, &endptr, 10);
+
+    // Check for conversion errors
+    if (errno == ERANGE || val > UINT_MAX || val < 0) {
+        return 0; // Out of int range
+    }
+
+    // Check if no digits were found
+    if (endptr == str) {
+        return 0; // No valid conversion
+    }
+
+    // Check if there are unexpected characters after the number
+	if (*endptr != '\0') { return 0; }
+
+    *out = (unsigned)val;
+    return 1; // Success
 }

@@ -43,16 +43,16 @@ server
 client
 	COMMAND <word>+
 		- initial
-		LOGIN <name> <password>
-		REGISTER <name> <password>
+		+LOGIN <name> <password>
+		+REGISTER <name> <password>
 		- gameworld
-		MOVE <int>
+		+MOVE <int>
 			int: clé du lien dans la place
 		INTERACT <int>
 			int: clé de la feature dans la place
-		MESSAGE <word>+
-		GLOBAL-MESSAGE <word>+
-		LIST-ONLINE
+		+MESSAGE <word>+
+		+GLOBAL-MESSAGE <word>+
+		+LIST-ONLINE
 		DUEL-OFFER <int>
 			int: clé du pion dans la place
 		DUEL-ACCEPT <int>
@@ -70,7 +70,7 @@ client
 		BUY-ITEM <int>
 			int: clé du deal
 		CHECK-MARKET
-		SEE
+		+SEE
 		SEE-CHAMPIONS
 		SELECT-CHAMPION <int> <int>
 			int: clé du champion dans l'inventaire
