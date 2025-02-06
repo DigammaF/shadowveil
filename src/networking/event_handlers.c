@@ -25,7 +25,7 @@ void* playerEventHandler(void* _) {
 
 	char message[1024];
 	pawn_event_args* pawnEventArgs = NULL;
-	message_event_args* message_event_args = NULL;
+	message_event_args* messageEventArgs = NULL;
 
 	switch (event->type) {
 		case EVENT_PAWN_ARRIVED:
@@ -47,8 +47,8 @@ void* playerEventHandler(void* _) {
 			break;
 
 		case EVENT_MESSAGE:
-			message_event_args = event->args;
-			sprintf(message, "MESSAGE %s", message_event_args->message);
+			messageEventArgs = event->args;
+			sprintf(message, "MESSAGE %s", messageEventArgs->message);
 			sendData(&user->socket, message);
 			break;
 	}
