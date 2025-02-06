@@ -30,6 +30,8 @@ server = <error reading variable server (value of type `server_t' requires 34358
 typedef struct {
     struct place_t* places[WORLD_SIZE][WORLD_SIZE]; // possède la valeur
 	hashmap_t pawns; // pawn_t*, possède la valeur
+	hashmap_t championDeals; // champion_deal_t*, possède la valeur
+	hashmap_t itemDeals; // item_deal_t*, possède la valeur
 } world_t;
 
 void initWorld(world_t* world);

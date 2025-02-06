@@ -23,6 +23,7 @@
 void initServer(server_t* server) {
 	initHashmap(&server->users);
 	initHashmap(&server->accounts);
+	initWorld(&server->world);
 }
 
 void dropServer(server_t* server) {
@@ -42,6 +43,7 @@ void dropServer(server_t* server) {
 
 	dropHashmap(&server->users);
 	dropHashmap(&server->accounts);
+	dropWorld(&server->world);
 }
 
 /**

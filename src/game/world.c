@@ -9,6 +9,7 @@
 #include "server.h"
 #include "place.h"
 #include "pawn.h"
+#include "deal.h"
 
 #define UNUSED(x) (void)(x)
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
@@ -21,6 +22,8 @@ void initWorld(world_t* world) {
 	}
 
 	initHashmap(&world->pawns);
+	initHashmap(&world->championDeals);
+	initHashmap(&world->itemDeals);
 }
 
 void dropWorld(world_t* world) {
@@ -40,7 +43,23 @@ void dropWorld(world_t* world) {
 		free(pawn);
 	}
 
+	for (unsigned n = 0; n < world->championDeals.capacity; n++) {
+		champion_deal_t* championDeal = world->championDeals.elements[n];
+		if (championDeal == NULL) { continue; }
+		dropChampionDeal(championDeal);
+		free(championDeal);
+	}
+
+	for (unsigned n = 0; n < world->itemDeals.capacity; n++) {
+		item_deal_t* itemDeal = world->itemDeals.elements[n];
+		if (itemDeal == NULL) { continue; }
+		dropItemDeal(itemDeal);
+		free(itemDeal);
+	}
+
 	dropHashmap(&world->pawns);
+	dropHashmap(&world->championDeals);
+	dropHashmap(&world->itemDeals);
 }
 
 void connectToNeighbors(world_t* world, unsigned x, unsigned y) {
