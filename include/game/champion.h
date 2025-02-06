@@ -3,9 +3,11 @@
 #define CHAMPION_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "ability.h"
 #include "constants.h"
+#include "hashmap.h"
 
 struct pawn_t;
 
@@ -17,8 +19,6 @@ struct pawn_t;
 	{ .value = 0, .maxValue = mdfe, .minValue = 0 }, \
 	{ .value = 0, .maxValue = intel, .minValue = 0 }, \
 	{ .value = 0, .maxValue = health, .minValue = 0 }
-
-#define ABILITY_COUNT 3 /** nombre maximum d'attaques par personnage */
 
 typedef struct {
     int value;
@@ -44,11 +44,17 @@ typedef struct champion_t {
     champion_type_t type;
     int effects[EFFECT_COUNT];
     stat_value_t stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */
-    ability_t* abilities[ABILITY_COUNT]; // possède la valeur, peut être NULL
+    hashmap_t abilities; // ability_t* possède la valeur
+	unsigned powerBudget;
+	bool fleeing;
+	bool hasInitiative;
 } champion_t;
 
 void initChampion(champion_t* champion);
 void dropChampion(champion_t* champion);
+
+void addAbilityToChampion(champion_t* champion, ability_t* ability);
+void removeAbilityToChampion(champion_t* champion, ability_t* ability);
 
 void setStat(stat_value_t* stat, int value);
 

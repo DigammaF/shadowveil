@@ -2,6 +2,8 @@
 #ifndef ABILITY_H
 #define ABILITY_H
 
+struct champion_t;
+
 #define MAX_ABILITY_OP_CODES 10
 
 /**
@@ -28,6 +30,8 @@
 #define NOOP 6
 
 typedef struct {
+	struct champion_t* champion; // peut être NULL
+	unsigned championKey;
     unsigned type;
     unsigned opCodes[MAX_ABILITY_OP_CODES];
     int monoTarget;

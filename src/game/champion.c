@@ -6,6 +6,7 @@
 #include "ability.h"
 #include "champion.h"
 #include "random_utils.h"
+#include "hashmap.h"
 
 #define UNUSED(x) (void)(x)
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
@@ -13,18 +14,32 @@
 
 void initChampion(champion_t* champion) {
 	champion->type = 0;
+	champion->powerBudget = 0;
 	for (unsigned n = 0; n < EFFECT_COUNT; n++) { champion->effects[n] = 0; }
 	for (unsigned n = 0; n < STAT_COUNT; n++) { champion->stats[n] = MAKE_STAT(0); }
-	for (unsigned n = 0; n < ABILITY_COUNT; n++) { champion->abilities[n] = NULL; }
+	initHashmap(&champion->abilities);
 }
 
 void dropChampion(champion_t* champion) {
-	for (unsigned n = 0; n < ABILITY_COUNT; n++) {
-		if (champion->abilities[n] == NULL) { continue; }
-		dropAbility(champion->abilities[n]);
-		free(champion->abilities[n]);
-		champion->abilities[n] = NULL;
+	for (unsigned n = 0; n < champion->abilities.capacity; n++) {
+		ability_t* ability = champion->abilities.elements[n];
+		if (ability == NULL) { continue; }
+		dropAbility(ability);
+		free(ability);
 	}
+
+	dropHashmap(&champion->abilities);
+}
+
+void addAbilityToChampion(champion_t* champion, ability_t* ability) {
+	ability->championKey = hashmapLocateUnusedKey(&champion->abilities);
+	hashmapSet(&champion->abilities, ability->championKey, ability);
+	ability->champion = champion;
+}
+
+void removeAbilityToChampion(champion_t* champion, ability_t* ability) {
+	hashmapSet(&champion->abilities, ability->championKey, NULL);
+	ability->champion = NULL;
 }
 
 /** Crée des personnages définis. */
@@ -33,23 +48,25 @@ int setupExamples() {
         .type = TYPE_COSMIC,
 		.effects = { 0 },
 		.stats = { MAKE_STATS(5, 6, 5, 3, 8, 10) },
-		.abilities = { NULL }
+		.abilities = BLANK_HASHMAP
     };
-
+	initHashmap(&character1.abilities);
 
     champion_t character2 = {
         .type = TYPE_BLOOD,
 		.effects = { 0 },
 		.stats = { MAKE_STATS(7, 1, 9, 4, 5, 21) },
-		.abilities = { NULL }
+		.abilities = BLANK_HASHMAP
     };
+	initHashmap(&character2.abilities);
 
     champion_t character3 = {
         .type = TYPE_DARK,
 		.effects = { 0 },
 		.stats = { MAKE_STATS(7, 4, 3, 8, 8, 11) },
-		.abilities = { NULL }
+		.abilities = BLANK_HASHMAP
     };
+	initHashmap(&character3.abilities);
 
 	UNUSED(character1); UNUSED(character2); UNUSED(character3);
     printf("setupExamples : Trois personnages créés.\n");
@@ -75,6 +92,7 @@ void generateChampion(unsigned seed, unsigned powerBudget, champion_t* champion)
 	}
 
 	champion->stats[STAT_COUNT - 1] = MAKE_STAT(powerBudget - budgets[STAT_COUNT - 2]);
+	champion->powerBudget = powerBudget;
 }
 
 void setStat(stat_value_t* stat, int value) {

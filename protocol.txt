@@ -98,7 +98,7 @@ client
 			int: clé du champion
 		+SEE
 			décrire l'emplacement du joueur
-		ME
+		+ME
 			décrire le personnage du joueur (nom + inventaire + champions séléctionnés)
 		SEE-CHAMPIONS
 		SELECT-CHAMPION <int> <int>
@@ -109,7 +109,9 @@ client
 			int: clé du champion source
 			int: clé du champion cible
 			int: clé de la compétence
-		SURREND
+		RUN-AWAY
+		FLEE <int>
+			int: clé du champion
 		DRAW-OFFER
 		DRAW-ACCEPT
 	END

@@ -2,6 +2,8 @@
 #ifndef HASHMAP_H
 #define HASHMAP_H
 
+#include <stdlib.h>
+
 #define HASHMAP_GROWTH_RATE 1.1
 #define HASHMAP_GROWTH_CONSTANT 20
 
@@ -15,6 +17,8 @@ typedef struct {
     void** elements;
     unsigned capacity;
 } hashmap_t;
+
+#define BLANK_HASHMAP { .elements = NULL, .capacity = 0 }
 
 void initHashmap(hashmap_t* hashmap);
 void dropHashmap(hashmap_t* hashmap);
