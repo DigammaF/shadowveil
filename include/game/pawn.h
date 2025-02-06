@@ -20,6 +20,7 @@ typedef struct pawn_t {
     struct user_t* user; // possiblement NULL si le joueur n'est pas connecté
 	unsigned placeKey; // la clé de l'entité dans le dictionnaire .pawns de la place_t dans laquelle elle se situe
 	unsigned worldKey; // la clé de l'entité dans le dictionnaire .pawns de world_t
+	unsigned gold;
 } pawn_t;
 
 typedef enum {

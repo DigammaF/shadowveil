@@ -24,6 +24,7 @@ SRC =\
 	$(SRC_DIR)/$(DATA_STRUCTURES)/stack.c $(SRC_DIR)/$(DATA_STRUCTURES)/vector.c\
 	$(SRC_DIR)/$(GAME)/ability.c $(SRC_DIR)/$(GAME)/champion.c $(SRC_DIR)/$(GAME)/feature.c\
 	$(SRC_DIR)/$(GAME)/pawn.c $(SRC_DIR)/$(GAME)/place.c $(SRC_DIR)/$(GAME)/world.c\
+	$(SRC_DIR)/$(GAME)/item.c $(SRC_DIR)/$(GAME)deal.c\
 	$(SRC_DIR)/$(NETWORKING)/command_handlers.c $(SRC_DIR)/$(NETWORKING)/server.c\
 	$(SRC_DIR)/$(NETWORKING)/user.c $(SRC_DIR)/$(NETWORKING)/account.c\
 	$(SRC_DIR)/$(NETWORKING)/client.c $(SRC_DIR)/$(NETWORKING)/event_handlers.c
