@@ -233,7 +233,7 @@ void handleGlobalMessage(command_context_t* context) {
 		if (localPawn == NULL) { continue; }
 		sendPawnEvent(context->server, localPawn, &event);
 	}
-	
+
 	freeJoin(text);
 }
 
@@ -288,7 +288,7 @@ void handleInteract(command_context_t* context) {
 	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
 	feature_t* feature = hashmapGet(&place->features, featureKey);
-	
+
 	if (feature == NULL) { fprintf(stderr, "(!) %i could not be found in features\n", featureKey); return; }
 
 	pawn_interaction_args_t args = { .pawn = pawn };
@@ -396,12 +396,7 @@ void handleSelectChampion(command_context_t* context) {
 	if (champion == NULL) { fprintf(stderr, "(!) could not fetch champion %i", championKey); return; }
 	if (teamSpot >= TEAM_SIZE) { fprintf(stderr, "(!) team spot too big (%i)", teamSpot); return; }
 
-	for (unsigned n = 0; n < TEAM_SIZE; n++) {
-		champion_t* localChampion = pawn->team[n];
-		if (localChampion == NULL) { continue; }
-		if (localChampion == champion) { pawn->team[n] = NULL; }
-	}
-
+	removeChampionFromTeam(pawn, champion);
 	pawn->team[teamSpot] = champion;
 }
 
@@ -433,14 +428,9 @@ void handleSellChampion(command_context_t* context) {
 
 	if (champion == NULL) { fprintf(stderr, "(!) could not fetch champion at %i", championKey); return; }
 
-	for (unsigned n = 0; n < TEAM_SIZE; n++) {
-		champion_t* localChampion = pawn->team[n];
-		if (localChampion == NULL) { continue; }
-		if (localChampion == champion) { pawn->team[n] = NULL; }
-	}
-
 	server_t* server = context->server;
 	world_t* world = &server->world;
+
 	champion_deal_t* deal = malloc(sizeof(champion_deal_t));
 	CHECKM(deal, "malloc champion deal");
 	initChampionDeal(deal);
@@ -448,8 +438,8 @@ void handleSellChampion(command_context_t* context) {
 	deal->price = price;
 	deal->seller = pawn;
 	deal->key = hashmapLocateUnusedKey(&world->championDeals);
-	hashmapSet(&world->championDeals, deal->key, deal);
-	removeChampionFromPawn(pawn, champion);
+
+	addChampionDealToWorld(world, deal);
 	notifyChampionRemoved(server, pawn, champion, "mise en vente");
 }
 
@@ -466,13 +456,13 @@ void handleBuyChampion(command_context_t* context) {
 	champion_deal_t* deal = hashmapGet(&world->championDeals, dealKey);
 
 	if (deal == NULL) { fprintf(stderr, "(!) could not fetch champion deal %i", dealKey); return; }
-	
+
 	if (deal->price > pawn->gold) {
 		sendData(&user->socket, "ERROR pas assez d'or");
 		return;
 	}
 
-	hashmapSet(&world->championDeals, deal->key, NULL);
+	removeChampionDealFromWorld(world, deal);
 	char reason[1024];
 	sprintf(reason, "achat du champion %s", deal->champion->name);
 	changePawnGold(server, pawn, -deal->price, reason);
@@ -480,6 +470,7 @@ void handleBuyChampion(command_context_t* context) {
 	pawn_t* seller = deal->seller;
 
 	if (seller != NULL) {
+		sprintf(reason, "vente du champion %s", deal->champion->name);
 		changePawnGold(server, seller, deal->price, reason);
 	}
 
@@ -487,6 +478,35 @@ void handleBuyChampion(command_context_t* context) {
 	deal->champion = NULL;
 	dropChampionDeal(deal);
 	free(deal);
+}
+
+void handleCheckMarket(command_context_t* context) {
+	user_t* user = context->user;
+	server_t* server = context->server;
+	world_t* world = &server->world;
+	char message[1024];
+
+	for (unsigned n = 0; n < world->championDeals.capacity; n++) {
+		champion_deal_t* deal = world->championDeals.elements[n];
+		if (deal == NULL) { continue; }
+		sprintf(message, "LIST-CHAMPION-DEAL %i %i %s", n, deal->price, deal->champion->name);
+		sendData(&user->socket, message);
+	}
+
+	sendData(&user->socket, "END-LIST");
+
+	for (unsigned n = 0; n < world->itemDeals.capacity; n++) {
+		item_deal_t* deal = world->itemDeals.elements[n];
+		if (deal == NULL) { continue; }
+		sprintf(message, "LIST-ITEM-DEAL %i %i %s", n, deal->price, deal->item->name);
+		sendData(&user->socket, message);
+	}
+
+	sendData(&user->socket, "END-LIST");
+}
+
+void handleCancelChampionDeal(command_context_t* context) {
+	
 }
 
 void* gameWorldHandler(void* arg) {
@@ -512,6 +532,11 @@ void* gameWorldHandler(void* arg) {
 			handleSeeChampions(context);
 			return NULL;
 		}
+
+		if (strcmp(context->args[1], "CHECK-MARKET") == 0) {
+			handleCheckMarket(context);
+			return NULL;
+		}
 	}
 
 	if (context->count == 3) {
@@ -532,6 +557,11 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "BUY-CHAMPION") == 0) {
 			handleBuyChampion(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "CANCEL-CHAMPION-DEAL") == 0) {
+			handleCancelChampionDeal(context);
 			return NULL;
 		}
 	}

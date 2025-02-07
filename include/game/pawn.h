@@ -64,6 +64,8 @@ void removeItemFromPawn(pawn_t* pawn, struct item_t* item);
 void addChampionToPawn(pawn_t* pawn, struct champion_t* champion);
 void removeChampionFromPawn(pawn_t* pawn, struct champion_t* champion);
 
+void removeChampionFromTeam(pawn_t* pawn, struct champion_t* champion);
+
 void notifyChampionAdded(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason);
 void notifyChampionRemoved(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason);
 

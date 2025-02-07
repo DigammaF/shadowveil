@@ -41,37 +41,44 @@ void dropPawn(pawn_t* pawn) {
 	dropHashmap(&pawn->items);
 }
 
-void addItemToPawn(pawn_t* pawn, struct item_t* item) {
+void addItemToPawn(pawn_t* pawn, item_t* item) {
 	item->pawnKey = hashmapLocateUnusedKey(&pawn->items);
 	hashmapSet(&pawn->items, item->pawnKey, item);
 	item->pawn = pawn;
 }
 
-void removeItemFromPawn(pawn_t* pawn, struct item_t* item) {
+void removeItemFromPawn(pawn_t* pawn, item_t* item) {
 	hashmapSet(&pawn->items, item->pawnKey, NULL);
 	item->pawn = NULL;
 }
 
-void addChampionToPawn(pawn_t* pawn, struct champion_t* champion) {
+void addChampionToPawn(pawn_t* pawn, champion_t* champion) {
 	champion->pawnKey = hashmapLocateUnusedKey(&pawn->champions);
 	hashmapSet(&pawn->champions, champion->pawnKey, champion);
 	champion->pawn = pawn;
 }
 
-void removeChampionFromPawn(pawn_t* pawn, struct champion_t* champion) {
-	printf("REM %i %i\n", pawn->champions.elements[champion->pawnKey], champion->pawnKey);
-	hashmapSet(&pawn->champions, champion->pawnKey, NULL);
-	champion->pawn = NULL;
-	printf("REM %i %i\n", pawn->champions.elements[champion->pawnKey], champion->pawnKey);
+void removeChampionFromTeam(pawn_t* pawn, champion_t* champion) {
+	for (unsigned n = 0; n < TEAM_SIZE; n++) {
+		champion_t* localChampion = pawn->team[n];
+		if (localChampion == NULL) { continue; }
+		if (localChampion == champion) { pawn->team[n] = NULL; }
+	}
 }
 
-void notifyChampionAdded(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason) {
+void removeChampionFromPawn(pawn_t* pawn, champion_t* champion) {
+	removeChampionFromTeam(pawn, champion);
+	hashmapSet(&pawn->champions, champion->pawnKey, NULL);
+	champion->pawn = NULL;
+}
+
+void notifyChampionAdded(server_t* server, pawn_t* pawn, champion_t* champion, char* reason) {
 	champion_event_args_t args = { .champion = champion, .reason = reason };
 	event_t event = MAKE_EVENT(EVENT_CHAMPION_GAINED, &args);
 	sendPawnEvent(server, pawn, &event);
 }
 
-void notifyChampionRemoved(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason) {
+void notifyChampionRemoved(server_t* server, pawn_t* pawn, champion_t* champion, char* reason) {
 	champion_event_args_t args = { .champion = champion, .reason = reason };
 	event_t event = MAKE_EVENT(EVENT_CHAMPION_LOST, &args);
 	sendPawnEvent(server, pawn, &event);
@@ -83,7 +90,7 @@ void sendPawnEvent(server_t* server, pawn_t* pawn, event_t* event) {
     pawn->eventHandler((void*)event);
 }
 
-void changePawnGold(struct server_t* server, pawn_t* pawn, int delta, char* reason) {
+void changePawnGold(server_t* server, pawn_t* pawn, int delta, char* reason) {
 	pawn->gold += delta;
 	char deltaRepr[1024];
 	char sign = (delta >= 0) ? '+' : '-';

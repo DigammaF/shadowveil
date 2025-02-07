@@ -113,7 +113,7 @@ void removePawnFromWorld(world_t* world, pawn_t* pawn) {
 void generateWorld(unsigned seed, world_t* world) {
 	srand(seed);
 	printf("(...) Generating world\n");
-    
+
 	for (unsigned x = 0; x < WORLD_SIZE; x++) {
 		printf(".");
 		for (unsigned y = 0; y < WORLD_SIZE; y++) {
@@ -148,3 +148,11 @@ void spawnPawn(server_t* server, place_t* place, pawn_t* pawn) {
 	addPawnToPlace(place, pawn);
 	notifyPawnSpawned(server, place, pawn);
 }
+
+void addChampionDealToWorld(world_t* world, champion_deal_t* deal) {}
+
+void removeChampionDealFromWorld(world_t* world, champion_deal_t* deal) {}
+
+void addItemDealToWorld(world_t* world, item_deal_t* deal) {}
+
+void removeItemDealFromWorld(world_t* world, item_deal_t* deal) {}
