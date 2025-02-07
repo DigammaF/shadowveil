@@ -57,6 +57,18 @@ server
 	YOU-MOVED <word>
 		fait savoir à l'utilisateur que son pion a été déplacé
 		word: nom de la place d'arrivée
+	YOUR-GOLD-CHANGED <word> <word+>
+		word: représente le changement de valeur
+		word+: raisons
+	GAINED-CHAMPION <int> <word> <word+>
+		int: clé
+		word: nom
+		word: raison
+	LOST-CHAMPION <word> <word+>
+		word: nom
+		word+: raison
+	ABOUT-YOUR-GOLD <int>
+		fait savoir la quantité d'or possédée
 
 client
 	COMMAND <word>+

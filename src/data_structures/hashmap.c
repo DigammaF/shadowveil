@@ -55,7 +55,7 @@ void increaseHashmapCapacity(hashmap_t* hashmap) {
 }
 
 void dumpHashmap(hashmap_t* hashmap) {
-	printf("--- Dumping Hashmap ---\n");
+	printf("--- Dumping Hashmap %i ---\n", *(unsigned*)hashmap);
 	printf("capacity: %i\n", hashmap->capacity);
     for (unsigned n = 0; n < hashmap->capacity; n++) {
         if (hashmap->elements[n] == NULL) {

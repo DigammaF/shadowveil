@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "hashmap.h"
 #include "server.h"
@@ -57,13 +58,37 @@ void addChampionToPawn(pawn_t* pawn, struct champion_t* champion) {
 	champion->pawn = pawn;
 }
 
-void removeChampionToPawn(pawn_t* pawn, struct champion_t* champion) {
+void removeChampionFromPawn(pawn_t* pawn, struct champion_t* champion) {
+	printf("REM %i %i\n", pawn->champions.elements[champion->pawnKey], champion->pawnKey);
 	hashmapSet(&pawn->champions, champion->pawnKey, NULL);
 	champion->pawn = NULL;
+	printf("REM %i %i\n", pawn->champions.elements[champion->pawnKey], champion->pawnKey);
+}
+
+void notifyChampionAdded(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason) {
+	champion_event_args_t args = { .champion = champion, .reason = reason };
+	event_t event = MAKE_EVENT(EVENT_CHAMPION_GAINED, &args);
+	sendPawnEvent(server, pawn, &event);
+}
+
+void notifyChampionRemoved(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason) {
+	champion_event_args_t args = { .champion = champion, .reason = reason };
+	event_t event = MAKE_EVENT(EVENT_CHAMPION_LOST, &args);
+	sendPawnEvent(server, pawn, &event);
 }
 
 void sendPawnEvent(server_t* server, pawn_t* pawn, event_t* event) {
     event->server = server;
     event->pawn = pawn;
     pawn->eventHandler((void*)event);
+}
+
+void changePawnGold(struct server_t* server, pawn_t* pawn, int delta, char* reason) {
+	pawn->gold += delta;
+	char deltaRepr[1024];
+	char sign = (delta >= 0) ? '+' : '-';
+	sprintf(deltaRepr, "%c%i", sign, abs(delta));
+	gold_changed_event_args_t args = { .delta = deltaRepr, .reason = reason };
+	event_t event = MAKE_EVENT(EVENT_GOLD_CHANGED, &args);
+	sendPawnEvent(server, pawn, &event);
 }

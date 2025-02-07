@@ -7,6 +7,7 @@
 #include "pawn.h"
 #include "user.h"
 #include "account.h"
+#include "champion.h"
 
 #define UNUSED(x) (void)(x)
 
@@ -26,6 +27,8 @@ void* playerEventHandler(void* _) {
 	char message[1024];
 	pawn_event_args_t* pawnEventArgs = NULL;
 	message_event_args_t* messageEventArgs = NULL;
+	gold_changed_event_args_t* goldChangedEventArgs = NULL;
+	champion_event_args_t* championEventArgs = NULL;
 
 	switch (event->type) {
 		case EVENT_PAWN_ARRIVED:
@@ -49,6 +52,24 @@ void* playerEventHandler(void* _) {
 		case EVENT_MESSAGE:
 			messageEventArgs = event->args;
 			sprintf(message, "MESSAGE %s", messageEventArgs->message);
+			sendData(&user->socket, message);
+			break;
+
+		case EVENT_CHAMPION_GAINED:
+			championEventArgs = event->args;
+			sprintf(message, "GAINED-CHAMPION %i %s %s", championEventArgs->champion->pawnKey, championEventArgs->champion->name, championEventArgs->reason);
+			sendData(&user->socket, message);
+			break;
+
+		case EVENT_CHAMPION_LOST:
+			championEventArgs = event->args;
+			sprintf(message, "LOST-CHAMPION %s %s", championEventArgs->champion->name, championEventArgs->reason);
+			sendData(&user->socket, message);
+			break;
+
+		case EVENT_GOLD_CHANGED:
+			goldChangedEventArgs = event->args;
+			sprintf(message, "YOUR-GOLD-CHANGED %s %s", goldChangedEventArgs->delta, goldChangedEventArgs->reason);
 			sendData(&user->socket, message);
 			break;
 

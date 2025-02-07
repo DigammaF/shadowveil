@@ -41,6 +41,9 @@ typedef enum {
 	EVENT_MESSAGE, // message_event_args_t
 	EVENT_INTERACTION, // interaction_event_args_t
 	EVENT_ITEM_USE, // item_use_event_args_t
+	EVENT_GOLD_CHANGED, // gold_changed_event_args_t
+	EVENT_CHAMPION_GAINED, // champion_event_args_t
+	EVENT_CHAMPION_LOST, // champion_event_args_t
 } event_type_t;
 
 typedef struct event_t {
@@ -59,7 +62,10 @@ void addItemToPawn(pawn_t* pawn, struct item_t* item);
 void removeItemFromPawn(pawn_t* pawn, struct item_t* item);
 
 void addChampionToPawn(pawn_t* pawn, struct champion_t* champion);
-void removeChampionToPawn(pawn_t* pawn, struct champion_t* champion);
+void removeChampionFromPawn(pawn_t* pawn, struct champion_t* champion);
+
+void notifyChampionAdded(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason);
+void notifyChampionRemoved(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason);
 
 /**
  * 
@@ -68,6 +74,8 @@ void removeChampionToPawn(pawn_t* pawn, struct champion_t* champion);
  * 
  */
 void sendPawnEvent(struct server_t* server, pawn_t* pawn, event_t* event);
+
+void changePawnGold(struct server_t* server, pawn_t* pawn, int delta, char* reason);
 
 typedef struct pawn_event_args_t {
 	pawn_t* pawn;
@@ -84,5 +92,15 @@ typedef struct interaction_event_args_t {
 typedef struct item_use_event_args_t {
 	struct use_t* use;
 } item_use_event_args_t;
+
+typedef struct gold_changed_event_args_t {
+	char* delta;
+	char* reason;
+} gold_changed_event_args_t;
+
+typedef struct champion_event_args_t {
+	struct champion_t* champion;
+	char* reason;
+} champion_event_args_t;
 
 #endif

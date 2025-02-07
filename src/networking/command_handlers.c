@@ -18,6 +18,7 @@
 #include "feature.h"
 #include "item.h"
 #include "champion.h"
+#include "deal.h"
 
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 #define UNUSED(x) (void)(x)
@@ -76,6 +77,7 @@ pawn_t* setupPawn(server_t* server, account_t* account, user_t* user) {
 	account->pawn = pawn;
 	pawn->name = strdup(account->name);
 	pawn->user = user;
+	pawn->gold = 1000;
 	pawn->eventHandler = playerEventHandler;
 	place_t* spawnPoint = server->world.places[1][1];
 	spawnPawn(server, spawnPoint, pawn);
@@ -341,6 +343,9 @@ void handleMe(command_context_t* context) {
 	sprintf(message, "ABOUT-PAWN %s", pawn->name);
 	sendData(&user->socket, message);
 
+	sprintf(message, "ABOUT-YOUR-GOLD %i", pawn->gold);
+	sendData(&user->socket, message);
+
 	for (unsigned n = 0; n < pawn->items.capacity; n++) {
 		item_t* item = pawn->items.elements[n];
 		if (item == NULL) { continue; }
@@ -414,6 +419,76 @@ void handleUnselectChampion(command_context_t* context) {
 	pawn->team[teamSpot] = NULL;
 }
 
+void handleSellChampion(command_context_t* context) {
+	unsigned championKey;
+	unsigned price;
+
+	if (!safeStrToUnsigned(context->args[2], &championKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+	if (!safeStrToUnsigned(context->args[3], &price)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[3]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	champion_t* champion = hashmapGet(&pawn->champions, championKey);
+
+	if (champion == NULL) { fprintf(stderr, "(!) could not fetch champion at %i", championKey); return; }
+
+	for (unsigned n = 0; n < TEAM_SIZE; n++) {
+		champion_t* localChampion = pawn->team[n];
+		if (localChampion == NULL) { continue; }
+		if (localChampion == champion) { pawn->team[n] = NULL; }
+	}
+
+	server_t* server = context->server;
+	world_t* world = &server->world;
+	champion_deal_t* deal = malloc(sizeof(champion_deal_t));
+	CHECKM(deal, "malloc champion deal");
+	initChampionDeal(deal);
+	deal->champion = champion;
+	deal->price = price;
+	deal->seller = pawn;
+	deal->key = hashmapLocateUnusedKey(&world->championDeals);
+	hashmapSet(&world->championDeals, deal->key, deal);
+	removeChampionFromPawn(pawn, champion);
+	notifyChampionRemoved(server, pawn, champion, "mise en vente");
+}
+
+void handleBuyChampion(command_context_t* context) {
+	unsigned dealKey;
+
+	if (!safeStrToUnsigned(context->args[2], &dealKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	server_t* server = context->server;
+	world_t* world = &server->world;
+	champion_deal_t* deal = hashmapGet(&world->championDeals, dealKey);
+
+	if (deal == NULL) { fprintf(stderr, "(!) could not fetch champion deal %i", dealKey); return; }
+	
+	if (deal->price > pawn->gold) {
+		sendData(&user->socket, "ERROR pas assez d'or");
+		return;
+	}
+
+	hashmapSet(&world->championDeals, deal->key, NULL);
+	char reason[1024];
+	sprintf(reason, "achat du champion %s", deal->champion->name);
+	changePawnGold(server, pawn, -deal->price, reason);
+	addChampionToPawn(pawn, deal->champion);
+	pawn_t* seller = deal->seller;
+
+	if (seller != NULL) {
+		changePawnGold(server, seller, deal->price, reason);
+	}
+
+	notifyChampionAdded(server, pawn, deal->champion, "achat");
+	deal->champion = NULL;
+	dropChampionDeal(deal);
+	free(deal);
+}
+
 void* gameWorldHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
 
@@ -454,6 +529,11 @@ void* gameWorldHandler(void* arg) {
 			handleUnselectChampion(context);
 			return NULL;
 		}
+
+		if (strcmp(context->args[1], "BUY-CHAMPION") == 0) {
+			handleBuyChampion(context);
+			return NULL;
+		}
 	}
 
 	if (context->count == 4) {
@@ -469,6 +549,11 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "SELECT-CHAMPION") == 0) {
 			handleSelectChampion(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "SELL-CHAMPION") == 0) {
+			handleSellChampion(context);
 			return NULL;
 		}
 	}
