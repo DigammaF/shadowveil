@@ -99,10 +99,10 @@ client
 			int: prix
 		+BUY-CHAMPION <int>
 			int: clé du deal
-		SELL-ITEM <int> <int>
+		+SELL-ITEM <int> <int>
 			int: clé de l'objet dans l'inventaire
 			int: prix
-		BUY-ITEM <int>
+		+BUY-ITEM <int>
 			int: clé du deal
 		+CHECK-MARKET
 		+USE-ITEM <int>
