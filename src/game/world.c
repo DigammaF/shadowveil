@@ -24,6 +24,7 @@ void initWorld(world_t* world) {
 	initHashmap(&world->pawns);
 	initHashmap(&world->championDeals);
 	initHashmap(&world->itemDeals);
+	initHashmap(&world->fights);
 }
 
 void dropWorld(world_t* world) {

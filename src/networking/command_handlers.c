@@ -19,6 +19,7 @@
 #include "item.h"
 #include "champion.h"
 #include "deal.h"
+#include "command_handlers_combat.h"
 
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
 #define UNUSED(x) (void)(x)
@@ -605,6 +606,15 @@ void handleCancelChampionDeal(command_context_t* context) {
 	notifyChampionAdded(server, pawn, deal->champion, "annulation de vente");
 }
 
+void handleStartCombat(command_context_t* context){
+	//TODO malloc un fight_t et le rajouter 1. au world et 2. aux pawns concernés
+
+	//TODO peupler le fight_t si besoin
+
+	//basculement vers combatCommandHandler
+	pushFunction(&user->commandHandlers, combatCommandHandler);
+}
+
 void handleCancelItemDeal(command_context_t* context) {
 	unsigned dealKey;
 
@@ -629,7 +639,7 @@ void handleCancelItemDeal(command_context_t* context) {
 void* gameWorldHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
 
-	if (context->count == 2) {
+	if (context->count == 2) { // nom commande + aucun autre argument
 		if (strcmp(context->args[1], "SEE") == 0) {
 			handleSee(context);
 			return NULL;
@@ -661,7 +671,7 @@ void* gameWorldHandler(void* arg) {
 		}
 	}
 
-	if (context->count == 3) {
+	if (context->count == 3) {  // nom commande + 1 autre argument
 		if (strcmp(context->args[1], "MOVE") == 0) {
 			handleMove(context);
 			return NULL;
@@ -694,6 +704,11 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "CANCEL-ITEM-DEAL") == 0) {
 			handleCancelItemDeal(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "ATTACK") == 0) {
+			handleStartCombat(context);
 			return NULL;
 		}
 	}
@@ -737,6 +752,7 @@ void* gameWorldHandler(void* arg) {
 		}
 	}
 	
+	//si aucun cas ci-dessus n'a été activé
 	printf("(!) unable to parse command\n");
 	return NULL;
 }
