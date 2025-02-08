@@ -13,6 +13,7 @@ typedef struct feature_t {
     function_t interactionHandler;
 	unsigned placeKey;
 	struct place_t* place; // can be NULL
+	uint16_t interactionFlags; // (1 << interaction_type_t)
 } feature_t;
 
 void initFeature(feature_t* feature);

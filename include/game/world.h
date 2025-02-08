@@ -43,4 +43,10 @@ void removePawnFromWorld(world_t* world, struct pawn_t* pawn);
 void generateWorld(unsigned seed, world_t* world);
 void spawnPawn(struct server_t* server, struct place_t* place, struct pawn_t* pawn);
 
+void addChampionDealToWorld(world_t* world, champion_deal_t* deal);
+void removeChampionDealFromWorld(world_t* world, champion_deal_t* deal);
+
+void addItemDealToWorld(world_t* world, item_deal_t* deal);
+void removeItemDealFromWorld(world_t* world, item_deal_t* deal);
+
 #endif

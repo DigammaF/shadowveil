@@ -149,10 +149,20 @@ void spawnPawn(server_t* server, place_t* place, pawn_t* pawn) {
 	notifyPawnSpawned(server, place, pawn);
 }
 
-void addChampionDealToWorld(world_t* world, champion_deal_t* deal) {}
+void addChampionDealToWorld(world_t* world, champion_deal_t* deal) {
+	deal->key = hashmapLocateUnusedKey(&world->championDeals);
+	hashmapSet(&world->championDeals, deal->key, deal);
+}
 
-void removeChampionDealFromWorld(world_t* world, champion_deal_t* deal) {}
+void removeChampionDealFromWorld(world_t* world, champion_deal_t* deal) {
+	hashmapSet(&world->championDeals, deal->key, NULL);
+}
 
-void addItemDealToWorld(world_t* world, item_deal_t* deal) {}
+void addItemDealToWorld(world_t* world, item_deal_t* deal) {
+	deal->key = hashmapLocateUnusedKey(&world->itemDeals);
+	hashmapSet(&world->itemDeals, deal->key, deal);
+}
 
-void removeItemDealFromWorld(world_t* world, item_deal_t* deal) {}
+void removeItemDealFromWorld(world_t* world, item_deal_t* deal) {
+	hashmapSet(&world->itemDeals, deal->key, NULL);
+}
