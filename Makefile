@@ -13,7 +13,7 @@ CFLAGS =\
 	-Iinclude -Iinclude/$(DATA_STRUCTURES) -Iinclude/$(GAME) -Iinclude/$(NETWORKING) -Iinclude/$(COMMON)\
 	-Ilantern/include\
 	-Llantern
-LDFLAGS = -llantern -pthread -g
+LDFLAGS = -llantern -lncurses -pthread -g
 
 # Source files
 SRC =\
