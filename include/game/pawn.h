@@ -19,6 +19,7 @@ struct interaction_t;
 struct item_t;
 struct champion_t;
 struct use_t;
+struct fight_t;
 
 typedef struct pawn_t {
     char* name;
@@ -35,7 +36,7 @@ typedef struct pawn_t {
 	hashmap_t champions; // collection de tous les champions possédés, champion_t*, possède la valeur
 	hashmap_t items; // item_t*, possède la valeur
 	struct champion_t* team[TEAM_SIZE]; // champions utilisés pour le combat, peut être NULL
-	bool fighting;
+	struct fight_t* fight; // peut être NULL
 } pawn_t;
 
 typedef enum {

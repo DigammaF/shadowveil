@@ -19,7 +19,7 @@ void initPawn(pawn_t* pawn) {
     pawn->eventHandler = noHandler;
     pawn->account = NULL;
     pawn->user = NULL;
-	pawn->fighting = false;
+	pawn->fight = NULL;
 	initHashmap(&pawn->champions);
 	initHashmap(&pawn->items);
 }

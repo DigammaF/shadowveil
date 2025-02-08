@@ -91,8 +91,15 @@ void setupChampions(pawn_t* pawn) {
 	CHECKM(spider, "malloc spider");
 	initChampion(spider);
 	makeSpider(spider);
+	replenishStats(spider);
 	addChampionToPawn(pawn, spider);
 	pawn->team[0] = spider;
+
+	ability_t* venom = malloc(sizeof(ability_t));
+	CHECKM(venom, "malloc ability");
+	initAbility(venom);
+	makeVenom(venom);
+	addAbilityToChampion(spider, venom);
 }
 
 void handleRegister(server_t* server, user_t* user, command_context_t* context) {

@@ -28,10 +28,12 @@ void removeChampionFromFight(fight_t* fight, struct champion_t* champion) {
 void addPawnToFight(fight_t* fight, struct pawn_t* pawn) {
 	pawn->fightKey = hashmapLocateUnusedKey(&fight->pawns);
 	hashmapSet(&fight->pawns, pawn->fightKey, pawn);
+	pawn->fight = fight;
 }
 
 void removePawnFromFight(fight_t* fight, struct pawn_t* pawn) {
 	hashmapSet(&fight->pawns, pawn->fightKey, NULL);
+	pawn->fight = NULL;
 }
 
 bool turnEnded(fight_t* fight) {
@@ -45,8 +47,6 @@ bool turnEnded(fight_t* fight) {
 }
 
 void makeFight(fight_t* fight, pawn_t* pawnA, pawn_t* pawnB) {
-	pawnA->fighting = true;
-	pawnB->fighting = true;
 	addPawnToFight(fight, pawnA);
 	addPawnToFight(fight, pawnB);
 
@@ -55,5 +55,39 @@ void makeFight(fight_t* fight, pawn_t* pawnA, pawn_t* pawnB) {
 		champion_t* championB = pawnB->team[n];
 		if (championA != NULL) { addChampionToFight(fight, championA); }
 		if (championB != NULL) { addChampionToFight(fight, championB); }
+	}
+}
+
+bool fightContainsChampion(fight_t* fight, champion_t* champion) {
+	for (unsigned n = 0; n < fight->champions.capacity; n++) {
+		champion_t* localChampion = fight->champions.elements[n];
+		if (localChampion == NULL) { continue; }
+		if (localChampion == champion) { return true; }
+	}
+
+	return false;
+}
+
+bool pawnCanOrderChampion(pawn_t* pawn, champion_t* champion) {
+	if (champion->pawn != pawn) { return false; }
+
+	for (unsigned n = 0; n < TEAM_SIZE; n++) {
+		if (pawn->team[n] == champion) { return true; }
+	}
+
+	return false;
+}
+
+void disband(fight_t* fight) {
+	for (unsigned n = 0; n < fight->pawns.capacity; n++) {
+		pawn_t* pawn = fight->pawns.elements[n];
+		if (pawn == NULL) { continue; }
+		removePawnFromFight(fight, pawn);
+	}
+
+	for (unsigned n = 0; n < fight->champions.capacity; n++) {
+		champion_t* champion = fight->champions.elements[n];
+		if (champion == NULL) { continue; }
+		removeChampionFromFight(fight, champion);
 	}
 }

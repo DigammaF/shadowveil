@@ -26,5 +26,8 @@ void removePawnFromFight(fight_t* fight, struct pawn_t* pawn);
 
 bool turnEnded(fight_t* fight);
 void makeFight(fight_t* fight, struct pawn_t* pawnA, struct pawn_t* pawnB);
+bool fightContainsChampion(fight_t* fight, struct champion_t* champion);
+bool pawnCanOrderChampion(struct pawn_t* pawn, struct champion_t* champion);
+void disband(fight_t* fight);
 
 #endif

@@ -145,6 +145,6 @@ typedef enum {
     EFFECT_SHOCK,
     EFFECT_GROWTH,
 	EFFECT_COUNT,
-} EffectType;
+} effect_type_t;
 
 #endif

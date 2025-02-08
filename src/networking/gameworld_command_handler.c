@@ -497,6 +497,8 @@ void handleCancelItemDeal(command_context_t* context) {
 }
 
 void handleAttack(command_context_t* context) {
+	// TODO: bug with other pawn not being drawn into combat
+	// TODO: initialize turns etc
 	unsigned pawnKey;
 	char message[1024];
 
@@ -506,7 +508,7 @@ void handleAttack(command_context_t* context) {
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
 
-	if (pawn->fighting) { fprintf(stderr, "(!) fighting pawn can't start another fight\n"); return; }
+	if (pawn->fight != NULL) { fprintf(stderr, "(!) fighting pawn can't start another fight\n"); return; }
 
 	place_t* place = pawn->place;
 	server_t* server = context->server;
@@ -514,7 +516,8 @@ void handleAttack(command_context_t* context) {
 	pawn_t* otherPawn = hashmapGet(&place->pawns, pawnKey);
 
 	if (otherPawn == NULL) { fprintf(stderr, "(!) could not fetch pawn %i\n", pawnKey); return; }
-	if (otherPawn->fighting) { return; }
+	if (otherPawn->fight != NULL) { return; }
+	if (pawn == otherPawn) { return; }
 
 	fight_t* fight = malloc(sizeof(fight_t));
 	CHECKM(fight, "malloc fight");

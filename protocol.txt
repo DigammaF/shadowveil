@@ -28,6 +28,11 @@ server
 	LIST-CHAMPION <int> <word>
 		int: clé
 		word: nom
+	LIST-CHAMPION-DETAIL <int> <word> <int> <int>
+		int: clé du champion dans le combat actuel
+		word: nom
+		int: points de vie
+		int: points de vie max
 	LIST-ABILITY <int> <word+>
 		int: clé
 		word: description
@@ -77,52 +82,54 @@ server
 client
 	COMMAND <word>+
 		- initial
-		+LOGIN <name> <password>
-		+REGISTER <name> <password>
+		LOGIN <name> <password>
+		REGISTER <name> <password>
 		- gameworld
-		+MOVE <int>
+		MOVE <int>
 			int: clé du lien dans la place
-		+INTERACT <int> <int>
+		INTERACT <int> <int>
 			int: clé de la feature dans la place
 			int: numéro de l'interaction
-		+MESSAGE <word>+
-		+GLOBAL-MESSAGE <word>+
-		+LIST-ONLINE
+		MESSAGE <word>+
+		GLOBAL-MESSAGE <word>+
+		LIST-ONLINE
 		DUEL-OFFER <int>
 			int: clé du pion dans la place
 		DUEL-ACCEPT <int>
 			int: clé de duel
 		ATTACK <int>
 			int: clé du pion dans la place
-		+SELL-CHAMPION <int> <int>
+		SELL-CHAMPION <int> <int>
 			int: clé du champion dans l'inventaire
 			int: prix
-		+BUY-CHAMPION <int>
+		BUY-CHAMPION <int>
 			int: clé du deal
-		+SELL-ITEM <int> <int>
+		SELL-ITEM <int> <int>
 			int: clé de l'objet dans l'inventaire
 			int: prix
-		+BUY-ITEM <int>
+		BUY-ITEM <int>
 			int: clé du deal
-		+CHECK-MARKET
-		+USE-ITEM <int>
+		CHECK-MARKET
+		USE-ITEM <int>
 			utiliser un objet
 			int: clé de l'objet
-		+USE-ITEM-ON-CHAMPION <int> <int>
+		USE-ITEM-ON-CHAMPION <int> <int>
 			utiliser un objet sur un champion
 			int: clé de l'objet
 			int: clé du champion
-		+SEE
+		SEE
 			décrire l'emplacement du joueur
-		+ME
+		ME
 			décrire le personnage du joueur (nom + inventaire + champions séléctionnés)
-		+SEE-CHAMPIONS
-		+SELECT-CHAMPION <int> <int>
+		SEE-CHAMPIONS
+		SELECT-CHAMPION <int> <int>
 			int: clé du champion dans l'inventaire
 			int: numéro de la place d'équipe
-		+UNSELECT-CHAMPION <int>
+		UNSELECT-CHAMPION <int>
 			int: numéro de place dans l'équipe
 		- combat
+		SEE
+			décrit l'état du combat
 		ATTACK <int> <int> <int>
 			int: clé du champion source
 			int: clé du champion cible

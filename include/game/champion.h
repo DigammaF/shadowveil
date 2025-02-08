@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdbool.h>
 
 #include "ability.h"
 #include "constants.h"
@@ -65,6 +66,8 @@ void addAbilityToChampion(champion_t* champion, ability_t* ability);
 void removeAbilityToChampion(champion_t* champion, ability_t* ability);
 
 void setStat(stat_value_t* stat, int value);
+bool isDead(champion_t* champion);
+void replenishStats(champion_t* champion);
 
 void generateChampion(unsigned seed, unsigned powerBudget, champion_t* champion);
 void applyAbility(champion_t* source, champion_t* destination, ability_t* ability);

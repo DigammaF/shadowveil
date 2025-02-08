@@ -47,6 +47,13 @@ void setStats(
 	champion->stats[HEALTH] = MAKE_STAT(health);
 }
 
+void replenishStats(champion_t* champion) {
+	for (unsigned n = 0; n < STAT_COUNT; n++) {
+		stat_value_t* stat = &champion->stats[n];
+		stat->value = stat->maxValue;
+	}
+}
+
 void addAbilityToChampion(champion_t* champion, ability_t* ability) {
 	ability->championKey = hashmapLocateUnusedKey(&champion->abilities);
 	hashmapSet(&champion->abilities, ability->championKey, ability);
@@ -115,6 +122,10 @@ void setStat(stat_value_t* stat, int value) {
     if (value < stat->minValue) { stat->value = stat->minValue; return; }
     if (value > stat->maxValue) { stat->value = stat->maxValue; return; }
     stat->value = value;
+}
+
+bool isDead(champion_t* champion) {
+	return champion->stats[HEALTH].value == 0;
 }
 
 void applyAbility(champion_t* source, champion_t* destination, ability_t* ability) {

@@ -2,6 +2,8 @@
 #ifndef ABILITY_H
 #define ABILITY_H
 
+#include <stdbool.h>
+
 struct champion_t;
 
 #define MAX_ABILITY_OP_CODES 10
@@ -33,11 +35,13 @@ typedef struct {
 	struct champion_t* champion; // peut être NULL
 	unsigned championKey;
     unsigned type;
-    unsigned opCodes[MAX_ABILITY_OP_CODES];
-    int monoTarget;
+    int opCodes[MAX_ABILITY_OP_CODES];
+    bool monoTarget;
 } ability_t;
 
 void initAbility(ability_t* ability);
 void dropAbility(ability_t* ability);
+
+void makeVenom(ability_t* ability);
 
 #endif
