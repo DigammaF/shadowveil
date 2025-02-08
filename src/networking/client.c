@@ -1,8 +1,8 @@
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/select.h>
+#include <string.h>
 #include <string.h>
 #include <ncurses.h>
 
@@ -11,6 +11,7 @@
 #include "constants.h"
 #include "function_stack.h"
 #include "vector.h"
+#include "string_utils.h"
 
 #define UNUSED(x) (void)(x)
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
@@ -122,30 +123,28 @@ void* initialClientHandler(void* _) {
 
 	while (1) {
 		displayMenu(window, select, options, optionCount);
+		wrefresh(window);
 		awaitInput(client);
 
 		if (FD_ISSET(fileno(stdin), &client->ioState)) {
 			int character = wgetch(window);
-			switch (character) {
-				case KEY_UP:
-					if (select > 0) { select--; }
-					break;
+			if (character == KEY_UP) {
+				if (select > 0) { select--; }
+			}
 
-				case KEY_DOWN:
-					if (select < optionCount - 1) { select++; }
-					break;
+			if (character == KEY_DOWN) {
+				if (select < optionCount - 1) { select++; }
+			}
 
-				case KEY_ENTER:
-					if (select == 0) {
-						pushFunction(&client->contextHandlers, loginClienthandler);
-						delwin(window);
-						return NULL;
-					}
-					break;
+			if (character == '\n') {
+				if (select == 0) {
+					pushFunction(&client->contextHandlers, loginClienthandler);
+					wclear(window); wrefresh(window);
+					delwin(window);
+					return NULL;
+				}
 			}
 		}
-
-		wrefresh(window);
 	}
 
 	return NULL;
@@ -158,35 +157,107 @@ void* loginClienthandler(void* _) {
 	int startx = (COLS - width) / 2;
 	int starty = (LINES - 10) / 2;
 	WINDOW* window = newwin(4, width, starty, startx);
+	WINDOW* output = newwin(4, width, starty + 5, startx);
+	unsigned outputY = 2;
 
 	char login[MAX_INPUT] = { 0 };
 	char password[MAX_INPUT] = { 0 };
 	unsigned loginHead = 0;
 	unsigned passwordHead = 0;
-	unsigned editionMode = 0;
+	unsigned editionMode = 1;
 
 	box(window, 0, 0);
-    mvwprintw(window, 0, 2, " Nom d'utilisateur ");
-	mvwprintw(window, 1, 2, " Mot de passe ");
+    mvwprintw(window, 1, 2, ">Nom d'utilisateur: ");
+	unsigned loginTextWidth = 21;
+	wmove(window, 1, loginTextWidth);
+	mvwprintw(window, 2, 2, " Mot de passe: ");
+	unsigned passwordTextWidth = 16;
+	wrefresh(window);
 	
 	while (1) {
 		awaitInput(client);
 
-		if (FD_ISSET(fileno(stdin), &client->ioState)) {
-			int character = wgetch(window);
-	
-			if (character == KEY_ENTER) {
-				login[loginHead] = '\0';
-			} else if (character == KEY_BACKSPACE) {
-				if (loginHead > 0) {
-					loginHead--;
-					mvwprintw(window, 1, loginHead + 2, " ");
-					wmove(window, 1, loginHead + 2);
+		while (FD_ISSET(client->socket.fileDescriptor, &client->ioState)) {
+			char data[1024];
+			unsigned argCount;
+			int byteCount = recvData(&client->socket, data, 1024);
+			char** args = splitString(data, &argCount);
+
+			if (byteCount == 0) {
+				client->running = 0;
+				return NULL;
+			}
+
+			if (argCount == 2) {
+				if (strcmp(args[0], "SET-CONTEXT") == 0) {
+					context_t context = (context_t)atoi(args[1]);
+
+					if (context == GAMEWORLD) {
+						pushFunction(&client->contextHandlers, loginClienthandler);
+						clear(); refresh();
+						return NULL;
+					}
 				}
-			} else if (loginHead < MAX_INPUT && character >= 32 && character <= 126) {
-				login[loginHead] = character;
-				loginHead++;
-				mvwprintw(window, 1, loginHead + 1, "%c", character);
+			}
+
+			if (argCount > 2) {
+				if (strcmp(args[0], "OUTPUT") == 0) {
+					char* text = joinString(&args[1], " ");
+					mvwprintw(output, 1, outputY, "serveur: %s", text);
+					outputY++;
+					freeJoin(text);
+				}
+
+				if (strcmp(args[0], "ERROR") == 0) {
+					char* text = joinString(&args[1], " ");
+					mvwprintw(output, 1, outputY, "erreur: %s", text);
+					outputY++;
+					freeJoin(text);
+				}
+			}
+		}
+
+		while (FD_ISSET(fileno(stdin), &client->ioState)) {
+			int character = wgetch(window);
+
+			if (character == '\n') {
+				login[loginHead] = '\0';
+				password[passwordHead] = '\0';
+				mvwprintw(output, 1, outputY, "Identification avec %s / %s ...", login, password);
+				outputY++;
+				wrefresh(output);
+				char message[1024];
+				sprintf(message, "COMMAND LOGIN %s %s", login, password);
+				sendData(&client->socket, message);
+			} else if (character == 127) {
+				if ((editionMode == 1 && loginHead > 0) || (editionMode == 2 && passwordHead > 0)) {
+					unsigned x = editionMode == 1 ? loginTextWidth + loginHead : passwordTextWidth + passwordHead;
+					mvwprintw(window, editionMode, x, " ");
+					wmove(window, editionMode, x);
+					if (editionMode == 1) { loginHead--; }
+					if (editionMode == 2) { passwordHead--; }
+				}
+			} else if (
+				((editionMode == 1 && loginHead < MAX_INPUT) || (editionMode == 2 && passwordHead < MAX_INPUT))
+				&& character >= 32 && character <= 126
+			) {
+				unsigned x;
+
+				if (editionMode == 1) {
+					login[loginHead] = character;
+					loginHead++;
+					x = loginTextWidth + loginHead;
+				} else {
+					password[passwordHead] = character;
+					passwordHead++;
+					x = passwordTextWidth + passwordHead;
+				}
+				
+				mvwprintw(window, editionMode, x, "%c", character);
+			} else if (character == 9) {
+				mvwprintw(window, editionMode, 2, " ");
+				editionMode = (editionMode == 1) ? 2 : 1;
+				mvwprintw(window, editionMode, 2, ">");
 			}
 		}
 	}

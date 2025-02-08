@@ -7,7 +7,7 @@
 #include "vector.h"
 #include "ncurses.h"
 
-#define MAX_INPUT 1024
+#define MAX_INPUT 300
 
 typedef struct {
 	unsigned running;
