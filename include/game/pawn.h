@@ -44,6 +44,8 @@ typedef enum {
 	EVENT_GOLD_CHANGED, // gold_changed_event_args_t
 	EVENT_CHAMPION_GAINED, // champion_event_args_t
 	EVENT_CHAMPION_LOST, // champion_event_args_t
+	EVENT_ITEM_GAINED, // item_event_args_t
+	EVENT_ITEM_LOST, // item_event_args_t
 } event_type_t;
 
 typedef struct event_t {
@@ -66,8 +68,14 @@ void removeChampionFromPawn(pawn_t* pawn, struct champion_t* champion);
 
 void removeChampionFromTeam(pawn_t* pawn, struct champion_t* champion);
 
+void addItemToPawn(pawn_t* pawn, struct item_t* item);
+void removeItemFromPawn(pawn_t* pawn, struct item_t* item);
+
 void notifyChampionAdded(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason);
 void notifyChampionRemoved(struct server_t* server, pawn_t* pawn, struct champion_t* champion, char* reason);
+
+void notifyItemAdded(struct server_t* server, pawn_t* pawn, struct item_t* item, char* reason);
+void notifyItemRemoved(struct server_t* server, pawn_t* pawn, struct item_t* item, char* reason);
 
 /**
  * 
@@ -104,5 +112,10 @@ typedef struct champion_event_args_t {
 	struct champion_t* champion;
 	char* reason;
 } champion_event_args_t;
+
+typedef struct item_event_args_t {
+	struct item_t* item;
+	char* reason;
+} item_event_args_t;
 
 #endif

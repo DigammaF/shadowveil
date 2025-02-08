@@ -64,11 +64,11 @@ server
 	YOUR-GOLD-CHANGED <word> <word+>
 		word: représente le changement de valeur
 		word+: raisons
-	GAINED-CHAMPION <int> <word> <word+>
+	GAINED-CHAMPION/GAINED-ITEM <int> <word> <word+>
 		int: clé
 		word: nom
 		word: raison
-	LOST-CHAMPION <word> <word+>
+	LOST-CHAMPION/LOST-ITEM <word> <word+>
 		word: nom
 		word+: raison
 	ABOUT-YOUR-GOLD <int>
@@ -94,17 +94,17 @@ client
 			int: clé de duel
 		ATTACK <int>
 			int: clé du pion dans la place
-		SELL-CHAMPION <int> <int>
+		+SELL-CHAMPION <int> <int>
 			int: clé du champion dans l'inventaire
 			int: prix
-		BUY-CHAMPION <int>
+		+BUY-CHAMPION <int>
 			int: clé du deal
 		SELL-ITEM <int> <int>
 			int: clé de l'objet dans l'inventaire
 			int: prix
 		BUY-ITEM <int>
 			int: clé du deal
-		CHECK-MARKET
+		+CHECK-MARKET
 		+USE-ITEM <int>
 			utiliser un objet
 			int: clé de l'objet

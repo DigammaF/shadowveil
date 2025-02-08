@@ -29,6 +29,7 @@ void* playerEventHandler(void* _) {
 	message_event_args_t* messageEventArgs = NULL;
 	gold_changed_event_args_t* goldChangedEventArgs = NULL;
 	champion_event_args_t* championEventArgs = NULL;
+	item_event_args_t* itemEventArgs = NULL;
 
 	switch (event->type) {
 		case EVENT_PAWN_ARRIVED:
@@ -70,6 +71,18 @@ void* playerEventHandler(void* _) {
 		case EVENT_GOLD_CHANGED:
 			goldChangedEventArgs = event->args;
 			sprintf(message, "YOUR-GOLD-CHANGED %s %s", goldChangedEventArgs->delta, goldChangedEventArgs->reason);
+			sendData(&user->socket, message);
+			break;
+
+		case EVENT_ITEM_GAINED:
+			itemEventArgs = event->args;
+			sprintf(message, "GAINED-ITEM %i %s %s", itemEventArgs->item->pawnKey, itemEventArgs->item->name, itemEventArgs->reason);
+			sendData(&user->socket, message);
+			break;
+
+		case EVENT_ITEM_LOST:
+			itemEventArgs = event->args;
+			sprintf(message, "LOST-ITEM %i %s %s", itemEventArgs->item->pawnKey, itemEventArgs->item->name, itemEventArgs->reason);
 			sendData(&user->socket, message);
 			break;
 

@@ -84,6 +84,18 @@ void notifyChampionRemoved(server_t* server, pawn_t* pawn, champion_t* champion,
 	sendPawnEvent(server, pawn, &event);
 }
 
+void notifyItemAdded(struct server_t* server, pawn_t* pawn, struct item_t* item, char* reason) {
+	item_event_args_t args = { .item = item, .reason = reason };
+	event_t event = MAKE_EVENT(EVENT_ITEM_GAINED, &args);
+	sendPawnEvent(server, pawn, &event);
+}
+
+void notifyItemRemoved(struct server_t* server, pawn_t* pawn, struct item_t* item, char* reason) {
+	item_event_args_t args = { .item = item, .reason = reason };
+	event_t event = MAKE_EVENT(EVENT_ITEM_LOST, &args);
+	sendPawnEvent(server, pawn, &event);
+}
+
 void sendPawnEvent(server_t* server, pawn_t* pawn, event_t* event) {
     event->server = server;
     event->pawn = pawn;

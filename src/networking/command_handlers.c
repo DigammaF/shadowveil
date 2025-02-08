@@ -346,19 +346,26 @@ void handleMe(command_context_t* context) {
 	sprintf(message, "ABOUT-YOUR-GOLD %i", pawn->gold);
 	sendData(&user->socket, message);
 
-	for (unsigned n = 0; n < pawn->items.capacity; n++) {
-		item_t* item = pawn->items.elements[n];
-		if (item == NULL) { continue; }
-		sprintf(message, "LIST-ITEM %i %s", n, item->name);
-		sendData(&user->socket, message);
-	}
-
-	sendData(&user->socket, "END-LIST");
-
 	for (unsigned n = 0; n < TEAM_SIZE; n++) {
 		champion_t* champion = pawn->team[n];
 		if (champion == NULL) { continue; }
 		sprintf(message, "LIST-CHAMPION %i %s", champion->pawnKey, champion->name);
+		sendData(&user->socket, message);
+	}
+
+	sendData(&user->socket, "END-LIST");
+}
+
+void handleSeeItems(command_context_t* context) {
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	char message[1024];
+
+	for (unsigned n = 0; n < pawn->items.capacity; n++) {
+		item_t* item = pawn->items.elements[n];
+		if (item == NULL) { continue; }
+		sprintf(message, "LIST-ITEM %i %s", n, item->name);
 		sendData(&user->socket, message);
 	}
 
@@ -444,6 +451,36 @@ void handleSellChampion(command_context_t* context) {
 	notifyChampionRemoved(server, pawn, champion, "mise en vente");
 }
 
+void handleSellItem(command_context_t* context) {
+	unsigned itemKey;
+	unsigned price;
+
+	if (!safeStrToUnsigned(context->args[2], &itemKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+	if (!safeStrToUnsigned(context->args[3], &price)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[3]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	item_t* item = hashmapGet(&pawn->items, itemKey);
+
+	if (item == NULL) { fprintf(stderr, "(!) could not fetch champion at %i\n", itemKey); return; }
+
+	server_t* server = context->server;
+	world_t* world = &server->world;
+
+	item_deal_t* deal = malloc(sizeof(item_deal_t));
+	CHECKM(deal, "malloc item deal");
+	initItemDeal(deal);
+	deal->item = item;
+	deal->price = price;
+	deal->seller = pawn;
+	deal->key = hashmapLocateUnusedKey(&world->itemDeals);
+
+	removeItemFromPawn(pawn, item);
+	addItemDealToWorld(world, deal);
+	notifyItemRemoved(server, pawn, item, "mise en vente");
+}
+
 void handleBuyChampion(command_context_t* context) {
 	unsigned dealKey;
 
@@ -478,6 +515,43 @@ void handleBuyChampion(command_context_t* context) {
 	notifyChampionAdded(server, pawn, deal->champion, "achat");
 	deal->champion = NULL;
 	dropChampionDeal(deal);
+	free(deal);
+}
+
+void handleBuyItem(command_context_t* context) {
+	unsigned dealKey;
+
+	if (!safeStrToUnsigned(context->args[2], &dealKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	server_t* server = context->server;
+	world_t* world = &server->world;
+	item_deal_t* deal = hashmapGet(&world->itemDeals, dealKey);
+
+	if (deal == NULL) { fprintf(stderr, "(!) could not fetch item deal %i\n", dealKey); return; }
+
+	if (deal->price > pawn->gold) {
+		sendData(&user->socket, "ERROR pas assez d'or");
+		return;
+	}
+
+	removeItemDealFromWorld(world, deal);
+	char reason[1024];
+	sprintf(reason, "achat de l'item %s", deal->item->name);
+	changePawnGold(server, pawn, -deal->price, reason);
+	addItemToPawn(pawn, deal->item);
+	pawn_t* seller = deal->seller;
+
+	if (seller != NULL) {
+		sprintf(reason, "vente de l'item %s", deal->item->name);
+		changePawnGold(server, seller, deal->price, reason);
+	}
+
+	notifyItemAdded(server, pawn, deal->item, "achat");
+	deal->item = NULL;
+	dropItemDeal(deal);
 	free(deal);
 }
 
@@ -531,6 +605,27 @@ void handleCancelChampionDeal(command_context_t* context) {
 	notifyChampionAdded(server, pawn, deal->champion, "annulation de vente");
 }
 
+void handleCancelItemDeal(command_context_t* context) {
+	unsigned dealKey;
+
+	if (!safeStrToUnsigned(context->args[2], &dealKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	server_t* server = context->server;
+	world_t* world = &server->world;
+	item_deal_t* deal = hashmapGet(&world->itemDeals, dealKey);
+
+	if (deal == NULL) { fprintf(stderr, "(!) could not fetch champion deal %i\n", dealKey); return; }
+	if (deal->seller == NULL) { fprintf(stderr, "(!) tried to cancel orphan trade\n"); return; }
+	if (deal->seller != pawn) { fprintf(stderr, "(!) tried to cancel unowned deal\n"); return; }
+
+	removeItemDealFromWorld(world, deal);
+	addItemToPawn(pawn, deal->item);
+	notifyItemAdded(server, pawn, deal->item, "annulation de vente");
+}
+
 void* gameWorldHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
 
@@ -552,6 +647,11 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "SEE-CHAMPIONS") == 0) {
 			handleSeeChampions(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "SEE-ITEMS") == 0) {
+			handleSeeItems(context);
 			return NULL;
 		}
 
@@ -582,8 +682,18 @@ void* gameWorldHandler(void* arg) {
 			return NULL;
 		}
 
+		if (strcmp(context->args[1], "BUY-ITEM") == 0) {
+			handleBuyItem(context);
+			return NULL;
+		}
+
 		if (strcmp(context->args[1], "CANCEL-CHAMPION-DEAL") == 0) {
 			handleCancelChampionDeal(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "CANCEL-ITEM-DEAL") == 0) {
+			handleCancelItemDeal(context);
 			return NULL;
 		}
 	}
@@ -606,6 +716,11 @@ void* gameWorldHandler(void* arg) {
 
 		if (strcmp(context->args[1], "SELL-CHAMPION") == 0) {
 			handleSellChampion(context);
+			return NULL;
+		}
+
+		if (strcmp(context->args[1], "SELL-ITEM") == 0) {
+			handleSellItem(context);
 			return NULL;
 		}
 	}
