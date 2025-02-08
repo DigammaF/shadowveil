@@ -48,6 +48,8 @@ typedef struct champion_t {
 	unsigned powerBudget;
 	bool fleeing;
 	bool hasInitiative;
+	bool playedTurn;
+	unsigned fightKey;
 } champion_t;
 
 void initChampion(champion_t* champion);

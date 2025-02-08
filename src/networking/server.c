@@ -11,7 +11,7 @@
 #include "user.h"
 #include "account.h"
 #include "constants.h"
-#include "command_handlers.h"
+#include "initial_command_handler.h"
 #include "string_utils.h"
 #include "world.h"
 #include "pawn.h"
@@ -57,7 +57,7 @@ void createUser(server_t* server, user_t* user, socket_t* socket) {
 	user->lastActivity = time(NULL);
 	user->id = hashmapLocateUnusedKey(&server->users);
 	hashmapSet(&server->users, user->id, user);
-	pushFunction(&user->commandHandlers, initialHandler);
+	pushFunction(&user->commandHandlers, initialCommandHandler);
 }
 
 void deleteUser(server_t* server, user_t* user) {

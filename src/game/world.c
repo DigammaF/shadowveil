@@ -10,6 +10,7 @@
 #include "place.h"
 #include "pawn.h"
 #include "deal.h"
+#include "fight.h"
 
 #define UNUSED(x) (void)(x)
 #define CHECKM(status, message) { if ((status) == NULL) { perror(message); exit(EXIT_FAILURE); } }
@@ -28,6 +29,7 @@ void initWorld(world_t* world) {
 }
 
 void dropWorld(world_t* world) {
+	// TODO free fights
 	for (unsigned x = 0; x < WORLD_SIZE; x++) {
 		for (unsigned y = 0; y < WORLD_SIZE; y++) {
 			place_t* place = world->places[x][y];
@@ -166,4 +168,13 @@ void addItemDealToWorld(world_t* world, item_deal_t* deal) {
 
 void removeItemDealFromWorld(world_t* world, item_deal_t* deal) {
 	hashmapSet(&world->itemDeals, deal->key, NULL);
+}
+
+void addFightToWorld(world_t* world, fight_t* fight) {
+	fight->key = hashmapLocateUnusedKey(&world->fights);
+	hashmapSet(&world->fights, fight->key, fight);
+}
+
+void removeFightFromWorld(world_t* world, fight_t* fight) {
+	hashmapSet(&world->fights, fight->key, NULL);
 }

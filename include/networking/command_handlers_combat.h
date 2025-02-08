@@ -5,7 +5,7 @@
 
 
 /**
- * @brief Complète gameWorldHandler() en gérant les commandes liées au combat.
+ * @brief Complète gameworldCommandHandler() en gérant les commandes liées au combat.
  */
 void* combatCommandHandler(void* arg);
 

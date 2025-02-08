@@ -11,6 +11,7 @@ struct server_t;
 struct place_t;
 struct champion_deal_t;
 struct item_deal_t;
+struct fight_t;
 
 /**
  * 
@@ -34,7 +35,7 @@ typedef struct {
 	hashmap_t pawns; // pawn_t*, possède la valeur
 	hashmap_t championDeals; // champion_deal_t*, possède la valeur
 	hashmap_t itemDeals; // item_deal_t*, possède la valeu
-	hashmap_t fights; /** 	fight_t*, ensemble des combats en cours dans le monde,  */ 
+	hashmap_t fights; /** 	fight_t*, possède la valeur, ensemble des combats en cours dans le monde,  */ 
 } world_t;
 
 void initWorld(world_t* world);
@@ -51,5 +52,8 @@ void removeChampionDealFromWorld(world_t* world, struct champion_deal_t* deal);
 
 void addItemDealToWorld(world_t* world, struct item_deal_t* deal);
 void removeItemDealFromWorld(world_t* world, struct item_deal_t* deal);
+
+void addFightToWorld(world_t* world, struct fight_t* fight);
+void removeFightFromWorld(world_t* world, struct fight_t* fight);
 
 #endif

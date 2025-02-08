@@ -2,6 +2,8 @@
 #ifndef PAWN_H
 #define PAWN_H
 
+#include <stdbool.h>
+
 #include "hashmap.h"
 #include "feature.h"
 #include "function_stack.h"
@@ -28,10 +30,12 @@ typedef struct pawn_t {
     struct user_t* user; // possiblement NULL si le joueur n'est pas connecté
 	unsigned placeKey; // la clé de l'entité dans le dictionnaire .pawns de la place_t dans laquelle elle se situe
 	unsigned worldKey; // la clé de l'entité dans le dictionnaire .pawns de world_t
+	unsigned fightKey;
 	unsigned gold;
 	hashmap_t champions; // collection de tous les champions possédés, champion_t*, possède la valeur
 	hashmap_t items; // item_t*, possède la valeur
 	struct champion_t* team[TEAM_SIZE]; // champions utilisés pour le combat, peut être NULL
+	bool fighting;
 } pawn_t;
 
 typedef enum {
