@@ -1,4 +1,12 @@
 
+le protocol utilisé par notre librarie inet est extrêmement simple:
+un message est terminé lorsque l'on rencontre \0
+
+le protocol mis en place par dessus pour cette application particulière est décrit ci-dessous.
+les mots en majuscule indiquent les commandes litérales.
+les lignes commençant par des tirets signales que le client ou le serveur doivent être dans un état
+particulier pour traiter les commandes suivantes. (voir diagramme d'états)
+
 les messages émis par le server et reçus par un client sont détaillés ci-dessous.
 Chaque description est faite relativement au client, ou au personnage contrôlé par le client
 
