@@ -2,6 +2,8 @@
 #ifndef FEATURE_H
 #define FEATURE_H
 
+#include <stdint.h>
+
 #include "function_stack.h"
 
 struct server_t;

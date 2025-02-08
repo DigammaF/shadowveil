@@ -393,8 +393,8 @@ void handleSelectChampion(command_context_t* context) {
 	pawn_t* pawn = account->pawn;
 	champion_t* champion = hashmapGet(&pawn->champions, championKey);
 
-	if (champion == NULL) { fprintf(stderr, "(!) could not fetch champion %i", championKey); return; }
-	if (teamSpot >= TEAM_SIZE) { fprintf(stderr, "(!) team spot too big (%i)", teamSpot); return; }
+	if (champion == NULL) { fprintf(stderr, "(!) could not fetch champion %i\n", championKey); return; }
+	if (teamSpot >= TEAM_SIZE) { fprintf(stderr, "(!) team spot too big (%i)\n", teamSpot); return; }
 
 	removeChampionFromTeam(pawn, champion);
 	pawn->team[teamSpot] = champion;
@@ -409,7 +409,7 @@ void handleUnselectChampion(command_context_t* context) {
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
 
-	if (teamSpot >= TEAM_SIZE) { fprintf(stderr, "(!) team spot too big (%i)", teamSpot); return; }
+	if (teamSpot >= TEAM_SIZE) { fprintf(stderr, "(!) team spot too big (%i)\n", teamSpot); return; }
 
 	pawn->team[teamSpot] = NULL;
 }
@@ -426,7 +426,7 @@ void handleSellChampion(command_context_t* context) {
 	pawn_t* pawn = account->pawn;
 	champion_t* champion = hashmapGet(&pawn->champions, championKey);
 
-	if (champion == NULL) { fprintf(stderr, "(!) could not fetch champion at %i", championKey); return; }
+	if (champion == NULL) { fprintf(stderr, "(!) could not fetch champion at %i\n", championKey); return; }
 
 	server_t* server = context->server;
 	world_t* world = &server->world;
@@ -439,6 +439,7 @@ void handleSellChampion(command_context_t* context) {
 	deal->seller = pawn;
 	deal->key = hashmapLocateUnusedKey(&world->championDeals);
 
+	removeChampionFromPawn(pawn, champion);
 	addChampionDealToWorld(world, deal);
 	notifyChampionRemoved(server, pawn, champion, "mise en vente");
 }
@@ -455,7 +456,7 @@ void handleBuyChampion(command_context_t* context) {
 	world_t* world = &server->world;
 	champion_deal_t* deal = hashmapGet(&world->championDeals, dealKey);
 
-	if (deal == NULL) { fprintf(stderr, "(!) could not fetch champion deal %i", dealKey); return; }
+	if (deal == NULL) { fprintf(stderr, "(!) could not fetch champion deal %i\n", dealKey); return; }
 
 	if (deal->price > pawn->gold) {
 		sendData(&user->socket, "ERROR pas assez d'or");
@@ -482,6 +483,8 @@ void handleBuyChampion(command_context_t* context) {
 
 void handleCheckMarket(command_context_t* context) {
 	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
 	server_t* server = context->server;
 	world_t* world = &server->world;
 	char message[1024];
@@ -489,7 +492,8 @@ void handleCheckMarket(command_context_t* context) {
 	for (unsigned n = 0; n < world->championDeals.capacity; n++) {
 		champion_deal_t* deal = world->championDeals.elements[n];
 		if (deal == NULL) { continue; }
-		sprintf(message, "LIST-CHAMPION-DEAL %i %i %s", n, deal->price, deal->champion->name);
+		char* ownsDeal = (deal->seller == NULL) ? "N" : (deal->seller == pawn ? "Y":"N");
+		sprintf(message, "LIST-CHAMPION-DEAL %i %i %s %s", n, deal->price, deal->champion->name, ownsDeal);
 		sendData(&user->socket, message);
 	}
 
@@ -498,7 +502,8 @@ void handleCheckMarket(command_context_t* context) {
 	for (unsigned n = 0; n < world->itemDeals.capacity; n++) {
 		item_deal_t* deal = world->itemDeals.elements[n];
 		if (deal == NULL) { continue; }
-		sprintf(message, "LIST-ITEM-DEAL %i %i %s", n, deal->price, deal->item->name);
+		char* ownsDeal = (deal->seller == NULL) ? "N" : (deal->seller == pawn ? "Y":"N");
+		sprintf(message, "LIST-ITEM-DEAL %i %i %s %s", n, deal->price, deal->item->name, ownsDeal);
 		sendData(&user->socket, message);
 	}
 
@@ -506,7 +511,24 @@ void handleCheckMarket(command_context_t* context) {
 }
 
 void handleCancelChampionDeal(command_context_t* context) {
-	
+	unsigned dealKey;
+
+	if (!safeStrToUnsigned(context->args[2], &dealKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	server_t* server = context->server;
+	world_t* world = &server->world;
+	champion_deal_t* deal = hashmapGet(&world->championDeals, dealKey);
+
+	if (deal == NULL) { fprintf(stderr, "(!) could not fetch champion deal %i\n", dealKey); return; }
+	if (deal->seller == NULL) { fprintf(stderr, "(!) tried to cancel orphan trade\n"); return; }
+	if (deal->seller != pawn) { fprintf(stderr, "(!) tried to cancel unowned deal\n"); return; }
+
+	removeChampionDealFromWorld(world, deal);
+	addChampionToPawn(pawn, deal->champion);
+	notifyChampionAdded(server, pawn, deal->champion, "annulation de vente");
 }
 
 void* gameWorldHandler(void* arg) {

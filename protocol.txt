@@ -34,6 +34,10 @@ server
 	LIST-ACCOUNT <word>
 		fait savoir l'existence d'un compte
 		word: nom du compte
+	LIST-CHAMPION-DEAL <int> <word> <Y|N>
+		int: prix
+		word: nom du champion
+		Y|N: indique si le joueur est à l'origine de cet échange
 	END-LIST
 		signale la fin d'une 
 	ABOUT-PLACE <word>
