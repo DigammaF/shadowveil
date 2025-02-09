@@ -497,9 +497,7 @@ void handleCancelItemDeal(command_context_t* context) {
 }
 
 void handleAttack(command_context_t* context) {
-	// TODO: bug with other pawn not being drawn into combat
 	unsigned pawnKey;
-	char message[1024];
 
 	if (!safeStrToUnsigned(context->args[2], &pawnKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
 
@@ -520,18 +518,18 @@ void handleAttack(command_context_t* context) {
 
 	fight_t* fight = malloc(sizeof(fight_t));
 	CHECKM(fight, "malloc fight");
+	initFight(fight);
 	makeFight(fight, pawn, otherPawn);
 	addFightToWorld(world, fight);
 
 	pushFunction(&user->commandHandlers, combatCommandHandler);
-	sprintf(message, "SET-CONTEXT %i", COMBAT);
-	sendData(&user->socket, message);
+	setUserContext(user, CONTEXT_COMBAT);
 
 	user_t* otherUser = otherPawn->user;
 
 	if (otherUser != NULL) {
 		pushFunction(&otherUser->commandHandlers, combatCommandHandler);
-		sendData(&otherUser->socket, message);
+		setUserContext(otherUser, CONTEXT_COMBAT);
 	}
 }
 

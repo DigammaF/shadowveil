@@ -7,7 +7,10 @@
 #include "lantern.h"
 #include "function_stack.h"
 #include "vector.h"
+#include "stack.h"
+#include "constants.h"
 
+struct server_t;
 struct account_t;
 
 typedef struct user_t {
@@ -16,10 +19,14 @@ typedef struct user_t {
 	time_t lastActivity;
 	unsigned id;
 	function_stack_t commandHandlers;
+	stack_t contexts;
 	int running;
 } user_t;
 
 void initUser(user_t* user);
 void dropUser(user_t* user);
+
+void setUserContext(user_t* user, context_t context);
+void popUserContex(user_t* user);
 
 #endif

@@ -10,7 +10,7 @@
 void* noHandler(void* arg);
 
 typedef enum {
-	INITIAL, ADMIN, GAMEWORLD, COMBAT
+	CONTEXT_INITIAL, CONTEXT_ADMIN, CONTEXT_GAMEWORLD, CONTEXT_COMBAT
 } context_t;
 
 typedef enum {

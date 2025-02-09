@@ -48,9 +48,7 @@ void handleLogin(server_t* server, user_t* user, command_context_t* context) {
 		printf("\t[admin]\n");
 		popFunction(&user->commandHandlers);
 		pushFunction(&user->commandHandlers, adminCommandhandler);
-		char message[255];
-		sprintf(message, "SET-CONTEXT %i", ADMIN);
-		sendData(&user->socket, message);
+		setUserContext(user, CONTEXT_ADMIN);
 		return;
 	}
 
@@ -58,9 +56,7 @@ void handleLogin(server_t* server, user_t* user, command_context_t* context) {
 	popFunction(&user->commandHandlers);
 	pushFunction(&user->commandHandlers, gameworldCommandHandler);
 	user->account = account;
-	char message[255];
-	sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
-	sendData(&user->socket, message);
+	setUserContext(user, CONTEXT_GAMEWORLD);
 }
 
 pawn_t* setupPawn(server_t* server, account_t* account, user_t* user) {
@@ -126,9 +122,7 @@ void handleRegister(server_t* server, user_t* user, command_context_t* context) 
 	printf("\t[success]\n");
 	popFunction(&user->commandHandlers);
 	pushFunction(&user->commandHandlers, gameworldCommandHandler);
-	char message[255];
-	sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
-	sendData(&user->socket, message);
+	setUserContext(user, CONTEXT_GAMEWORLD);
 	return;
 }
 

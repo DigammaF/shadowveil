@@ -235,7 +235,7 @@ void handleServerResponse(client_t* client, WINDOW* output, unsigned* outputY) {
 
 	if (argCount == 2 && strcmp(args[0], "SET-CONTEXT") == 0) {
 		context_t context = (context_t)atoi(args[1]);
-		if (context == GAMEWORLD) {
+		if (context == CONTEXT_GAMEWORLD) {
 			pushFunction(&client->contextHandlers, loginClienthandler);
 			clear(); refresh();
 			return;

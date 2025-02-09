@@ -49,9 +49,8 @@ void handleRunaway(command_context_t* context) {
 	user_t* user = context->user;
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
+	world_t* world = &context->server->world;
 	fight_t* fight = pawn->fight;
-	char message[1024];
-	sprintf(message, "SET-CONTEXT %i", GAMEWORLD);
 
 	for (unsigned n = 0; n < fight->pawns.capacity; n++) {
 		pawn_t* pawn = fight->pawns.elements[n];
@@ -60,11 +59,14 @@ void handleRunaway(command_context_t* context) {
 
 		if (localUser != NULL) {
 			popFunction(&localUser->commandHandlers);
-			sendData(&localUser->socket, message);
+			popUserContex(localUser);
 		}
 	}
 
 	disband(fight);
+	removeFightFromWorld(world, fight);
+	dropFight(fight);
+	free(fight);
 }
 
 void handleCombatSee(command_context_t* context) {

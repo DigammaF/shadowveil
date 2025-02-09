@@ -231,6 +231,8 @@ void handleServerSockets(server_t* server, fd_set* fileDescriptorSet) {
 
 int mainServer(int argc, const char** argv) {
 	UNUSED(argc); UNUSED(argv);
+	setbuf(stderr, NULL);
+	setbuf(stdout, NULL);
 	server_t server;
 	initServer(&server);
 	setupServer(&server);
