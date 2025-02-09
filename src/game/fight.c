@@ -56,6 +56,14 @@ void makeFight(fight_t* fight, pawn_t* pawnA, pawn_t* pawnB) {
 		if (championA != NULL) { addChampionToFight(fight, championA); }
 		if (championB != NULL) { addChampionToFight(fight, championB); }
 	}
+
+	for (unsigned n = 0; n < fight->champions.capacity; n++) {
+		champion_t* champion = fight->champions.elements[n];
+		if (champion == NULL) { continue; }
+		champion->hasInitiative = false;
+		champion->fleeing = false;
+		champion->playedTurn = false;
+	}
 }
 
 bool fightContainsChampion(fight_t* fight, champion_t* champion) {
@@ -69,13 +77,7 @@ bool fightContainsChampion(fight_t* fight, champion_t* champion) {
 }
 
 bool pawnCanOrderChampion(pawn_t* pawn, champion_t* champion) {
-	if (champion->pawn != pawn) { return false; }
-
-	for (unsigned n = 0; n < TEAM_SIZE; n++) {
-		if (pawn->team[n] == champion) { return true; }
-	}
-
-	return false;
+	return (champion->pawn == pawn);
 }
 
 void disband(fight_t* fight) {

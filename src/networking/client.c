@@ -218,6 +218,7 @@ void setupInitial(client_t* client) {
 // -------------------------------------------------------------------------------------------------------
 
 void* initialClientHandler(void* _) {
+	UNUSED(_);
 	return NULL;
 }
 
@@ -296,6 +297,7 @@ void handleUserInput(client_t* client, WINDOW* window, WINDOW* output, unsigned*
 }
 
 void* loginClienthandler(void* _) {
+	UNUSED(_);
 	// client_t* client = (client_t*)_;
 
 	// unsigned width = 60;
@@ -380,8 +382,7 @@ int mainGUIClient(int argc, const char* argv[]) {
 			context.client = &client;
 			char data[1024];
 			int byteCount = recvData(&client.socket, data, 1024);
-			unsigned argCount;
-			char** args = splitString(data, &argCount);
+			context.args = splitString(data, &context.argCount);
 
 			if (byteCount == 0) { client.running = 0; return 0; }
 

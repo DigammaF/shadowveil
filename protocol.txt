@@ -142,7 +142,7 @@ client
 			int: clé du champion source
 			int: clé du champion cible
 			int: clé de la compétence
-		RUN-AWAY
+		RUNAWAY
 		FLEE <int>
 			int: clé du champion
 		DRAW-OFFER

@@ -498,7 +498,6 @@ void handleCancelItemDeal(command_context_t* context) {
 
 void handleAttack(command_context_t* context) {
 	// TODO: bug with other pawn not being drawn into combat
-	// TODO: initialize turns etc
 	unsigned pawnKey;
 	char message[1024];
 
@@ -531,7 +530,7 @@ void handleAttack(command_context_t* context) {
 	user_t* otherUser = otherPawn->user;
 
 	if (otherUser != NULL) {
-		pushFunction(&user->commandHandlers, combatCommandHandler);
+		pushFunction(&otherUser->commandHandlers, combatCommandHandler);
 		sendData(&otherUser->socket, message);
 	}
 }
