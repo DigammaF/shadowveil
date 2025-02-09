@@ -53,7 +53,7 @@ void* squeakerUseHandler(void* _) {
 	if (use->type == USE_ON_CHAMPION) {
 		champion_use_args_t* args = use->args;
 		champion_t* champion = args->champion;
-		char message[1024];
+		char message[COMMUNICATION_SIZE];
 		sprintf(message, "OUTPUT champion: %s", champion->name);
 		sendData(&user->socket, message);
 	}

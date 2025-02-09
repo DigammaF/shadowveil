@@ -31,7 +31,7 @@ void* adminCommandhandler(void* arg) {
 void* debugEchoCommandHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
 	user_t* user = context->user;
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 	char* line = joinString(context->args, " ");
 	printf("(received from %i) '%s'\n", user->id, line);
 	sprintf(message, "OUTPUT '%s'", line);

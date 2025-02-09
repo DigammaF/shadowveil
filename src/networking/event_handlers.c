@@ -24,7 +24,7 @@ void* playerEventHandler(void* _) {
 
 	if (user == NULL) { return NULL; }
 
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 	pawn_event_args_t* pawnEventArgs = NULL;
 	message_event_args_t* messageEventArgs = NULL;
 	gold_changed_event_args_t* goldChangedEventArgs = NULL;

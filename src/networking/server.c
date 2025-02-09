@@ -132,8 +132,8 @@ void handleUserKeepAlive(user_t* user) {
 }
 
 void handleUserRequest(server_t* server, user_t* user) {
-	char data[1024];
-	int byteCount = recvData(&user->socket, data, 1024);
+	char data[4096];
+	int byteCount = recvData(&user->socket, data, 4096);
 	unsigned argCount;
 	char** args = splitString(data, &argCount);
 

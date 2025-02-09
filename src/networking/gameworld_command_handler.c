@@ -30,7 +30,7 @@ void handleSee(command_context_t* context) {
 	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
 
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 	sprintf(message, "ABOUT-PLACE %s", place->name);
 	sendData(&user->socket, message);
 
@@ -47,7 +47,7 @@ void handleSee(command_context_t* context) {
 	for (unsigned n = 0; n < place->features.capacity; n++) {
 		feature_t* feature = place->features.elements[n];
 		if (feature == NULL) { continue; }
-		sprintf(message, "LIST-FEATURE %i %s", n, feature->name);
+		sprintf(message, "LIST-FEATURE %i %s %i", n, feature->name, feature->interactionFlags);
 		printf("(sending) %s\n", message);
 		sendData(&user->socket, message);
 	}
@@ -57,7 +57,12 @@ void handleSee(command_context_t* context) {
 	for (unsigned n = 0; n < place->pawns.capacity; n++) {
 		pawn_t* pawn = place->pawns.elements[n];
 		if (pawn == NULL) { continue; }
-		sprintf(message, "LIST-PAWN %i %s", n, pawn->name);
+		sprintf(
+			message,
+			"LIST-PAWN %s %i %i %i %c",
+			pawn->name, pawn->gold, pawn->exhaustion, pawn->gracePeriod,
+			(pawn->fight == NULL) ? 'N':'Y'
+		);
 		printf("(sending) %s\n", message);
 		sendData(&user->socket, message);
 	}
@@ -72,7 +77,7 @@ void handleMessage(command_context_t* context) {
 	place_t* place = pawn->place;
 
 	char* text = joinString(&context->args[2], " ");
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 	sprintf(message, "%s: %s", account->name, text);
 	message_event_args_t args = { .message = message };
 	event_t event = MAKE_EVENT(EVENT_MESSAGE, &args);
@@ -93,7 +98,7 @@ void handleGlobalMessage(command_context_t* context) {
 	world_t* world = &server->world;
 
 	char* text = joinString(&context->args[2], " ");
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 	sprintf(message, "%s: %s", account->name, text);
 	message_event_args_t args = { .message = message };
 	event_t event = MAKE_EVENT(EVENT_MESSAGE, &args);
@@ -113,7 +118,7 @@ void handleMove(command_context_t* context){
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
 	place_t* place = pawn->place;
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 
 	unsigned destinationKey = 0;
 
@@ -137,7 +142,7 @@ void handleListOnline(command_context_t* context) {
 		if (localPawn == NULL) { continue; }
 		account_t* localAccount = localPawn->account;
 		if (localAccount == NULL) { continue; }
-		char message[1024];
+		char message[COMMUNICATION_SIZE];
 		sprintf(message, "LIST-ACCOUNT %s", localAccount->name);
 		sendData(&user->socket, message);
 	}
@@ -208,18 +213,35 @@ void handleMe(command_context_t* context) {
 	user_t* user = context->user;
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 
-	sprintf(message, "ABOUT-PAWN %s", pawn->name);
-	sendData(&user->socket, message);
-
-	sprintf(message, "ABOUT-YOUR-GOLD %i", pawn->gold);
+	sprintf(
+		message,
+		"ABOUT-PAWN %s %i %i %i %c",
+		pawn->name, pawn->gold, pawn->exhaustion, pawn->gracePeriod,
+		(pawn->fight == NULL) ? 'N':'Y'
+	);
 	sendData(&user->socket, message);
 
 	for (unsigned n = 0; n < TEAM_SIZE; n++) {
 		champion_t* champion = pawn->team[n];
 		if (champion == NULL) { continue; }
-		sprintf(message, "LIST-CHAMPION %i %s", champion->pawnKey, champion->name);
+		char effectText[EFFECT_COUNT];
+		for (unsigned k = 0; k < EFFECT_COUNT; k++) { effectText[k] = champion->effects[k] ? 'Y':'N'; }
+		sprintf(
+			message,
+			"LIST-CHAMPION %i %s %i %i %i %i %s %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+			champion->pawnKey, champion->name, champion->type,
+			champion->fleeing, champion->hasInitiative, champion->playedTurn,
+			effectText,
+			champion->stats[HEALTH].minValue, champion->stats[HEALTH].value, champion->stats[HEALTH].maxValue,
+			champion->stats[INTELLIGENCE].minValue, champion->stats[INTELLIGENCE].value, champion->stats[INTELLIGENCE].maxValue,
+			champion->stats[MAGIC_DEFENSE].minValue, champion->stats[MAGIC_DEFENSE].value, champion->stats[MAGIC_DEFENSE].maxValue,
+			champion->stats[MAGIC_ATTACK].minValue, champion->stats[MAGIC_ATTACK].value, champion->stats[MAGIC_ATTACK].maxValue,
+			champion->stats[DEFENSE].minValue, champion->stats[DEFENSE].value, champion->stats[DEFENSE].maxValue,
+			champion->stats[ATTACK].minValue, champion->stats[ATTACK].value, champion->stats[ATTACK].maxValue,
+			champion->powerBudget
+		);
 		sendData(&user->socket, message);
 	}
 
@@ -230,7 +252,7 @@ void handleSeeItems(command_context_t* context) {
 	user_t* user = context->user;
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 
 	for (unsigned n = 0; n < pawn->items.capacity; n++) {
 		item_t* item = pawn->items.elements[n];
@@ -246,12 +268,27 @@ void handleSeeChampions(command_context_t* context) {
 	user_t* user = context->user;
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 
 	for (unsigned n = 0; n < pawn->champions.capacity; n++) {
 		champion_t* champion = pawn->champions.elements[n];
 		if (champion == NULL) { continue; }
-		sprintf(message, "LIST-CHAMPION %i %s", n, champion->name);
+		char effectText[EFFECT_COUNT];
+		for (unsigned k = 0; k < EFFECT_COUNT; k++) { effectText[k] = champion->effects[k] ? 'Y':'N'; }
+		sprintf(
+			message,
+			"LIST-CHAMPION %i %s %i %i %i %i %s %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+			champion->pawnKey, champion->name, champion->type,
+			champion->fleeing, champion->hasInitiative, champion->playedTurn,
+			effectText,
+			champion->stats[HEALTH].minValue, champion->stats[HEALTH].value, champion->stats[HEALTH].maxValue,
+			champion->stats[INTELLIGENCE].minValue, champion->stats[INTELLIGENCE].value, champion->stats[INTELLIGENCE].maxValue,
+			champion->stats[MAGIC_DEFENSE].minValue, champion->stats[MAGIC_DEFENSE].value, champion->stats[MAGIC_DEFENSE].maxValue,
+			champion->stats[MAGIC_ATTACK].minValue, champion->stats[MAGIC_ATTACK].value, champion->stats[MAGIC_ATTACK].maxValue,
+			champion->stats[DEFENSE].minValue, champion->stats[DEFENSE].value, champion->stats[DEFENSE].maxValue,
+			champion->stats[ATTACK].minValue, champion->stats[ATTACK].value, champion->stats[ATTACK].maxValue,
+			champion->powerBudget
+		);
 		sendData(&user->socket, message);
 	}
 
@@ -431,7 +468,7 @@ void handleCheckMarket(command_context_t* context) {
 	pawn_t* pawn = account->pawn;
 	server_t* server = context->server;
 	world_t* world = &server->world;
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 
 	for (unsigned n = 0; n < world->championDeals.capacity; n++) {
 		champion_deal_t* deal = world->championDeals.elements[n];

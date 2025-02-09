@@ -4,6 +4,7 @@
 
 #define SERVER_PORT (short)20100
 #define SERVER_TICK 500 // ms
+#define COMMUNICATION_SIZE 4096
 
 #define WORLD_SEED 555
 

@@ -263,7 +263,7 @@ void handleUserInput(client_t* client, WINDOW* window, WINDOW* output, unsigned*
 		mvwprintw(output, 1, *outputY, "Identification avec %s / %s ...", login, password);
 		(*outputY)++;
 		wrefresh(output);
-		char message[1024];
+		char message[COMMUNICATION_SIZE];
 		sprintf(message, "COMMAND LOGIN %s %s", login, password);
 		sendData(&client->socket, message);
 	} else if (character == 127) {

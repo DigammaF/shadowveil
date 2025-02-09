@@ -74,12 +74,27 @@ void handleCombatSee(command_context_t* context) {
 	account_t* account = user->account;
 	pawn_t* pawn = account->pawn;
 	fight_t* fight = pawn->fight;
-	char message[1024];
+	char message[COMMUNICATION_SIZE];
 
 	for (unsigned n = 0; n < fight->champions.capacity; n++) {
 		champion_t* champion = fight->champions.elements[n];
 		if (champion == NULL) { continue; }
-		sprintf(message, "LIST-CHAMPION-DETAIL %i %s %i %i", n, champion->name, champion->stats[HEALTH].value, champion->stats[HEALTH].maxValue);
+		char effectText[EFFECT_COUNT];
+		for (unsigned k = 0; k < EFFECT_COUNT; k++) { effectText[k] = champion->effects[k] ? 'Y':'N'; }
+		sprintf(
+			message,
+			"LIST-CHAMPION %i %s %i %i %i %i %s %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+			n, champion->name, champion->type,
+			champion->fleeing, champion->hasInitiative, champion->playedTurn,
+			effectText,
+			champion->stats[HEALTH].minValue, champion->stats[HEALTH].value, champion->stats[HEALTH].maxValue,
+			champion->stats[INTELLIGENCE].minValue, champion->stats[INTELLIGENCE].value, champion->stats[INTELLIGENCE].maxValue,
+			champion->stats[MAGIC_DEFENSE].minValue, champion->stats[MAGIC_DEFENSE].value, champion->stats[MAGIC_DEFENSE].maxValue,
+			champion->stats[MAGIC_ATTACK].minValue, champion->stats[MAGIC_ATTACK].value, champion->stats[MAGIC_ATTACK].maxValue,
+			champion->stats[DEFENSE].minValue, champion->stats[DEFENSE].value, champion->stats[DEFENSE].maxValue,
+			champion->stats[ATTACK].minValue, champion->stats[ATTACK].value, champion->stats[ATTACK].maxValue,
+			champion->powerBudget
+		);
 		sendData(&user->socket, message);
 	}
 

@@ -34,13 +34,8 @@ server
 		int: clé
 		word: nom
 	LIST-CHAMPION <int> <word>
-		int: clé
+		int: clé dans l'inventaire du joueur OU clé dans le combat actuel si en combat
 		word: nom
-	LIST-CHAMPION-DETAIL <int> <word> <int> <int>
-		int: clé du champion dans le combat actuel
-		word: nom
-		int: points de vie
-		int: points de vie max
 	LIST-ABILITY <int> <word+>
 		int: clé
 		word: description
