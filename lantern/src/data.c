@@ -22,9 +22,17 @@
  * 
  */
 int sendData(socket_t* socket, const char* data) {
-	ssize_t bytesSent = send(socket->fileDescriptor, data, strlen(data) + 1, 0);
-	if (bytesSent < 0) { return -1; }
-	return (int)bytesSent;
+	size_t totalSent = 0;
+    size_t dataLen = strlen(data) + 1;
+    ssize_t bytesSent;
+
+    while (totalSent < dataLen) {
+        bytesSent = send(socket->fileDescriptor, data + totalSent, dataLen - totalSent, 0);
+        if (bytesSent < 0) { return -1; }
+        totalSent += bytesSent;
+    }
+
+    return (int)totalSent;
 }
 
 int sendDGRAM(socket_t* socket, const char* address, const short port, const char* data) {
