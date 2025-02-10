@@ -8,19 +8,22 @@ struct pawn_t;
 struct server_t;
 struct champion_t;
 
+/** un objet que possède un pion */
 typedef struct item_t {
 	char* name;
 	struct pawn_t* pawn; // peut être NULL
 	unsigned pawnKey;
 	void* params; // possède la valeur
-	function_t useHandler;
+	function_t useHandler; // appelé avec (use_t*), indique l'effet de l'item à l'initialisation
 } item_t;
 
+/** types d'utilisation d'un item, avec leurs types d'arguments en commentaire */
 typedef enum {
 	USE_ON_CHAMPION, // champion_use_args_t
 	USE_SOLO, // solo_use_args_t
 } use_type_t;
 
+/** évènement d'utilisation d'un item */
 typedef struct use_t {
     use_type_t type;
     struct server_t* server;

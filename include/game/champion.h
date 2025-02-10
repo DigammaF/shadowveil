@@ -37,7 +37,7 @@ typedef enum {
     STAT_COUNT /** STAT_COUNT will be the number of elements stored in this enum, not counting itself */
 } stat_t;
 
-/** Structure représentant un personnage jouable. */
+/** Structure représentant une entité qui possède des capacités et est utilisée pour le combat */
 typedef struct champion_t {
 	char* name;
 	struct pawn_t* pawn; // peut être NULL
@@ -46,10 +46,10 @@ typedef struct champion_t {
     int effects[EFFECT_COUNT];
     stat_value_t stats[STAT_COUNT]; /** dictionnaire qui prends des STAT en clés et a des stats_t comme valeurs */
     hashmap_t abilities; // ability_t* possède la valeur
-	unsigned powerBudget;
-	bool fleeing;
-	bool hasInitiative;
-	bool playedTurn;
+	unsigned powerBudget; // le budget utilisé pour générer le champion
+	bool fleeing; // indique si le champion est en train de fuir le combat
+	bool hasInitiative; // indique si le champion est celui qui doit jouer son tour
+	bool playedTurn; // indique si le champion a joué son tour
 	unsigned fightKey;
 } champion_t;
 
@@ -65,10 +65,17 @@ void setStats(
 void addAbilityToChampion(champion_t* champion, ability_t* ability);
 void removeAbilityToChampion(champion_t* champion, ability_t* ability);
 
+/** règle la valeur courante de la stat en respectant min et max */
 void setStat(stat_value_t* stat, int value);
+/** vérifie si le champion est mort */
 bool isDead(champion_t* champion);
+/** met toutes les stats à leur niveau max */
 void replenishStats(champion_t* champion);
 
+/**
+ * génère un champion aléatoirement à partir d'une seed et d'un budget de puissance
+ * le budget de puissance utilisé est inscrit dans le champ correspondant
+ * */
 void generateChampion(unsigned seed, unsigned powerBudget, champion_t* champion);
 void applyAbility(champion_t* source, champion_t* destination, ability_t* ability);
 

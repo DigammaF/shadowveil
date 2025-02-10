@@ -8,3 +8,14 @@ les fonctions sont nommées selon une certaine logique:
 	createX(A, X) / deleteX(A, X)
 		ajoute / supprime un élément X du dépôt de données A
 		ne réalise pas de init / drop
+
+	makeX(A)
+		écrit dans un objet en état initial pour en faire un objet spécifiique
+
+	addXToA(A, X) / removeXFromA(A, X)
+		primitives qui manipulent les hashmaps. le conteneur vient en premier
+
+	triggerX
+		envoie un évènement à un objet
+
+beaucoup d'objets ont des champs contentant 'key'. ce champs contiennent la clé de l'objet dans la hashmap qui le contient

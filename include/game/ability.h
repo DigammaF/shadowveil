@@ -31,12 +31,15 @@ struct champion_t;
 #define IF_TYPE 5
 #define NOOP 6
 
+/**
+ * une capacité que possède un champion
+ */
 typedef struct {
 	struct champion_t* champion; // peut être NULL
 	unsigned championKey;
     unsigned type;
     int opCodes[MAX_ABILITY_OP_CODES];
-    bool monoTarget;
+    bool monoTarget; // indique si la compétence est lancée sur toute l'équipe adverse
 } ability_t;
 
 void initAbility(ability_t* ability);
