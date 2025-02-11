@@ -18,7 +18,11 @@ les fonctions sont nommées selon une certaine logique:
 	triggerX
 		envoie un évènement à un objet interne
 
-	notify
+	notifyX
 		envoie un évènement à un objet en communication avec un utilisateur
+
+	doX
+		effectue une action après avoir fait les tests associés
+		TODO implémenter
 
 beaucoup d'objets ont des champs contentant 'key'. ce champs contiennent la clé de l'objet dans la hashmap qui le contient
