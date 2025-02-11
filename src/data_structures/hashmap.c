@@ -41,7 +41,7 @@ unsigned hashmapLocateUnusedKey(hashmap_t* hashmap) {
 	return key;
 }
 
-unsigned hashmapCountValues(hashmap_t* hashmap) {
+unsigned hashmapValueCount(hashmap_t* hashmap) {
 	unsigned count = 0;
 
 	for (unsigned n = 0; n < hashmap->capacity; n++) {
