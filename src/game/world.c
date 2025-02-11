@@ -185,3 +185,11 @@ void addFightToWorld(world_t* world, fight_t* fight) {
 void removeFightFromWorld(world_t* world, fight_t* fight) {
 	hashmapSet(&world->fights, fight->key, NULL);
 }
+
+void updateWorld(struct server_t* server, world_t* world) {
+	for (unsigned n = 0; n < world->fights.capacity; n++) {
+		fight_t* fight = world->fights.elements[n];
+		if (fight == NULL) { continue; }
+		updateFight(server, fight);
+	}
+}

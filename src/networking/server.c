@@ -185,6 +185,8 @@ void update(server_t* server) {
 		if (user == NULL) { continue; }
 		updateUser(server, user);
 	}
+
+	updateWorld(server, &server->world);
 }
 
 void updateUser(server_t* server, user_t* user) {
@@ -248,7 +250,7 @@ int mainServer(int argc, const char** argv) {
 
 	while (server.running) {
 		update(&server);
-		struct timeval timeout = { 0, SERVER_TICK };
+		struct timeval timeout = { .tv_sec = 0, .tv_usec = SERVER_TICK };
 		fd_set fileDescriptorSet;
 		int maxFileDescriptor;
 		setupServerFileDescriptorSet(&server, &fileDescriptorSet, &maxFileDescriptor);

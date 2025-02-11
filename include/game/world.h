@@ -56,4 +56,7 @@ void removeItemDealFromWorld(world_t* world, struct item_deal_t* deal);
 void addFightToWorld(world_t* world, struct fight_t* fight);
 void removeFightFromWorld(world_t* world, struct fight_t* fight);
 
+/** applique les opérations routinières sur les objets qui composent le monde */
+void updateWorld(struct server_t* server, world_t* world);
+
 #endif
