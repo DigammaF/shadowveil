@@ -176,6 +176,31 @@ void applyAbility(champion_t* source, champion_t* destination, ability_t* abilit
     }
 }
 
+void listChampion(champion_t* champion, char* buffer, unsigned bufferSize) {
+	char effectText[EFFECT_COUNT + 1];
+	for (unsigned k = 0; k < EFFECT_COUNT; k++) { effectText[k] = champion->effects[k] ? 'Y':'N'; }
+	unsigned recquiredSize = snprintf(
+		buffer,
+		bufferSize,
+		"LIST-CHAMPION %i %s %i %i %i %i %s %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+		champion->pawnKey, champion->name, champion->type,
+		champion->fleeing, champion->hasInitiative, champion->playedTurn,
+		effectText,
+		champion->stats[HEALTH].minValue, champion->stats[HEALTH].value, champion->stats[HEALTH].maxValue,
+		champion->stats[INTELLIGENCE].minValue, champion->stats[INTELLIGENCE].value, champion->stats[INTELLIGENCE].maxValue,
+		champion->stats[MAGIC_DEFENSE].minValue, champion->stats[MAGIC_DEFENSE].value, champion->stats[MAGIC_DEFENSE].maxValue,
+		champion->stats[MAGIC_ATTACK].minValue, champion->stats[MAGIC_ATTACK].value, champion->stats[MAGIC_ATTACK].maxValue,
+		champion->stats[DEFENSE].minValue, champion->stats[DEFENSE].value, champion->stats[DEFENSE].maxValue,
+		champion->stats[ATTACK].minValue, champion->stats[ATTACK].value, champion->stats[ATTACK].maxValue,
+		champion->powerBudget
+	);
+
+	if (recquiredSize > bufferSize) {
+		fprintf(stderr, "buffer too small to handle champion description: %i, required: %i\n", bufferSize, recquiredSize);
+		exit(EXIT_FAILURE);
+	}
+}
+
 void makeSpider(champion_t* champion) {
 	champion->name = "Araignee";
 	champion->type = TYPE_BUG;

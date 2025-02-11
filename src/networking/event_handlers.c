@@ -30,6 +30,7 @@ void* playerEventHandler(void* _) {
 	gold_changed_event_args_t* goldChangedEventArgs = NULL;
 	champion_event_args_t* championEventArgs = NULL;
 	item_event_args_t* itemEventArgs = NULL;
+	setcontext_event_args_t* setContextEventArgs = NULL;
 
 	switch (event->type) {
 		case EVENT_PAWN_ARRIVED:
@@ -84,6 +85,15 @@ void* playerEventHandler(void* _) {
 			itemEventArgs = event->args;
 			sprintf(message, "LOST-ITEM %i %s %s", itemEventArgs->item->pawnKey, itemEventArgs->item->name, itemEventArgs->reason);
 			sendData(&user->socket, message);
+			break;
+
+		case EVENT_SETCONTEXT:
+			setContextEventArgs = event->args;
+			setUserContext(user, setContextEventArgs->context, setContextEventArgs->handler);
+			break;
+
+		case EVENT_POPCONTEXT:
+			popUserContext(user);
 			break;
 
 		default:

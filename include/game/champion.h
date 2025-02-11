@@ -79,6 +79,9 @@ void replenishStats(champion_t* champion);
 void generateChampion(unsigned seed, unsigned powerBudget, champion_t* champion);
 void applyAbility(champion_t* source, champion_t* destination, ability_t* ability);
 
+/** créé le message (terminé par '\0') qui permet à un client de connaître le champion */
+void listChampion(champion_t* champion, char* buffer, unsigned bufferSize);
+
 void makeSpider(champion_t* champion);
 
 #endif

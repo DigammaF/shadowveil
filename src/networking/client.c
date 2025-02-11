@@ -70,8 +70,8 @@ void handleClientSockets(client_t* client, fd_set* fileDescriptorSet){
 	socket_t* clientSocket = &client->socket;
 
 	if (FD_ISSET(clientSocket->fileDescriptor, fileDescriptorSet)) {
-		char line[1024];
-		int byteCount = recvData(clientSocket, line, 1024);
+		char line[COMMUNICATION_SIZE];
+		int byteCount = recvData(clientSocket, line, COMMUNICATION_SIZE);
 		if (byteCount == 0) {
 			printf("(-) le serveur a mis fin à la connexion\n");
 			client->running = 0;

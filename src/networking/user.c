@@ -17,17 +17,22 @@ void dropUser(user_t* user) {
 	dropStack(&user->contexts);
 }
 
-void setUserContext(user_t* user, context_t context) {
+void setUserContext(user_t* user, context_t context, function_t handler) {
 	char message[COMMUNICATION_SIZE];
 	sprintf(message, "SET-CONTEXT %i", (unsigned)context);
 	sendData(&user->socket, message);
 	push(&user->contexts, (unsigned)context);
+	pushFunction(&user->commandHandlers, handler);
 }
 
-void popUserContex(user_t* user) {
+void popUserContext(user_t* user) {
 	pop(&user->contexts);
-	context_t context = (context_t)peek(&user->contexts);
-	char message[COMMUNICATION_SIZE];
-	sprintf(message, "SET-CONTEXT %i", (unsigned)context);
-	sendData(&user->socket, message);
+	popFunction(&user->commandHandlers);
+
+	if (!stackEmpty(&user->contexts)) {
+		context_t context = (context_t)peek(&user->contexts);
+		char message[COMMUNICATION_SIZE];
+		sprintf(message, "SET-CONTEXT %i", (unsigned)context);
+		sendData(&user->socket, message);
+	}
 }

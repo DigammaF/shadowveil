@@ -226,22 +226,7 @@ void handleMe(command_context_t* context) {
 	for (unsigned n = 0; n < TEAM_SIZE; n++) {
 		champion_t* champion = pawn->team[n];
 		if (champion == NULL) { continue; }
-		char effectText[EFFECT_COUNT];
-		for (unsigned k = 0; k < EFFECT_COUNT; k++) { effectText[k] = champion->effects[k] ? 'Y':'N'; }
-		sprintf(
-			message,
-			"LIST-CHAMPION %i %s %i %i %i %i %s %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
-			champion->pawnKey, champion->name, champion->type,
-			champion->fleeing, champion->hasInitiative, champion->playedTurn,
-			effectText,
-			champion->stats[HEALTH].minValue, champion->stats[HEALTH].value, champion->stats[HEALTH].maxValue,
-			champion->stats[INTELLIGENCE].minValue, champion->stats[INTELLIGENCE].value, champion->stats[INTELLIGENCE].maxValue,
-			champion->stats[MAGIC_DEFENSE].minValue, champion->stats[MAGIC_DEFENSE].value, champion->stats[MAGIC_DEFENSE].maxValue,
-			champion->stats[MAGIC_ATTACK].minValue, champion->stats[MAGIC_ATTACK].value, champion->stats[MAGIC_ATTACK].maxValue,
-			champion->stats[DEFENSE].minValue, champion->stats[DEFENSE].value, champion->stats[DEFENSE].maxValue,
-			champion->stats[ATTACK].minValue, champion->stats[ATTACK].value, champion->stats[ATTACK].maxValue,
-			champion->powerBudget
-		);
+		listChampion(champion, message, COMMUNICATION_SIZE);
 		sendData(&user->socket, message);
 	}
 
@@ -273,22 +258,7 @@ void handleSeeChampions(command_context_t* context) {
 	for (unsigned n = 0; n < pawn->champions.capacity; n++) {
 		champion_t* champion = pawn->champions.elements[n];
 		if (champion == NULL) { continue; }
-		char effectText[EFFECT_COUNT];
-		for (unsigned k = 0; k < EFFECT_COUNT; k++) { effectText[k] = champion->effects[k] ? 'Y':'N'; }
-		sprintf(
-			message,
-			"LIST-CHAMPION %i %s %i %i %i %i %s %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
-			champion->pawnKey, champion->name, champion->type,
-			champion->fleeing, champion->hasInitiative, champion->playedTurn,
-			effectText,
-			champion->stats[HEALTH].minValue, champion->stats[HEALTH].value, champion->stats[HEALTH].maxValue,
-			champion->stats[INTELLIGENCE].minValue, champion->stats[INTELLIGENCE].value, champion->stats[INTELLIGENCE].maxValue,
-			champion->stats[MAGIC_DEFENSE].minValue, champion->stats[MAGIC_DEFENSE].value, champion->stats[MAGIC_DEFENSE].maxValue,
-			champion->stats[MAGIC_ATTACK].minValue, champion->stats[MAGIC_ATTACK].value, champion->stats[MAGIC_ATTACK].maxValue,
-			champion->stats[DEFENSE].minValue, champion->stats[DEFENSE].value, champion->stats[DEFENSE].maxValue,
-			champion->stats[ATTACK].minValue, champion->stats[ATTACK].value, champion->stats[ATTACK].maxValue,
-			champion->powerBudget
-		);
+		listChampion(champion, message, COMMUNICATION_SIZE);
 		sendData(&user->socket, message);
 	}
 
@@ -558,16 +528,8 @@ void handleAttack(command_context_t* context) {
 	initFight(fight);
 	makeFight(fight, pawn, otherPawn);
 	addFightToWorld(world, fight);
-
-	pushFunction(&user->commandHandlers, combatCommandHandler);
-	setUserContext(user, CONTEXT_COMBAT);
-
-	user_t* otherUser = otherPawn->user;
-
-	if (otherUser != NULL) {
-		pushFunction(&otherUser->commandHandlers, combatCommandHandler);
-		setUserContext(otherUser, CONTEXT_COMBAT);
-	}
+	notifySetContext(context->server, pawn, CONTEXT_COMBAT, combatCommandHandler);
+	notifySetContext(context->server, otherPawn, CONTEXT_COMBAT, combatCommandHandler);
 }
 
 void* gameworldCommandHandler(void* arg) {

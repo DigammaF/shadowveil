@@ -26,7 +26,7 @@ typedef struct user_t {
 void initUser(user_t* user);
 void dropUser(user_t* user);
 
-void setUserContext(user_t* user, context_t context);
-void popUserContex(user_t* user);
+void setUserContext(user_t* user, context_t context, function_t handler);
+void popUserContext(user_t* user);
 
 #endif

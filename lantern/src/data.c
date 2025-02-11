@@ -35,6 +35,7 @@ int sendData(socket_t* socket, const char* data) {
     return (int)totalSent;
 }
 
+// TODO mettre à jour sur le principe de sendData
 int sendDGRAM(socket_t* socket, const char* address, const short port, const char* data) {
 	ssize_t bytesSent = sendto(socket->fileDescriptor, data, strlen(data) + 1, 0,
 		(struct sockaddr*)&(socket->remote), sizeof(socket->remote)
@@ -51,6 +52,8 @@ int sendDGRAM(socket_t* socket, const char* address, const short port, const cha
  *  \param		data: chaîne de charactères terminée par un zéro
  *  \param		maxDataLength: la longueur maximale des données reçues
  * 	\result		nombre d'octets recus
+ * 
+ * TODO ajouter un timeout
  * 
  */
 int recvData(socket_t* socket, char* data, size_t maxDataLength) {

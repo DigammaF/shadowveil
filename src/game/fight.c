@@ -160,7 +160,7 @@ unsigned pawnValidChampionCount(fight_t* fight, struct pawn_t* pawn) {
 	for (unsigned n = 0; n < fight->champions.capacity; n++) {
 		champion_t* champion = fight->champions.elements[n];
 		if (champion == NULL) { continue; }
-		if (!isDead(champion)) { count++; }
+		if (!isDead(champion) && champion->pawn == pawn) { count++; }
 	}
 
 	return count;
@@ -181,13 +181,7 @@ void updateFight(struct server_t* server, fight_t* fight) {
 		if (pawnValidChampionCount(fight, pawn) == 0) {
 			applyPawnRunaway(server, pawn);
 			removePawnFromFight(fight, pawn);
-
-			user_t* user = pawn->user;
-
-			if (user != NULL) {
-				popFunction(&user->commandHandlers);
-				popUserContex(user);
-			}
+			notifyPopContext(server, pawn);
 		}
 	}
 

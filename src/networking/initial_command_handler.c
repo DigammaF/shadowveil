@@ -46,17 +46,15 @@ void handleLogin(server_t* server, user_t* user, command_context_t* context) {
 
 	if (account->flags & ADMIN_FLAG) {
 		printf("\t[admin]\n");
-		popFunction(&user->commandHandlers);
-		pushFunction(&user->commandHandlers, adminCommandhandler);
-		setUserContext(user, CONTEXT_ADMIN);
+		popUserContext(user);
+		setUserContext(user, CONTEXT_ADMIN, adminCommandhandler);
 		return;
 	}
 
 	printf("\t[standard]\n");
-	popFunction(&user->commandHandlers);
-	pushFunction(&user->commandHandlers, gameworldCommandHandler);
 	user->account = account;
-	setUserContext(user, CONTEXT_GAMEWORLD);
+	popUserContext(user);
+	setUserContext(user, CONTEXT_GAMEWORLD, gameworldCommandHandler);
 }
 
 pawn_t* setupPawn(server_t* server, account_t* account, user_t* user) {
@@ -120,9 +118,8 @@ void handleRegister(server_t* server, user_t* user, command_context_t* context) 
 	printf("\t[giving champions]\n");
 	setupChampions(pawn);
 	printf("\t[success]\n");
-	popFunction(&user->commandHandlers);
-	pushFunction(&user->commandHandlers, gameworldCommandHandler);
-	setUserContext(user, CONTEXT_GAMEWORLD);
+	popUserContext(user);
+	setUserContext(user, CONTEXT_GAMEWORLD, gameworldCommandHandler);
 	return;
 }
 

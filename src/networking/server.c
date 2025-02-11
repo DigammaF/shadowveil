@@ -59,7 +59,7 @@ void createUser(server_t* server, user_t* user, socket_t* socket) {
 	user->lastActivity = time(NULL);
 	user->id = hashmapLocateUnusedKey(&server->users);
 	hashmapSet(&server->users, user->id, user);
-	pushFunction(&user->commandHandlers, initialCommandHandler);
+	setUserContext(user, CONTEXT_INITIAL, initialCommandHandler);
 }
 
 void deleteUser(server_t* server, user_t* user) {
@@ -111,15 +111,9 @@ void handleUserCommand(server_t* server, user_t* user, char**args, int argCount)
 		return;
 	}
 
-	command_context_t* commandContext = malloc(sizeof(command_context_t));
-	CHECKM(commandContext, "malloc commandContext");
-	commandContext->args = args;
-	commandContext->count = argCount;
-	commandContext->user = user;
-	commandContext->server = server;
+	command_context_t commandContext = { .args = args, .count = argCount, .user = user, .server = server };
 	function_t commandHandler = peekFunction(&user->commandHandlers);
-	commandHandler((void*)commandContext);
-	free(commandContext);
+	commandHandler((void*)&commandContext);
 	user->lastActivity = time(NULL);
 	if (functionStackEmpty(&user->commandHandlers)) { user->running = 0; }
 }

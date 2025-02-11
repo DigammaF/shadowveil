@@ -8,6 +8,7 @@
 #include "feature.h"
 #include "function_stack.h"
 #include "item.h"
+#include "constants.h"
 
 #define TEAM_SIZE 3
 
@@ -37,9 +38,13 @@ typedef struct pawn_t {
 	hashmap_t items; // item_t*, possède la valeur
 	struct champion_t* team[TEAM_SIZE]; // champions utilisés pour le combat, peut être NULL
 	struct fight_t* fight; // peut être NULL
+	void* properties; // structure qui regroupe les données nécessaires à la différenciation de fonction
 } pawn_t;
 
 typedef enum {
+	EVENT_SETCONTEXT, // setcontext_event_args_t
+	EVENT_POPCONTEXT, // popcontext_event_args_t
+	EVENT_UPDATE, // update_event_args_t
     EVENT_PAWN_ARRIVED, // pawn_event_args_t
     EVENT_PAWN_LEFT, // pawn_event_args_t
 	EVENT_PAWN_SPAWNED, // pawn_event_args_t
@@ -82,6 +87,13 @@ void notifyChampionRemoved(struct server_t* server, pawn_t* pawn, struct champio
 void notifyItemAdded(struct server_t* server, pawn_t* pawn, struct item_t* item, char* reason);
 void notifyItemRemoved(struct server_t* server, pawn_t* pawn, struct item_t* item, char* reason);
 
+/** donne la possibilité à l'eventHandler de faire une update. principalement utilisé pour l'IA */
+void notifyPawnUpdate(struct server_t* server, pawn_t* pawn);
+void notifySetContext(struct server_t* server, pawn_t* pawn, context_t context, function_t newHandler);
+void notifyPopContext(struct server_t* server, pawn_t* pawn);
+/** opérations routinières */
+void updatePawn(struct server_t* server, pawn_t* pawn);
+
 /**
  * 
  *  Envoie un évènement à l'entité
@@ -91,6 +103,15 @@ void notifyItemRemoved(struct server_t* server, pawn_t* pawn, struct item_t* ite
 void sendPawnEvent(struct server_t* server, pawn_t* pawn, event_t* event);
 
 void changePawnGold(struct server_t* server, pawn_t* pawn, int delta, char* reason);
+
+typedef struct update_event_args_t { } update_event_args_t;
+
+typedef struct setcontext_event_args_t {
+	context_t context;
+	function_t handler;
+} setcontext_event_args_t;
+
+typedef struct popcontext_event_args_t { } popcontext_event_args_t;
 
 typedef struct pawn_event_args_t {
 	pawn_t* pawn;

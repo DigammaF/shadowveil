@@ -74,6 +74,27 @@ void removeChampionFromPawn(pawn_t* pawn, champion_t* champion) {
 	champion->pawn = NULL;
 }
 
+void notifySetContext(
+	struct server_t* server, pawn_t* pawn,
+	context_t context, function_t handler
+) {
+	setcontext_event_args_t args = { .context = context, .handler = handler };
+	event_t event = MAKE_EVENT(EVENT_SETCONTEXT, &args);
+	sendPawnEvent(server, pawn, &event);
+}
+
+void notifyPopContext(struct server_t* server, pawn_t* pawn) {
+	popcontext_event_args_t args = { };
+	event_t event = MAKE_EVENT(EVENT_POPCONTEXT, &args);
+	sendPawnEvent(server, pawn, &event);
+}
+
+void notifyPawnUpdate(struct server_t* server, pawn_t* pawn) {
+	update_event_args_t args = { };
+	event_t event = MAKE_EVENT(EVENT_UPDATE, &args);
+	sendPawnEvent(server, pawn, &event);
+}
+
 void notifyChampionAdded(server_t* server, pawn_t* pawn, champion_t* champion, char* reason) {
 	champion_event_args_t args = { .champion = champion, .reason = reason };
 	event_t event = MAKE_EVENT(EVENT_CHAMPION_GAINED, &args);
@@ -112,4 +133,8 @@ void changePawnGold(server_t* server, pawn_t* pawn, int delta, char* reason) {
 	gold_changed_event_args_t args = { .delta = deltaRepr, .reason = reason };
 	event_t event = MAKE_EVENT(EVENT_GOLD_CHANGED, &args);
 	sendPawnEvent(server, pawn, &event);
+}
+
+void updatePawn(struct server_t* server, pawn_t* pawn) {
+
 }
