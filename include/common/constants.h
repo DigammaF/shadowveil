@@ -3,7 +3,7 @@
 #define CONSTANTS_H
 
 #define SERVER_PORT (short)20100
-#define SERVER_TICK 500 // ms
+#define SERVER_TICK 100000 // us
 #define COMMUNICATION_SIZE 4096
 
 #define WORLD_SEED 555
