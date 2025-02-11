@@ -1,7 +1,9 @@
+/** TODO évènements de combat */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "combat_command_handler.h"
 #include "server.h"
@@ -39,6 +41,14 @@ void handleCombatAttack(command_context_t* context) {
 
 	if (isDead(sourceChampion)) {
 		fprintf(stderr, "(!) champion is dead\n"); return;
+	}
+
+	if (!sourceChampion->hasInitiative) {
+		fprintf(stderr, "(!) champion doesn't have initiative\n"); return;
+	}
+
+	if (sourceChampion->fleeing) {
+		fprintf(stderr, "(!) champion is fleeing\n"); return;
 	}
 
 	ability_t* ability = hashmapGet(&sourceChampion->abilities, abilityKey);
@@ -101,6 +111,39 @@ void handleCombatSee(command_context_t* context) {
 	sendData(&user->socket, "END-LIST");
 }
 
+void handleFlee(command_context_t* context) {
+	unsigned championKey;
+
+	if (!safeStrToUnsigned(context->args[2], &championKey)) { fprintf(stderr, "(!) Failed to convert '%s' to an unsigned\n", context->args[2]); return; }
+
+	user_t* user = context->user;
+	account_t* account = user->account;
+	pawn_t* pawn = account->pawn;
+	fight_t* fight = pawn->fight;
+
+	champion_t* champion = hashmapGet(&fight->champions, championKey);
+
+	if (champion == NULL) { fprintf(stderr, "(!) could not fetch champion %i\n", championKey); return; }
+
+	if (!pawnCanOrderChampion(pawn, champion)) {
+		fprintf(stderr, "(!) can't order champion\n"); return;
+	}
+
+	if (isDead(champion)) {
+		fprintf(stderr, "(!) champion is dead\n"); return;
+	}
+
+	if (!champion->hasInitiative) {
+		fprintf(stderr, "(!) champion doesn't have initiative\n"); return;
+	}
+
+	if (champion->fleeing) {
+		fprintf(stderr, "(!) champion is fleeing\n"); return;
+	}
+
+	champion->fleeing = true;
+}
+
 void* combatCommandHandler(void* arg) {
 	command_context_t* context = (command_context_t*)arg;
 
@@ -112,6 +155,13 @@ void* combatCommandHandler(void* arg) {
 
 		if (strcmp(context->args[1], "SEE") == 0) {
 			handleCombatSee(context);
+			return NULL;
+		}
+	}
+
+	if (context->count == 3) {
+		if (strcmp(context->args[1], "FLEE") == 0) {
+			handleFlee(context);
 			return NULL;
 		}
 	}
