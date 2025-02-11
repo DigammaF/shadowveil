@@ -73,10 +73,8 @@ void handleRunaway(command_context_t* context) {
 		}
 	}
 
-	disband(fight);
-	removeFightFromWorld(world, fight);
-	dropFight(fight);
-	free(fight);
+	applyPawnRunaway(context->server, pawn);
+	removePawnFromFight(fight, pawn);
 }
 
 void handleCombatSee(command_context_t* context) {

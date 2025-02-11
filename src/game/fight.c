@@ -6,6 +6,7 @@
 #include "fight.h"
 #include "pawn.h"
 #include "champion.h"
+#include "server.h"
 
 void initFight(fight_t* fight) {
 	initHashmap(&fight->pawns);
@@ -128,4 +129,26 @@ bool initiativeChampionHasYetToPlay(fight_t* fight) {
 	}
 
 	return false;
+}
+
+void applyPawnRunaway(server_t* server, pawn_t* pawn) {
+	for (unsigned n = 0; n < TEAM_SIZE; n++) {
+		champion_t* champion = pawn->team[n];
+		if (champion == NULL) { continue; }
+		if (isDead(champion)) {
+			removeChampionFromPawn(pawn, champion);
+			removeChampionFromTeam(pawn, champion);
+			notifyChampionRemoved(server, pawn, champion, "mort au combat");
+		}
+
+		if (!champion->fleeing) {
+			removeChampionFromPawn(pawn, champion);
+			removeChampionFromTeam(pawn, champion);
+			notifyChampionRemoved(server, pawn, champion, "abandonné au combat");
+		}
+	}
+}
+
+void updateFight(struct server_t* server, fight_t* fight) {
+	
 }

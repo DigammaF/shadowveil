@@ -16,6 +16,9 @@ les fonctions sont nommées selon une certaine logique:
 		primitives qui manipulent les hashmaps. le conteneur vient en premier
 
 	triggerX
-		envoie un évènement à un objet
+		envoie un évènement à un objet interne
+
+	notify
+		envoie un évènement à un objet en communication avec un utilisateur
 
 beaucoup d'objets ont des champs contentant 'key'. ce champs contiennent la clé de l'objet dans la hashmap qui le contient

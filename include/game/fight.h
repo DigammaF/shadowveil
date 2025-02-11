@@ -8,6 +8,7 @@
 
 struct champion_t;
 struct pawn_t;
+struct server_t;
 
 /** représente un combat en cours */
 typedef struct fight_t {
@@ -41,5 +42,10 @@ void giveInitiative(fight_t* fight);
 bool anyChampionHasYetToPlay(fight_t* fight);
 /** indique si le champion qui a l'initiative n'a pas joué son tour */
 bool initiativeChampionHasYetToPlay(fight_t* fight);
+/** répercute les effets de fuite sur les champions dans l'équipe du pion */
+void applyPawnRunaway(struct server_t* server, struct pawn_t* pawn);
+
+/** applique les opérations routinières sur le combat */
+void updateFight(struct server_t* server, fight_t* fight);
 
 #endif
