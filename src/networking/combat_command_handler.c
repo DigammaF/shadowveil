@@ -62,19 +62,10 @@ void handleRunaway(command_context_t* context) {
 	world_t* world = &context->server->world;
 	fight_t* fight = pawn->fight;
 
-	for (unsigned n = 0; n < fight->pawns.capacity; n++) {
-		pawn_t* pawn = fight->pawns.elements[n];
-		if (pawn == NULL) { continue; }
-		user_t* localUser = pawn->user;
-
-		if (localUser != NULL) {
-			popFunction(&localUser->commandHandlers);
-			popUserContex(localUser);
-		}
-	}
-
 	applyPawnRunaway(context->server, pawn);
 	removePawnFromFight(fight, pawn);
+	popFunction(&user->commandHandlers);
+	popUserContex(user);
 }
 
 void handleCombatSee(command_context_t* context) {

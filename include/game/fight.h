@@ -44,6 +44,10 @@ bool anyChampionHasYetToPlay(fight_t* fight);
 bool initiativeChampionHasYetToPlay(fight_t* fight);
 /** répercute les effets de fuite sur les champions dans l'équipe du pion */
 void applyPawnRunaway(struct server_t* server, struct pawn_t* pawn);
+/** applique toutes les opérations liées à un nouveau tour */
+void applyTurn(struct server_t* server, fight_t* fight);
+/** compte les champions aptes à se battre d'un pion */
+unsigned pawnValidChampionCount(fight_t* fight, struct pawn_t* pawn);
 
 /** applique les opérations routinières sur le combat */
 void updateFight(struct server_t* server, fight_t* fight);

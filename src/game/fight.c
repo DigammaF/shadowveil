@@ -7,6 +7,7 @@
 #include "pawn.h"
 #include "champion.h"
 #include "server.h"
+#include "user.h"
 
 void initFight(fight_t* fight) {
 	initHashmap(&fight->pawns);
@@ -149,6 +150,51 @@ void applyPawnRunaway(server_t* server, pawn_t* pawn) {
 	}
 }
 
+void applyTurn(struct server_t* server, fight_t* fight) {
+
+}
+
+unsigned pawnValidChampionCount(fight_t* fight, struct pawn_t* pawn) {
+	unsigned count = 0;
+
+	for (unsigned n = 0; n < fight->champions.capacity; n++) {
+		champion_t* champion = fight->champions.elements[n];
+		if (champion == NULL) { continue; }
+		if (!isDead(champion)) { count++; }
+	}
+
+	return count;
+}
+
 void updateFight(struct server_t* server, fight_t* fight) {
-	
+	if (!initiativeChampionHasYetToPlay(fight)) {
+		giveInitiative(fight);
+	}
+
+	if (!anyChampionHasYetToPlay(fight)) {
+		applyTurn(server, fight);
+	}
+
+	for (unsigned n = 0; n < fight->pawns.capacity; n++) {
+		pawn_t* pawn = fight->pawns.elements[n];
+		if (pawn == NULL) { continue; }
+		if (pawnValidChampionCount(fight, pawn) == 0) {
+			applyPawnRunaway(server, pawn);
+			removePawnFromFight(fight, pawn);
+
+			user_t* user = pawn->user;
+
+			if (user != NULL) {
+				popFunction(&user->commandHandlers);
+				popUserContex(user);
+			}
+		}
+	}
+
+	if (hashmapValueCount(&fight->pawns) == 1) {
+		disband(fight);
+		removeFightFromWorld(&server->world, fight);
+		dropFight(fight);
+		free(fight);
+	}
 }
