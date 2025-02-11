@@ -29,7 +29,6 @@ void initWorld(world_t* world) {
 }
 
 void dropWorld(world_t* world) {
-	// TODO free fights
 	for (unsigned x = 0; x < WORLD_SIZE; x++) {
 		for (unsigned y = 0; y < WORLD_SIZE; y++) {
 			place_t* place = world->places[x][y];
@@ -60,9 +59,17 @@ void dropWorld(world_t* world) {
 		free(itemDeal);
 	}
 
+	for (unsigned n = 0; n < world->fights.capacity; n++) {
+		fight_t* fight = world->fights.elements[n];
+		if (fight == NULL) { continue; }
+		dropFight(fight);
+		free(fight);
+	}
+
 	dropHashmap(&world->pawns);
 	dropHashmap(&world->championDeals);
 	dropHashmap(&world->itemDeals);
+	dropHashmap(&world->fights);
 }
 
 void connectToNeighbors(world_t* world, unsigned x, unsigned y) {
