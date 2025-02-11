@@ -6,6 +6,9 @@
 #define SERVER_TICK 100000 // us
 #define COMMUNICATION_SIZE 4096
 
+#define MAX_LOGIN_SIZE (unsigned)20
+#define MAX_PASSWORD_SIZE (unsigned)20
+
 #define WORLD_SEED 555
 
 void* noHandler(void* arg);

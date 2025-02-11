@@ -105,6 +105,18 @@ void handleRegister(server_t* server, user_t* user, command_context_t* context) 
 		return;
 	}
 
+	if (strlen(context->args[2]) > MAX_LOGIN_SIZE) {
+		printf("\t[login too big]\n");
+		sendData(&user->socket, "ERROR nom d'utilisateur trop long");
+		return;
+	}
+
+	if (strlen(context->args[3]) > MAX_PASSWORD_SIZE) {
+		printf("\t[password too big]\n");
+		sendData(&user->socket, "ERROR mot de passe trop long");
+		return;
+	}
+
 	account = malloc(sizeof(account_t));
 	CHECKM(account, "malloc account");
 	initAccount(account);
