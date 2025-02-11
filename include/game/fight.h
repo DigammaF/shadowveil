@@ -35,7 +35,11 @@ bool fightContainsChampion(fight_t* fight, struct champion_t* champion);
 bool pawnCanOrderChampion(struct pawn_t* pawn, struct champion_t* champion);
 /** sort les pions et les champions du combat */
 void disband(fight_t* fight);
-/** TODO donne l'initiative au bon champion */
+/** donne l'initiative au bon champion */
 void giveInitiative(fight_t* fight);
+/** indique si il reste un champion qui n'a pas joué son tour */
+bool anyChampionHasYetToPlay(fight_t* fight);
+/** indique si le champion qui a l'initiative n'a pas joué son tour */
+bool initiativeChampionHasYetToPlay(fight_t* fight);
 
 #endif

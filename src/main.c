@@ -6,7 +6,6 @@
 #include "server.h"
 #include "client.h"
 #include "stack.h"
-
 #include "hashmap.h"
 
 int main(int argc, const char** argv) {

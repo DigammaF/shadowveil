@@ -1,6 +1,7 @@
 
 #include <stdbool.h>
 
+#include "random_utils.h"
 #include "hashmap.h"
 #include "fight.h"
 #include "pawn.h"
@@ -92,4 +93,39 @@ void disband(fight_t* fight) {
 		if (champion == NULL) { continue; }
 		removeChampionFromFight(fight, champion);
 	}
+}
+
+void giveInitiative(fight_t* fight) {
+	champion_t* quickest = NULL;
+
+	for (unsigned n = 0; n < fight->champions.capacity; n++) {
+		champion_t* champion = fight->champions.elements[n];
+		if (champion == NULL) { continue; }
+		if (quickest == NULL) { quickest = champion; continue; }
+		if (champion->stats[INTELLIGENCE].value > quickest->stats[INTELLIGENCE].value) {
+			quickest = champion;
+		}
+	}
+
+	quickest->hasInitiative = true;
+}
+
+bool anyChampionHasYetToPlay(fight_t* fight) {
+	for (unsigned n = 0; n < fight->champions.capacity; n++) {
+		champion_t* champion = fight->champions.elements[n];
+		if (champion == NULL) { continue; }
+		if (!champion->playedTurn) { return true; }
+	}
+
+	return false;
+}
+
+bool initiativeChampionHasYetToPlay(fight_t* fight) {
+	for (unsigned n = 0; n < fight->champions.capacity; n++) {
+		champion_t* champion = fight->champions.elements[n];
+		if (champion == NULL) { continue; }
+		if (!champion->playedTurn && champion->hasInitiative) { return true; }
+	}
+
+	return false;
 }
