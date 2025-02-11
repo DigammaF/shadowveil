@@ -21,6 +21,8 @@
 #define UNUSED(x) (void)(x)
 
 void initServer(server_t* server) {
+	server->deltaTime = 1;
+	server->lastUpdateTime = time(NULL);
 	initHashmap(&server->users);
 	initHashmap(&server->accounts);
 	initWorld(&server->world);
@@ -174,6 +176,10 @@ void handleUserRequest(server_t* server, user_t* user) {
 }
 
 void update(server_t* server) {
+	time_t now = time(NULL);
+	server->deltaTime = now - server->lastUpdateTime;
+	server->lastUpdateTime = now;
+
 	for (unsigned n = 0; n < server->users.capacity; n++) {
 		user_t* user = server->users.elements[n];
 		if (user == NULL) { continue; }
