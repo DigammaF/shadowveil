@@ -28,19 +28,19 @@ void handleLogin(server_t* server, user_t* user, command_context_t* context) {
 
 	if (account == NULL) {
 		printf("\t[cannot find]\n");
-		sendData(&user->socket, "OUTPUT ce compte n'existe pas");
+		sendData(&user->socket, "ERROR ce compte n'existe pas");
 		return;
 	}
 
 	if (account->flags & BANNED_FLAG) {
 		printf("\t[banned]\n");
-		sendData(&user->socket, "OUTPUT ce compte est banni");
+		sendData(&user->socket, "ERROR ce compte est banni");
 		return;
 	}
 
 	if (!checkPassword(account, context->args[3])) {
 		printf("\t[wrong password]\n");
-		sendData(&user->socket, "OUTPUT mauvais mot de passe");
+		sendData(&user->socket, "ERROR mauvais mot de passe");
 		return;
 	}
 
@@ -103,7 +103,7 @@ void handleRegister(server_t* server, user_t* user, command_context_t* context) 
 
 	if (account != NULL) {
 		printf("\t[already exists]\n");
-		sendData(&user->socket, "OUTPUT ce compte existe déjà");
+		sendData(&user->socket, "ERROR ce compte existe déjà");
 		return;
 	}
 
