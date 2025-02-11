@@ -226,7 +226,7 @@ void handleMe(command_context_t* context) {
 	for (unsigned n = 0; n < TEAM_SIZE; n++) {
 		champion_t* champion = pawn->team[n];
 		if (champion == NULL) { continue; }
-		listChampion(champion, message, COMMUNICATION_SIZE);
+		formatChampion(champion, "LIST-CHAMPION", message, COMMUNICATION_SIZE);
 		sendData(&user->socket, message);
 	}
 
@@ -258,7 +258,7 @@ void handleSeeChampions(command_context_t* context) {
 	for (unsigned n = 0; n < pawn->champions.capacity; n++) {
 		champion_t* champion = pawn->champions.elements[n];
 		if (champion == NULL) { continue; }
-		listChampion(champion, message, COMMUNICATION_SIZE);
+		formatChampion(champion, "LIST-CHAMPION", message, COMMUNICATION_SIZE);
 		sendData(&user->socket, message);
 	}
 

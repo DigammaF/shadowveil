@@ -176,13 +176,14 @@ void applyAbility(champion_t* source, champion_t* destination, ability_t* abilit
     }
 }
 
-void listChampion(champion_t* champion, char* buffer, unsigned bufferSize) {
+void formatChampion(champion_t* champion, char* header, char* buffer, unsigned bufferSize) {
 	char effectText[EFFECT_COUNT + 1];
 	for (unsigned k = 0; k < EFFECT_COUNT; k++) { effectText[k] = champion->effects[k] ? 'Y':'N'; }
 	unsigned recquiredSize = snprintf(
 		buffer,
 		bufferSize,
-		"LIST-CHAMPION %i %s %i %i %i %i %s %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+		"%s %i %s %i %i %i %i %s %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i %i",
+		header,
 		champion->pawnKey, champion->name, champion->type,
 		champion->fleeing, champion->hasInitiative, champion->playedTurn,
 		effectText,

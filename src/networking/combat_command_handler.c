@@ -76,7 +76,7 @@ void handleCombatSee(command_context_t* context) {
 	for (unsigned n = 0; n < fight->champions.capacity; n++) {
 		champion_t* champion = fight->champions.elements[n];
 		if (champion == NULL) { continue; }
-		listChampion(champion, message, COMMUNICATION_SIZE);
+		formatChampion(champion, "LIST-CHAMPION", message, COMMUNICATION_SIZE);
 		sendData(&user->socket, message);
 	}
 
