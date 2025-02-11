@@ -41,6 +41,16 @@ unsigned hashmapLocateUnusedKey(hashmap_t* hashmap) {
 	return key;
 }
 
+unsigned hashmapCountValues(hashmap_t* hashmap) {
+	unsigned count = 0;
+
+	for (unsigned n = 0; n < hashmap->capacity; n++) {
+		if (hashmap->elements[n] != NULL) { count++; }
+	}
+
+	return count;
+}
+
 void increaseHashmapCapacity(hashmap_t* hashmap) {
 	unsigned previousCapacity = hashmap->capacity;
     unsigned newCapacity = hashmap->capacity*HASHMAP_GROWTH_RATE + HASHMAP_GROWTH_CONSTANT;

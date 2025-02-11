@@ -27,6 +27,7 @@ void* hashmapGet(hashmap_t* hashmap, unsigned key);
 void hashmapSet(hashmap_t* hashmap, unsigned key, void* value);
 
 unsigned hashmapLocateUnusedKey(hashmap_t* hashmap);
+unsigned hashmapCountValues(hashmap_t* hashmap);
 
 void increaseHashmapCapacity(hashmap_t* hashmap);
 
