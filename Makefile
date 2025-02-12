@@ -11,9 +11,8 @@ CC = gcc
 CFLAGS =\
 	-Wall -Wextra -pthread\
 	-Iinclude -Iinclude/$(DATA_STRUCTURES) -Iinclude/$(GAME) -Iinclude/$(NETWORKING) -Iinclude/$(COMMON)\
-	-Ilantern/include\
-	-Llantern
-LDFLAGS = -llantern -lncurses -pthread -g
+	-Ilantern/include
+LDFLAGS = -Llantern -llantern -lncurses -pthread -g
 
 # Source files
 SRC =\
