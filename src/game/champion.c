@@ -8,6 +8,9 @@
 #include "champion.h"
 #include "random_utils.h"
 #include "hashmap.h"
+#include "server.h"
+#include "pawn.h"
+#include "fight.h"
 
 #define UNUSED(x) (void)(x)
 #define CHECK(status, message) { if ((status) == -1) { perror(message); exit(EXIT_FAILURE); } }
@@ -128,7 +131,16 @@ bool isDead(champion_t* champion) {
 	return champion->stats[HEALTH].value == 0;
 }
 
-void applyAbility(champion_t* source, champion_t* destination, ability_t* ability) {
+void applyAbility(server_t* server, champion_t* source, champion_t* destination, ability_t* ability) {
+	pawn_t* pawn = source->pawn;
+	fight_t* fight = pawn->fight;
+
+	if (fight != NULL) {
+		champion_ability_event_args_t args = { .champion = source, .ability = ability };
+		event_t event = MAKE_EVENT(EVENT_CHAMPION_ABILITY_USE, &args);
+		notifyFight(server, fight, &event);
+	}
+
     unsigned reader = 0;
     champion_t* target = destination;
 

@@ -41,6 +41,7 @@ void removePawnFromPlace(place_t* place, struct pawn_t* pawn);
 void addFeatureToPlace(place_t* place, struct feature_t* feature);
 void removeFeatureFromPlace(place_t* place, struct feature_t* feature);
 
+/** propage un évènement à tous les pions se trouvant dans la place */
 void notifyPlace(struct server_t* server, place_t* place, struct event_t* event);
 
 void notifyPawnLeft(struct server_t* server, place_t* place, struct pawn_t* pawn);

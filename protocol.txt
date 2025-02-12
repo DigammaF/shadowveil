@@ -79,8 +79,7 @@ server
 	LOST-CHAMPION/LOST-ITEM <word> <word+>
 		word: nom
 		word+: raison
-	ABOUT-YOUR-GOLD <int>
-		fait savoir la quantité d'or possédée
+	CHAMPION-USE-ABILITY
 
 client
 	COMMAND <word>+

@@ -11,6 +11,7 @@
 #include "hashmap.h"
 
 struct pawn_t;
+struct server_t;
 
 #define MAKE_STAT(n) (stat_value_t){ .value = 0, .maxValue = (n), .minValue = 0 }
 #define MAKE_STATS(atk, dfe, matk, mdfe, intel, health) \
@@ -77,7 +78,7 @@ void replenishStats(champion_t* champion);
  * le budget de puissance utilisé est inscrit dans le champ correspondant
  * */
 void generateChampion(unsigned seed, unsigned powerBudget, champion_t* champion);
-void applyAbility(champion_t* source, champion_t* destination, ability_t* ability);
+void applyAbility(struct server_t* server, champion_t* source, champion_t* destination, ability_t* ability);
 
 /** créé le message (terminé par '\0') qui permet à un client de connaître le champion */
 void formatChampion(champion_t* champion, char* header, char* buffer, unsigned bufferSize);

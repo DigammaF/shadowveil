@@ -18,6 +18,7 @@ void initAbility(ability_t* ability) {
 void dropAbility(ability_t* ability) { UNUSED(ability); }
 
 void makeVenom(ability_t* ability) {
+	ability->name = "Venin";
 	ability->type = 10;
 	ability->monoTarget = true;
 	ability->opCodes[0] = SET_TARGET;

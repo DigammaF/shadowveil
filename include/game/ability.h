@@ -34,7 +34,8 @@ struct champion_t;
 /**
  * une capacité que possède un champion
  */
-typedef struct {
+typedef struct ability_t {
+	char* name;
 	struct champion_t* champion; // peut être NULL
 	unsigned championKey;
     unsigned type;

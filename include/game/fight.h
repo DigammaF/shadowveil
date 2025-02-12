@@ -9,6 +9,7 @@
 struct champion_t;
 struct pawn_t;
 struct server_t;
+struct event_t;
 
 /** représente un combat en cours */
 typedef struct fight_t {
@@ -37,7 +38,7 @@ bool pawnCanOrderChampion(struct pawn_t* pawn, struct champion_t* champion);
 /** sort les pions et les champions du combat */
 void disband(fight_t* fight);
 /** donne l'initiative au bon champion */
-void giveInitiative(fight_t* fight);
+struct champion_t* giveInitiative(fight_t* fight);
 /** indique si il reste un champion qui n'a pas joué son tour */
 bool anyChampionHasYetToPlay(fight_t* fight);
 /** indique si le champion qui a l'initiative n'a pas joué son tour */
@@ -48,6 +49,8 @@ void applyPawnRunaway(struct server_t* server, struct pawn_t* pawn);
 void applyTurn(struct server_t* server, fight_t* fight);
 /** compte les champions aptes à se battre d'un pion */
 unsigned pawnValidChampionCount(fight_t* fight, struct pawn_t* pawn);
+/** propage un évènement à tous les pions participant au combat */
+void notifyFight(struct server_t* server, fight_t* fight, struct event_t* event);
 
 /** applique les opérations routinières sur le combat */
 void updateFight(struct server_t* server, fight_t* fight);

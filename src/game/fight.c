@@ -99,7 +99,7 @@ void disband(fight_t* fight) {
 	}
 }
 
-void giveInitiative(fight_t* fight) {
+champion_t* giveInitiative(fight_t* fight) {
 	champion_t* quickest = NULL;
 
 	for (unsigned n = 0; n < fight->champions.capacity; n++) {
@@ -113,6 +113,7 @@ void giveInitiative(fight_t* fight) {
 	}
 
 	quickest->hasInitiative = true;
+	return quickest;
 }
 
 bool anyChampionHasYetToPlay(fight_t* fight) {
@@ -138,6 +139,10 @@ bool initiativeChampionHasYetToPlay(fight_t* fight) {
 }
 
 void applyPawnRunaway(server_t* server, pawn_t* pawn) {
+	pawn_event_args_t args = { .pawn = pawn };
+	event_t event = MAKE_EVENT(EVENT_PAWN_RUNAWAY, &args);
+	notifyFight(server, pawn->fight, &event);
+
 	for (unsigned n = 0; n < TEAM_SIZE; n++) {
 		champion_t* champion = pawn->team[n];
 		if (champion == NULL) { continue; }
@@ -178,9 +183,20 @@ unsigned pawnValidChampionCount(fight_t* fight, struct pawn_t* pawn) {
 	return count;
 }
 
+void notifyFight(server_t* server, fight_t* fight, event_t* event) {
+	for (unsigned n = 0; n < fight->pawns.capacity; n++) {
+		pawn_t* pawn = fight->pawns.elements[n];
+		if (pawn == NULL) { continue; }
+		sendPawnEvent(server, pawn, event);
+	}
+}
+
 void updateFight(struct server_t* server, fight_t* fight) {
 	if (!initiativeChampionHasYetToPlay(fight)) {
-		giveInitiative(fight);
+		champion_t* champion = giveInitiative(fight);
+		champion_event_args_t args = { .champion = champion, .reason = "meilleur intelligence" };
+		event_t event = MAKE_EVENT(EVENT_CHAMPION_GET_INITIATIVE, &args);
+		notifyFight(server, fight, &event);
 	}
 
 	if (!anyChampionHasYetToPlay(fight)) {

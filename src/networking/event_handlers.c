@@ -31,6 +31,7 @@ void* playerEventHandler(void* _) {
 	champion_event_args_t* championEventArgs = NULL;
 	item_event_args_t* itemEventArgs = NULL;
 	setcontext_event_args_t* setContextEventArgs = NULL;
+	champion_ability_event_args_t* championAbilityArgs = NULL;
 
 	switch (event->type) {
 		case EVENT_PAWN_ARRIVED:
@@ -94,6 +95,39 @@ void* playerEventHandler(void* _) {
 
 		case EVENT_POPCONTEXT:
 			popUserContext(user);
+			break;
+
+		case EVENT_CHAMPION_ABILITY_USE:
+			championAbilityArgs = event->args;
+			sprintf(
+				message,
+				"CHAMPION-USE-ABILITY %i %s %i %s",
+				championAbilityArgs->champion->fightKey, championAbilityArgs->champion->name,
+				championAbilityArgs->ability->championKey, championAbilityArgs->ability->name
+			);
+			sendData(&user->socket, message);
+			break;
+
+		case EVENT_CHAMPION_FLEE:
+			championEventArgs = event->args;
+			sprintf(
+				message,
+				"CHAMPION-FLEE %i %s %s",
+				championEventArgs->champion->fightKey, championEventArgs->champion->name,
+				championEventArgs->reason
+			);
+			sendData(&user->socket, message);
+			break;
+
+		case EVENT_CHAMPION_GET_INITIATIVE:
+			championEventArgs = event->args;
+			sprintf(
+				message,
+				"CHAMPION-GET-INITIATIVE %i %s %s",
+				championEventArgs->champion->fightKey, championEventArgs->champion->name,
+				championEventArgs->reason
+			);
+			sendData(&user->socket, message);
 			break;
 
 		default:

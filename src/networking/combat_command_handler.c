@@ -1,4 +1,3 @@
-/** TODO évènements de combat */
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -52,7 +51,7 @@ void handleCombatAttack(command_context_t* context) {
 	}
 
 	ability_t* ability = hashmapGet(&sourceChampion->abilities, abilityKey);
-	applyAbility(sourceChampion, destinationChampion, ability);
+	applyAbility(context->server, sourceChampion, destinationChampion, ability);
 }
 
 void handleRunaway(command_context_t* context) {
@@ -114,6 +113,11 @@ void handleFlee(command_context_t* context) {
 	}
 
 	champion->fleeing = true;
+	char reason[200];
+	sprintf(reason, "ordre de %s", pawn->name);
+	champion_event_args_t args = { .champion = champion, .reason = reason };
+	event_t event = MAKE_EVENT(EVENT_CHAMPION_FLEE, &args);
+	notifyFight(context->server, fight, &event);
 }
 
 void* combatCommandHandler(void* arg) {

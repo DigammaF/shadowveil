@@ -21,6 +21,7 @@ struct item_t;
 struct champion_t;
 struct use_t;
 struct fight_t;
+struct ability_t;
 
 typedef struct pawn_t {
     char* name;
@@ -41,6 +42,7 @@ typedef struct pawn_t {
 	void* properties; // structure qui regroupe les données nécessaires à la différenciation de fonction
 } pawn_t;
 
+/** si le verbe se termine par ED, l'évènement est envoyé après l'effet. sinon, il est envoyé avant */
 typedef enum {
 	EVENT_SETCONTEXT, // setcontext_event_args_t
 	EVENT_POPCONTEXT, // popcontext_event_args_t
@@ -56,6 +58,10 @@ typedef enum {
 	EVENT_CHAMPION_LOST, // champion_event_args_t
 	EVENT_ITEM_GAINED, // item_event_args_t
 	EVENT_ITEM_LOST, // item_event_args_t
+	EVENT_CHAMPION_ABILITY_USE, // champion_ability_event_args_t
+	EVENT_CHAMPION_FLEE, // champion_event_args_t
+	EVENT_CHAMPION_GET_INITIATIVE, // champion_event_args_t
+	EVENT_PAWN_RUNAWAY, // pawn_event_args_t
 } event_type_t;
 
 typedef struct event_t {
@@ -91,6 +97,7 @@ void notifyItemRemoved(struct server_t* server, pawn_t* pawn, struct item_t* ite
 void notifyPawnUpdate(struct server_t* server, pawn_t* pawn);
 void notifySetContext(struct server_t* server, pawn_t* pawn, context_t context, function_t newHandler);
 void notifyPopContext(struct server_t* server, pawn_t* pawn);
+
 /** opérations routinières */
 void updatePawn(struct server_t* server, pawn_t* pawn);
 
@@ -103,6 +110,13 @@ void updatePawn(struct server_t* server, pawn_t* pawn);
 void sendPawnEvent(struct server_t* server, pawn_t* pawn, event_t* event);
 
 void changePawnGold(struct server_t* server, pawn_t* pawn, int delta, char* reason);
+
+// ---------------------------------------------------------------------------------------------------------------------------------------
+
+typedef struct champion_ability_event_args_t {
+	struct champion_t* champion;
+	struct ability_t* ability;
+} champion_ability_event_args_t;
 
 typedef struct update_event_args_t { } update_event_args_t;
 
