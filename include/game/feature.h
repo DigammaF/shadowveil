@@ -14,6 +14,7 @@ struct place_t;
 typedef struct feature_t {
     char* name;
     function_t interactionHandler; // appelé avec (interaction_t*), indique la réaction d'un pion aux évènements de jeu
+	void* properties;
 	unsigned placeKey;
 	struct place_t* place; // can be NULL
 	/**

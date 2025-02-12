@@ -14,7 +14,7 @@ typedef struct place_t {
     char* name;
     hashmap_t links; // link_t*, possède la valeur
     hashmap_t pawns; // pawn_t*
-    hashmap_t features; // feature_t*
+    hashmap_t features; // feature_t*, possède la valeur
 } place_t;
 
 typedef struct link_t {
