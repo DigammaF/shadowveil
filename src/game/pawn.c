@@ -136,5 +136,10 @@ void changePawnGold(server_t* server, pawn_t* pawn, int delta, char* reason) {
 }
 
 void updatePawn(struct server_t* server, pawn_t* pawn) {
+	int newExhaustion = pawn->exhaustion - EXHAUSTION_REFILL_RATE*server->deltaTime;
+	pawn->exhaustion = newExhaustion < 0 ? 0 : newExhaustion;
+	int newGracePeriod = pawn->gracePeriod - GRACE_PERIOD_DEPLETE_RATE*server->deltaTime;
+	pawn->gracePeriod = newGracePeriod < 0 ? 0 : newGracePeriod;
 
+	notifyPawnUpdate(server, pawn);
 }

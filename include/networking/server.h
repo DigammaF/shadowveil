@@ -3,11 +3,13 @@
 #define SERVER_H
 
 #include <time.h>
+#include <stdint.h>
 
 #include "lantern.h"
 #include "stack.h"
 #include "hashmap.h"
 #include "world.h"
+#include <sys/time.h>
 
 struct user_t;
 struct account_t;
@@ -18,8 +20,8 @@ typedef struct server_t {
 	hashmap_t users; // user_t*, possède la valeur
 	hashmap_t accounts; // account_t*, possède la valeur
 	world_t world;
-	time_t deltaTime;
-	time_t lastUpdateTime;
+	uint64_t deltaTime; // us
+	uint64_t lastUpdateTime; // us
 } server_t;
 
 typedef struct command_context_t {

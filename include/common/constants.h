@@ -3,11 +3,14 @@
 #define CONSTANTS_H
 
 #define SERVER_PORT (short)20100
-#define SERVER_TICK 100000 // us
+#define SERVER_TICK (unsigned)500e3 // us
 #define COMMUNICATION_SIZE 4096
 
 #define MAX_LOGIN_SIZE (unsigned)20
 #define MAX_PASSWORD_SIZE (unsigned)20
+
+#define EXHAUSTION_REFILL_RATE 1 // point/us
+#define GRACE_PERIOD_DEPLETE_RATE 1 // point/us
 
 #define WORLD_SEED 555
 

@@ -187,6 +187,12 @@ void removeFightFromWorld(world_t* world, fight_t* fight) {
 }
 
 void updateWorld(struct server_t* server, world_t* world) {
+	for (unsigned n = 0; n < world->pawns.capacity; n++) {
+		pawn_t* pawn = world->pawns.elements[n];
+		if (pawn == NULL) { continue; }
+		updatePawn(server, pawn);
+	}
+
 	for (unsigned n = 0; n < world->fights.capacity; n++) {
 		fight_t* fight = world->fights.elements[n];
 		if (fight == NULL) { continue; }

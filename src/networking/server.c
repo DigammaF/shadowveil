@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
+#include <stdint.h>
 
 #include "server.h"
 #include "lantern.h"
@@ -170,7 +171,9 @@ void handleUserRequest(server_t* server, user_t* user) {
 }
 
 void update(server_t* server) {
-	time_t now = time(NULL);
+	struct timeval timeValue;
+    gettimeofday(&timeValue, NULL);
+	uint64_t now = timeValue.tv_sec*1e6 + timeValue.tv_usec;
 	server->deltaTime = now - server->lastUpdateTime;
 	server->lastUpdateTime = now;
 

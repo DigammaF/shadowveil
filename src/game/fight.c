@@ -9,6 +9,8 @@
 #include "server.h"
 #include "user.h"
 
+#define UNUSED(x) (void)(x)
+
 void initFight(fight_t* fight) {
 	initHashmap(&fight->pawns);
 	initHashmap(&fight->champions);
@@ -103,6 +105,7 @@ void giveInitiative(fight_t* fight) {
 	for (unsigned n = 0; n < fight->champions.capacity; n++) {
 		champion_t* champion = fight->champions.elements[n];
 		if (champion == NULL) { continue; }
+		if (isDead(champion)) { continue; }
 		if (quickest == NULL) { quickest = champion; continue; }
 		if (champion->stats[INTELLIGENCE].value > quickest->stats[INTELLIGENCE].value) {
 			quickest = champion;
@@ -116,6 +119,7 @@ bool anyChampionHasYetToPlay(fight_t* fight) {
 	for (unsigned n = 0; n < fight->champions.capacity; n++) {
 		champion_t* champion = fight->champions.elements[n];
 		if (champion == NULL) { continue; }
+		if (isDead(champion)) { continue; }
 		if (!champion->playedTurn) { return true; }
 	}
 
@@ -126,6 +130,7 @@ bool initiativeChampionHasYetToPlay(fight_t* fight) {
 	for (unsigned n = 0; n < fight->champions.capacity; n++) {
 		champion_t* champion = fight->champions.elements[n];
 		if (champion == NULL) { continue; }
+		if (isDead(champion)) { continue; }
 		if (!champion->playedTurn && champion->hasInitiative) { return true; }
 	}
 
@@ -151,7 +156,14 @@ void applyPawnRunaway(server_t* server, pawn_t* pawn) {
 }
 
 void applyTurn(struct server_t* server, fight_t* fight) {
+	UNUSED(server);
 
+	for (unsigned n = 0; n < fight->champions.capacity; n++) {
+		champion_t* champion = fight->champions.elements[n];
+		if (champion == NULL) { continue; }
+		if (isDead(champion)) { continue; }
+		champion->playedTurn = false;
+	}
 }
 
 unsigned pawnValidChampionCount(fight_t* fight, struct pawn_t* pawn) {
